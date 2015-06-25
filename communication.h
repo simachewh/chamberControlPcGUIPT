@@ -4,14 +4,15 @@
 #include <QObject>
 #include <QtSerialPort/QtSerialPort>
 
-
 class Communication : public QObject
 {
     Q_OBJECT
 private:
     QByteArray *dataReceived;
-    QSerialPort *serial;
 public:
+
+    QSerialPort *serial;
+
     /**
      * @brief openPort Opens the serial port for communication
      * after setting the port settings
@@ -50,12 +51,24 @@ public:
      */
     void setDataReceived(QByteArray bytes);
 
-    // Constructors and destructor
+//    /**
+//     * @brief start function. Starts the communication between pc and
+//     * control box. it checks if communication is in idel mood or
+//     * program rinning using isIdel property of ControlPC class.
+//     */
+//    void startCommunication();
+
+
+    /**
+     * @brief Communication This constructor initializes the QSerialPort object and
+     * @param parent
+     */
     explicit Communication(QObject *parent = 0);
     ~Communication();
 
 signals:
-    void newData(QByteArray);
+    void newData(QByteArray newData);
+    void dataArived();
 public slots:
     QByteArray readData();
 };

@@ -10,14 +10,11 @@ class Chamber : public QWidget
 {
     Q_OBJECT
 private:
-    char *stx;
-    char *ext;
-    char *chkdsk;
-    char *end;
-    char *id1;
-    char *id2;
-    char *chamberMsg;
+    
 public:
+    
+
+    
     explicit Chamber(QWidget *parent = 0);
     ~Chamber();
 

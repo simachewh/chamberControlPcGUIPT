@@ -6,6 +6,7 @@
 #include "chamber.h"
 
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -14,19 +15,43 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->stackedWidget->setCurrentIndex(0);
     ui->monitorButton->setEnabled(false);
-    commun = new Communication();
-    commun->openPort();
-    connect(commun, SIGNAL(newData(QByteArray)), this, SLOT(on_newDataArived(QByteArray)));
 
-    controler = new ControlPC();
+    communication = new Communication();
+    controlerPc = new ControlPC();
+    climateChamber = new Chamber();
 
-    commun->sendData(controler->idelCommand());
+    //! no programs are runing at start up !//
+    ControlPC::isIdel = true;
+
+    //!port is set up and open at startup !//
+    communication->openPort();
+
+    //!connecting new data arival to a method that update the ui !//
+    connect(communication, SIGNAL(newData(QByteArray)), this, SLOT(on_newDataArived(QByteArray)));
+
+
+
+//    if(controlerPc->isIdel){
+//        forever{
+//            communication->sendData(controlerPc->iyCommand());
+//            communication->serial->waitForReadyRead(1000);
+//            communication->sendData(controlerPc->aqCommand());
+//            communication->serial->waitForReadyRead(1000);
+//            communication->sendData(controlerPc->brCommand());
+//            communication->serial->waitForReadyRead(1000);
+//            communication->sendData(controlerPc->idelCommand());
+//        }
+//    }
+
+
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete communication;
+    delete climateChamber;
 }
 
 void MainWindow::on_monitorButton_clicked()
@@ -75,5 +100,21 @@ void MainWindow::on_helpButton_clicked()
 
 void MainWindow::on_newDataArived(QByteArray data)
 {
-    qDebug() << "Data" << data;
+    QString str(data);
+    QStringList list;
+    QString temp, humid;
+
+    if(data.size() > 22){
+        list = str.split(" ");
+        qDebug() << "here" << list[0] << "cut: " << list[0].left(3);
+
+        if(list[0].left(3).endsWith('A', Qt::CaseInsensitive)){
+
+            temp = list[0].mid(4,9);
+            humid = list[2].left(4);
+            this->ui->tempRealValueLabel->setText(temp);
+            this->ui->humidRealValueLabel->setText(humid);
+        }
+
+    }
 }

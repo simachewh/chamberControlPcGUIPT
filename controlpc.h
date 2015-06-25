@@ -3,14 +3,28 @@
 
 #include <QObject>
 
+
+/**
+ * @brief The ControlPC class.
+ * This class holds properties needed to construct the commands
+ * to be written by the control pc to the control box over serial
+ * protocol.
+ * @author Simachew Tibebu
+ */
 class ControlPC : public QObject
 {
     Q_OBJECT
 public:
 //private:
+
+    /**
+     * @brief isIdel holds value true when there is no test program runing.
+     */
+    static bool isIdel;
+
     /**
      * @brief The Anonymous:1 struct holds vlues of hex
-     * I and Y
+     * I and Y.
      */
     struct{
         char i;
@@ -19,7 +33,7 @@ public:
 
     /**
      * @brief The Anonymous:1 struct, holds values of hex
-     * A and Q
+     * A and Q.
      */
     struct{
         char a;
@@ -28,12 +42,28 @@ public:
 
     /**
      * @brief The Anonymous:1 struct, holds values of hex
-     * B and R
+     * B and R.
      */
     struct{
         char b;
         char r;
     }br;
+
+    /**
+     * @brief commandBody Main part of the command that will be
+     * interpreted by the control box.
+     * This will hold data part of the command which latter, start
+     * and end parts can be appended up on to construct full writable command.
+     * Some functions in this class are responsible for the construction of this
+     * command.
+     */
+    QByteArray * commandBody;
+
+    /**
+     * @brief comleteCommand Holds values of the complete
+     * command ready to be written on serial device.
+     */
+    QByteArray *completeCommand;
 
     /**
      * @brief start Represents the STX, start of text, in the serial
@@ -74,25 +104,25 @@ public:
      * H2, H1, T2, T1, P3, P2, P1, LNU each bit representing these
      * components respectively, H2 being HSB and LNU represented by LSB
      */
-    char command1;
+    char commandBlock1;
     /**
      * @brief command2 Represents the second byte of the command block
      * in the serial protocol, each bit representing ?, ?, C1, V4, V3, V2/C2, V1, FAN
      * respectively from HSB to LSB
      */
-    char command2;
+    char commandBlock2;
     /**
      * @brief command3 Represents the third byte of the command block in the serial
      * protocol representing the humidity bar, 8bit high being full and 8bits low being
      * no bars.
      */
-    char command3;
+    char commandBlock3;
     /**
      * @brief command4 Represents the fourth byte in the command block of the serial
      * protocol. Holds bits to represent the temprature bar. 8bits high means full bar
      * and 8bits low means empty bar.
      */
-    char command4;
+    char commandBlock4;
 
 
 //public:
@@ -124,6 +154,10 @@ public:
     QByteArray brCommand();
 
     QByteArray idelCommand();
+
+    QByteArray fullCommand();
+
+
 
 signals:
 

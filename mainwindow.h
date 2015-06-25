@@ -6,6 +6,7 @@
 
 #include "controlpc.h"
 #include "communication.h"
+#include "chamber.h"
 
 
 namespace Ui {
@@ -34,8 +35,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    ControlPC *controler;
-    Communication *commun;
+    ControlPC *controlerPc;
+    Communication *communication;
+    Chamber *climateChamber;
 };
 
 #endif // MAINWINDOW_H
