@@ -4,12 +4,19 @@
 #include <QObject>
 #include <QtSerialPort/QtSerialPort>
 
+#include "controlpc.h"
+#include "chamber.h"
+
 class Communication : public QObject
 {
     Q_OBJECT
 private:
     QByteArray *dataReceived;
+
 public:
+
+    ControlPC *controlParams;
+    Chamber *chamberParams;
 
     QSerialPort *serial;
 
@@ -17,14 +24,21 @@ public:
      * @brief openPort Opens the serial port for communication
      * after setting the port settings
      */
-    void openPort();
+    bool openPort();
 
     /**
      * @brief sendData tries to send data given to it over the serial port
      */
     void sendData(const QByteArray);
 
-    // Getters and setters
+    /**
+     * @brief start function. Starts the communication between pc and
+     * control box. it checks if communication is in idel mood or
+     * program rinning using isIdel property of ControlPC class.
+     */
+    void startIdelCommunication(); //! TO DO: NOT USED CURRENTLY !//
+
+    //! ***************** Getters and setters ***************** !//
     /** Returns the pointer to the property of type QSerialPort object.
      * @brief Communication::serialPort
      * @return
@@ -51,14 +65,9 @@ public:
      */
     void setDataReceived(QByteArray bytes);
 
-//    /**
-//     * @brief start function. Starts the communication between pc and
-//     * control box. it checks if communication is in idel mood or
-//     * program rinning using isIdel property of ControlPC class.
-//     */
-//    void startCommunication();
 
 
+     //constructors and destructor
     /**
      * @brief Communication This constructor initializes the QSerialPort object and
      * @param parent
@@ -67,10 +76,14 @@ public:
     ~Communication();
 
 signals:
-    void newData(QByteArray newData);
+    void newDataArived(QByteArray newDataArived);
     void dataArived();
+    void idelState(bool);
+    void idelStateChanged(bool);
 public slots:
     QByteArray readData();
+    void on_idelStateChanged();
+    void on_newDataArived(QByteArray newDataArived);
 };
 
 #endif // COMMUN_H

@@ -6,7 +6,6 @@
 #include "chamber.h"
 
 
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,33 +16,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->monitorButton->setEnabled(false);
 
     communication = new Communication();
-    controlerPc = new ControlPC();
-    climateChamber = new Chamber();
 
-    //! no programs are runing at start up !//
-    ControlPC::isIdel = true;
+    //!connection to update chamber's dry temperature change to GUI temperature lable!//
+    connect(communication->chamberParams, SIGNAL(dryTemperatureChanged(QString)),
+            ui->tempRealValueLabel, SLOT(setText(QString)));
 
-    //!port is set up and open at startup !//
-    communication->openPort();
-
-    //!connecting new data arival to a method that update the ui !//
-    connect(communication, SIGNAL(newData(QByteArray)), this, SLOT(on_newDataArived(QByteArray)));
-
-
-
-//    if(controlerPc->isIdel){
-//        forever{
-//            communication->sendData(controlerPc->iyCommand());
-//            communication->serial->waitForReadyRead(1000);
-//            communication->sendData(controlerPc->aqCommand());
-//            communication->serial->waitForReadyRead(1000);
-//            communication->sendData(controlerPc->brCommand());
-//            communication->serial->waitForReadyRead(1000);
-//            communication->sendData(controlerPc->idelCommand());
-//        }
-//    }
-
-
+    //!connection to update chamber's humidity change to GUI humidity lable!//
+    connect(communication->chamberParams, SIGNAL(humidityChanged(QString)),
+            ui->humidRealValueLabel, SLOT(setText(QString)));
 
 }
 
@@ -51,9 +31,12 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete communication;
-    delete climateChamber;
 }
 
+/**
+ * @brief MainWindow::on_monitorButton_clicked slot.
+ * Updates the sacked widet view to monitors perspective.
+ */
 void MainWindow::on_monitorButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(0);
@@ -65,6 +48,10 @@ void MainWindow::on_monitorButton_clicked()
     ui->helpButton->setEnabled(true);
 }
 
+/**
+ * @brief MainWindow::on_programButton_clicked slot.
+ * Updates the stacked widget view to program set perspective.
+ */
 void MainWindow::on_programButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(1);
@@ -76,6 +63,10 @@ void MainWindow::on_programButton_clicked()
     ui->helpButton->setEnabled(true);
 }
 
+/**
+ * @brief MainWindow::on_auxButton_clicked slot.
+ * Update the stacked widget view to aux data perspective.
+ */
 void MainWindow::on_auxButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(2);
@@ -87,6 +78,10 @@ void MainWindow::on_auxButton_clicked()
     ui->helpButton->setEnabled(true);
 }
 
+/**
+ * @brief MainWindow::on_helpButton_clicked slot.
+ * Updates the stacked widget view to help's perspective.
+ */
 void MainWindow::on_helpButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(3);
@@ -98,23 +93,29 @@ void MainWindow::on_helpButton_clicked()
     ui->auxButton->setEnabled(true);
 }
 
+/**
+ * @brief MainWindow::on_newDataArived slot.
+ * @deprecated
+ * @param data
+ */
 void MainWindow::on_newDataArived(QByteArray data)
 {
-    QString str(data);
+
     QStringList list;
     QString temp, humid;
 
-    if(data.size() > 22){
+    if(data.at(2) == 'A'){
+        QString str(data);
         list = str.split(" ");
-        qDebug() << "here" << list[0] << "cut: " << list[0].left(3);
+        //qDebug() << "here" << list[0] << "cut: " << list[0].left(3);
 
-        if(list[0].left(3).endsWith('A', Qt::CaseInsensitive)){
+        //if(list[0].left(3).endsWith('A', Qt::CaseInsensitive)){
 
             temp = list[0].mid(4,9);
             humid = list[2].left(4);
             this->ui->tempRealValueLabel->setText(temp);
             this->ui->humidRealValueLabel->setText(humid);
-        }
+        //}
 
     }
 }

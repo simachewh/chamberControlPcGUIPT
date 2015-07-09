@@ -2,25 +2,36 @@
 #define CHAMBER_H
 
 #include <QWidget>
-/*********************************************************
- ** This class holds properties to represent the blocks in
- ** the message sent from the controllBox
- * */
-class Chamber : public QWidget
+/**
+ * @brief The Chamber class.
+ * This class represents the climate chamber, it holds properties to represnts variables
+ * in the chanber's state.
+ */
+class Chamber : public QObject
 {
     Q_OBJECT
 private:
+    double dryTemperature;
+    double wetTemperature;
+    double humidity;
     
 public:
+    double getDryTemperature();
+    double getWetTemperature();
+    double getHumidity();
     
-
-    
-    explicit Chamber(QWidget *parent = 0);
+    explicit Chamber(QObject *parent = 0);
     ~Chamber();
 
 signals:
+    void dryTemperatureChanged(QString value);
+    void wetTemperatureChanged(QString value);
+    void humidityChanged(QString value);
 
 public slots:
+    void setDryTemprature(double value);
+    void setWetTemprature(double value);
+    void setHumidity(double value);
 };
 
 #endif // CHAMBER_H

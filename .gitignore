@@ -36,3 +36,6 @@ Makefile*
 *.qmlproject.user
 *.qmlproject.user.*
 
+### vim temp files ###
+*.swp
+*.swo

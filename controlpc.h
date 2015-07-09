@@ -14,13 +14,15 @@
 class ControlPC : public QObject
 {
     Q_OBJECT
-public:
-//private:
+
+private:
 
     /**
      * @brief isIdel holds value true when there is no test program runing.
      */
     static bool isIdel;
+
+public:
 
     /**
      * @brief The Anonymous:1 struct holds vlues of hex
@@ -125,8 +127,6 @@ public:
     char commandBlock4;
 
 
-//public:
-
     /**
      * @brief ControllPC This constructor initializes start to HEX 02,
      * end to HEX 0D and the rest of blocks of command to HEX 30
@@ -158,10 +158,16 @@ public:
     QByteArray fullCommand();
 
 
+    //!************getters and setters are defined bellow **************!//
+    bool getIsIdel();
+
+
 
 signals:
+    void idelStateChanged();
 
 public slots:
+    void setIdel(bool idelState);
 };
 
 #endif // CONTROLLPC_H
