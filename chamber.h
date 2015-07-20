@@ -16,6 +16,7 @@ private:
     double humidity;
     
 public:
+    enum command {ACK, B, A, I};
     double getDryTemperature();
     double getWetTemperature();
     double getHumidity();
@@ -27,6 +28,7 @@ signals:
     void dryTemperatureChanged(QString value);
     void wetTemperatureChanged(QString value);
     void humidityChanged(QString value);
+    void chCommandChanged(Chamber::command chCommand);
 
 public slots:
     void setDryTemprature(double value);

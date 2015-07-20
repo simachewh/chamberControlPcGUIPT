@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->monitorButton->setEnabled(false);
 
     communication = new Communication();
-
+    communication->prepCommunication();
     //!connection to update chamber's dry temperature change to GUI temperature lable!//
     connect(communication->chamberParams, SIGNAL(dryTemperatureChanged(QString)),
             ui->tempRealValueLabel, SLOT(setText(QString)));

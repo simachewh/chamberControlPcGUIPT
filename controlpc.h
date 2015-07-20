@@ -20,9 +20,12 @@ private:
     /**
      * @brief isIdel holds value true when there is no test program runing.
      */
-    static bool isIdel;
+    static bool isIdle;
 
 public:
+
+    enum pcCommand {BR, AQ, IY, O = 'O'};
+    enum chCommand {ACK = 0x06, A = 'A', B = 'B', I = 'I'};
 
     /**
      * @brief The Anonymous:1 struct holds vlues of hex
@@ -153,21 +156,23 @@ public:
      */
     QByteArray brCommand();
 
-    QByteArray idelCommand();
+    QByteArray idleCommand();
 
     QByteArray fullCommand();
 
 
     //!************getters and setters are defined bellow **************!//
-    bool getIsIdel();
+    bool getIsIdle();
 
 
 
 signals:
-    void idelStateChanged();
+    void idleStateChanged();
+    void pcCommandChanged(ControlPC::pcCommand pcCommand);
+    void chCommandChanged(ControlPC::chCommand chCommand);
 
 public slots:
-    void setIdel(bool idelState);
+    void setIdle(bool idelState);
 };
 
 #endif // CONTROLLPC_H

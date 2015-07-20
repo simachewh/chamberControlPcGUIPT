@@ -2,7 +2,7 @@
 #include "communication.h"
 #include <QDebug>
 
-bool ControlPC::isIdel = false;
+bool ControlPC::isIdle = false;
 
 ControlPC::ControlPC(QObject *parent) : QObject(parent)
 {
@@ -19,11 +19,6 @@ ControlPC::ControlPC(QObject *parent) : QObject(parent)
     aq.q = 0x71;
     br.b = 0x42;
     br.r = 0x72;
-
-    //setIdel(false);
-
-
-
 }
 
 ControlPC::~ControlPC(){
@@ -65,7 +60,7 @@ QByteArray ControlPC::brCommand(){
     return *commandBr;
 }
 
-QByteArray ControlPC::idelCommand(){
+QByteArray ControlPC::idleCommand(){
 //    QString zeros(20, zero);
 //    commandBody->append(capO);
 //    commandBody->append(zeros);
@@ -92,15 +87,15 @@ QByteArray ControlPC::fullCommand(){
 }
 //! ******* Getters and Setters ********** !//
 
-bool ControlPC::getIsIdel(){
-    return ControlPC::isIdel;
+bool ControlPC::getIsIdle(){
+    return ControlPC::isIdle;
 }
 
 //! ******* SLOTS ********** !//
 
-void ControlPC::setIdel(bool idelState){
-    if(!(getIsIdel() == idelState)){
-        isIdel = idelState;
-        emit idelStateChanged();
+void ControlPC::setIdle(bool idelState){
+    if(!(getIsIdle() == idelState)){
+        isIdle = idelState;
+        emit idleStateChanged();
     }
 }

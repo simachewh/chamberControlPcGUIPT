@@ -1,6 +1,12 @@
 #include "communication.h"
-#include "controlpc.h"
+#include "processtest.h"
 
+QSerialPort *Communication::serial;
+
+Communication::Communication(int a)
+{
+    qDebug() << "entered";
+}
 
 Communication::Communication(QObject *parent) : QObject(parent)
 {
@@ -9,38 +15,37 @@ Communication::Communication(QObject *parent) : QObject(parent)
 
     controlParams = new ControlPC();
     chamberParams = new Chamber();
+    //process = new ProcessTest();
+    processThread = new QThread();
 
+    //process->moveToThread(processThread);
     openPort();
 
-    connect(serial, SIGNAL(readyRead()), this, SLOT(readData()));
+    connect(serial, SIGNAL(readyRead()),
+            this, SLOT(readData()));
 
-    connect(this, SIGNAL(newDataArived(QByteArray)),
-            this, SLOT(on_newDataArived(QByteArray)));
+    connect(this, SIGNAL(newDataArived(QByteArray, ControlPC::chCommand)),
+            this, SLOT(on_newDataArived(QByteArray, ControlPC::chCommand)));
 
-    //connect(controlParams, SIGNAL(idelStateChanged()), this, SLOT(on_idelStateChanged()), Qt::QueuedConnection );
+    connect(controlParams, SIGNAL(idleStateChanged()),
+            this, SLOT(on_idelStateChanged()));
 
-    controlParams->setIdel(true);
+    controlParams->setIdle(true);
+
+    //processThread->start();
+}
+
+void Communication::prepCommunication(){
 
 }
 
 Communication::~Communication(){
+    processThread->quit();
     delete serial;
     delete dataReceived;
-}
-
-// Getters and setters
-
-QSerialPort * Communication::SerialPort(){
-    return this->serial;
-}
-
-
-QByteArray Communication::DataReceived(){
-    return *this->dataReceived;
-}
-
-void Communication::setDataReceived(QByteArray bytes){
-    *this->dataReceived = bytes;
+    delete controlParams;
+    delete chamberParams;
+    delete process;
 }
 
 
@@ -54,14 +59,15 @@ bool Communication::openPort(){
         serial->setStopBits(QSerialPort::OneStop);
         serial->setParity(QSerialPort::NoParity);
 
-        emit idelStateChanged(true);
+        serial->flush();
+
         qDebug() << "port open: " << serial->isOpen() << endl
                  << "Baude: " << serial->baudRate() << endl
                  << "Data bits: " << serial->dataBits() << endl
                  << "Stop Bits: " << serial->stopBits() << endl
                  << "Parity: " << serial->parity();
     }else{
-        open = false;
+        open = serial->isOpen();
     }
 return open;
 
@@ -89,9 +95,21 @@ QByteArray Communication::readData(){
     //QByteArray recievedData;
     *dataReceived->append(serial->readAll());
     QByteArray *end = new QByteArray(1, 0x0D);
+    if(*dataReceived->data() == ControlPC::ACK ){
+        emit newDataArived(*dataReceived, ControlPC::ACK);
+        dataReceived->clear();
+    } else if(dataReceived->endsWith(*end)){
+        char nameOfCommand = dataReceived->at(2);
+        if(nameOfCommand == ControlPC::A){
+            emit newDataArived(*dataReceived, ControlPC::A); //there might be no need to emit datarecieved
+        }else if(nameOfCommand == ControlPC::B){
+            emit newDataArived(*dataReceived, ControlPC::B);
+        }else if(nameOfCommand == ControlPC::I){
+            emit newDataArived(*dataReceived, ControlPC::I);
+        }else{
+            qDebug() << "Unknown data recieved" << *dataReceived;
+        }
 
-    if(dataReceived->endsWith(*end)){
-        emit newDataArived(*dataReceived);
         qDebug() << "before Clear" << *dataReceived;
         dataReceived->clear();
     }
@@ -99,7 +117,7 @@ QByteArray Communication::readData(){
 }
 
 void Communication::on_idelStateChanged(){
-    bool isIdel = controlParams->getIsIdel();
+    bool isIdel = controlParams->getIsIdle();
     if(isIdel){
         qDebug() << "state changed: " << isIdel;
         startIdelCommunication();
@@ -108,11 +126,13 @@ void Communication::on_idelStateChanged(){
     }
 }
 
-void Communication::on_newDataArived(QByteArray newDataArived){
+void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::chCommand command){
     QStringList list;
     double temp, humid;
 
-    if(newDataArived.at(2) == 'A'){
+    if(command == ControlPC::ACK){
+        sendData(controlParams->brCommand());
+    }else if(command == ControlPC::A){
         QString str(newDataArived);
         list = str.split(" ");
 
@@ -121,24 +141,23 @@ void Communication::on_newDataArived(QByteArray newDataArived){
 
         chamberParams->setDryTemprature(temp);
         chamberParams->setHumidity(humid);
+
+        sendData(controlParams->iyCommand());
+    }else if (command == ControlPC::B){
+        sendData(controlParams->aqCommand());
+    }else if (command == ControlPC::I){
+        sendData(controlParams->idleCommand());
+    }else{
+
     }
 }
 
 //! end of SLOTS implementaion !//
 
-void Communication::startIdelCommunication(){
-    //QEventLoop loop;
-    qDebug() << "startIdelCommunication(): entered";
-    while(controlParams->getIsIdel()){
-        QCoreApplication::processEvents();
-               sendData(controlParams->iyCommand());
-               serial->waitForReadyRead(1000);
-               sendData(controlParams->aqCommand());
-               sendData(controlParams->brCommand());
-               sendData(controlParams->idelCommand());
 
-       }
-    //loop.exec();
+void Communication::startIdelCommunication(){
+    qDebug() << "startIdelCommunication(): entered";
+    sendData(controlParams->idleCommand());
 }
 
 

@@ -3,7 +3,7 @@
 Process::Process(QObject *parent) : QObject(parent)
 {
     controlerParams = new ControlPC();
-    communication = new Communication();
+    communication = new Communication(parent);
     climateChamber = new Chamber();
 
     //! no programs are runing at start up !//

@@ -7,18 +7,24 @@
 #include "controlpc.h"
 #include "chamber.h"
 
+class ProcessTest;
+
 class Communication : public QObject
 {
     Q_OBJECT
 private:
     QByteArray *dataReceived;
+    QThread *processThread;
+    ProcessTest *process;
 
 public:
 
     ControlPC *controlParams;
     Chamber *chamberParams;
 
-    QSerialPort *serial;
+   static QSerialPort *serial;
+
+    //! ******************* public functions ****************** !//
 
     /**
      * @brief openPort Opens the serial port for communication
@@ -38,52 +44,29 @@ public:
      */
     void startIdelCommunication(); //! TO DO: NOT USED CURRENTLY !//
 
-    //! ***************** Getters and setters ***************** !//
-    /** Returns the pointer to the property of type QSerialPort object.
-     * @brief Communication::serialPort
-     * @return
-     */
-    QSerialPort * SerialPort();
+    void prepCommunication();
 
-    /**
-     * @brief setSerialPort sets the value pointed by the property serial to the
-     * given QSerialPort
-     * @param port
-     */
-    void setSerialPort(QSerialPort port);
-
-    /** Returns the value pointed to by the dataRecieved property of Communication class.
-     * @brief Communication::DataReceived
-     * @return
-     */
-    QByteArray DataReceived();
-
-    /**
-     * @brief setDataReceived Sets the value pointed by the property dataReceived to the
-     * given QByteArray.
-     * @param bytes
-     */
-    void setDataReceived(QByteArray bytes);
+     //! ******************* end of public functions ****************** !//
 
 
-
-     //constructors and destructor
+     //! *************** constructors and destructor **************** !//
     /**
      * @brief Communication This constructor initializes the QSerialPort object and
      * @param parent
      */
     explicit Communication(QObject *parent = 0);
+    explicit Communication(int a);
     ~Communication();
 
 signals:
-    void newDataArived(QByteArray newDataArived);
-    void dataArived();
+    void newDataArived(QByteArray newDataArived, ControlPC::chCommand);
+    void dataArived(QByteArray);
     void idelState(bool);
     void idelStateChanged(bool);
 public slots:
     QByteArray readData();
     void on_idelStateChanged();
-    void on_newDataArived(QByteArray newDataArived);
+    void on_newDataArived(QByteArray newDataArived, ControlPC::chCommand);
 };
 
 #endif // COMMUN_H
