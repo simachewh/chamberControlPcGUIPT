@@ -35,6 +35,9 @@ private slots:
 private:
     Ui::MainWindow *ui;
     Communication *communication;
+
+    enum {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
+
 };
 
 #endif // MAINWINDOW_H

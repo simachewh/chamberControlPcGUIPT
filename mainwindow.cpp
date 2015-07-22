@@ -39,7 +39,7 @@ MainWindow::~MainWindow()
  */
 void MainWindow::on_monitorButton_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(MONITOR_INDEX);
     ui->monitorButton->setEnabled(false);
     ui->titleLabel->setText("<h3>Monitor</h3>");
 
@@ -54,7 +54,7 @@ void MainWindow::on_monitorButton_clicked()
  */
 void MainWindow::on_programButton_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->stackedWidget->setCurrentIndex(PROGRAM_INDEX);
     ui->programButton->setEnabled(false);
     ui->titleLabel->setText("<h3>Program Set</h3>");
 
@@ -69,7 +69,7 @@ void MainWindow::on_programButton_clicked()
  */
 void MainWindow::on_auxButton_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(2);
+    ui->stackedWidget->setCurrentIndex(AUX_INDEX);
     ui->auxButton->setEnabled(false);
     ui->titleLabel->setText("<h3>Aux Data</h3>");
 
@@ -84,7 +84,7 @@ void MainWindow::on_auxButton_clicked()
  */
 void MainWindow::on_helpButton_clicked()
 {
-    ui->stackedWidget->setCurrentIndex(3);
+    ui->stackedWidget->setCurrentIndex(HELP_INDEX);
     ui->helpButton->setEnabled(false);
     ui->titleLabel->setText("<h3>Help</h3>");
 
