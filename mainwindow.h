@@ -3,11 +3,13 @@
 
 
 #include <QMainWindow>
+#include <QFileSystemModel>
 
 #include "controlpc.h"
 #include "communication.h"
 #include "chamber.h"
 #include "process.h"
+#include "addprogram.h"
 
 
 namespace Ui {
@@ -30,11 +32,15 @@ private slots:
 
     void on_programButton_clicked();
 
-    void on_newDataArived(QByteArray data);
+    void on_newProgramButton_clicked();
+
+public slots:
+    void populateProgramsList();
 
 private:
     Ui::MainWindow *ui;
     Communication *communication;
+    AddProgram *ap;
 
     enum {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
 

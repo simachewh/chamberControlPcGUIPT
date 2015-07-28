@@ -11,11 +11,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    communication = new Communication();
+    ap = new AddProgram();
 
     ui->stackedWidget->setCurrentIndex(0);
     ui->monitorButton->setEnabled(false);
 
-    communication = new Communication();
+
     communication->prepCommunication();
     //!connection to update chamber's dry temperature change to GUI temperature lable!//
     connect(communication->chamberParams, SIGNAL(dryTemperatureChanged(QString)),
@@ -61,6 +63,8 @@ void MainWindow::on_programButton_clicked()
     ui->monitorButton->setEnabled(true);
     ui->auxButton->setEnabled(true);
     ui->helpButton->setEnabled(true);
+
+    populateProgramsList();
 }
 
 /**
@@ -93,29 +97,29 @@ void MainWindow::on_helpButton_clicked()
     ui->auxButton->setEnabled(true);
 }
 
-/**
- * @brief MainWindow::on_newDataArived slot.
- * @deprecated
- * @param data
- */
-void MainWindow::on_newDataArived(QByteArray data)
+
+void MainWindow::on_newProgramButton_clicked()
 {
+    ap->show();
+}
 
-    QStringList list;
-    QString temp, humid;
+//! ****************** PUBLIC SLOTS *************** !//
 
-    if(data.at(2) == 'A'){
-        QString str(data);
-        list = str.split(" ");
-        //qDebug() << "here" << list[0] << "cut: " << list[0].left(3);
+void MainWindow::populateProgramsList(){
+    QFileSystemModel *programsListModel = new QFileSystemModel();
+    programsListModel->setFilter(QDir::Files);
+    ui->programsTableView->setModel(programsListModel);
 
-        //if(list[0].left(3).endsWith('A', Qt::CaseInsensitive)){
+    ui->programsTableView->setAlternatingRowColors(true);
+    ui->programsTableView->setColumnHidden(1, true);
+    ui->programsTableView->setColumnHidden(2, true);
 
-            temp = list[0].mid(4,9);
-            humid = list[2].left(4);
-            this->ui->tempRealValueLabel->setText(temp);
-            this->ui->humidRealValueLabel->setText(humid);
-        //}
 
-    }
+    //programsListModel
+    programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
+
+    ui->programsTableView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
+
+
+
 }

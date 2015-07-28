@@ -15,10 +15,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
 
     controlParams = new ControlPC();
     chamberParams = new Chamber();
-    //process = new ProcessTest();
-    processThread = new QThread();
 
-    //process->moveToThread(processThread);
     openPort();
 
     connect(serial, SIGNAL(readyRead()),
@@ -31,8 +28,6 @@ Communication::Communication(QObject *parent) : QObject(parent)
             this, SLOT(on_idelStateChanged()));
 
     controlParams->setIdle(true);
-
-    //processThread->start();
 }
 
 void Communication::prepCommunication(){
@@ -40,12 +35,10 @@ void Communication::prepCommunication(){
 }
 
 Communication::~Communication(){
-    processThread->quit();
     delete serial;
     delete dataReceived;
     delete controlParams;
     delete chamberParams;
-    delete process;
 }
 
 

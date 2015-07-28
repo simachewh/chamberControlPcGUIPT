@@ -2,6 +2,9 @@
 #define DATABACKUP_H
 
 #include <QObject>
+#include <QFile>
+#include <QDir>
+#include <QFileInfo>
 
 #include "program.h"
 #include "step.h"
@@ -10,17 +13,26 @@ class DataBackup : public QObject
 {
     Q_OBJECT
 public:
+    static const QString PROGRAMS_DIR_PATH;
+
+    void checkDir(QString name);
+
     explicit DataBackup(QObject *parent = 0);
 
-    static bool saveProgram(Program p);
+    bool saveProgram(Program *p);
 
-    static Program loadProgram(QString programName);
+    Program loadProgram(QString programName);
 
-    static QStringList listPrograms();
+    QFileInfoList listPrograms();
+
+private:
+    static const QString PROGRAMS_DIR_NAME;
 
 signals:
+    void dirNotFound(QString dirName);
 
 public slots:
+    bool createDir(QString dirName);
 };
 
 #endif // DATABACKUP_H
