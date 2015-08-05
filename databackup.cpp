@@ -33,8 +33,11 @@ bool DataBackup::saveProgram(Program *p){
     return programSaved;
 }
 
-QFileInfoList DataBackup::listPrograms(){
-
+QFileSystemModel * DataBackup::listPrograms(){
+    QFileSystemModel *programsListModel = new QFileSystemModel();
+    programsListModel->setFilter(QDir::Files);
+    programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
+    return programsListModel;
 }
 
 

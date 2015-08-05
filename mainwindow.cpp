@@ -12,11 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     communication = new Communication();
-    ap = new AddProgram();
+    ap = new AddProgram(parent);
 
-    ui->stackedWidget->setCurrentIndex(0);
-    ui->monitorButton->setEnabled(false);
-
+    initStyle();
 
     communication->prepCommunication();
     //!connection to update chamber's dry temperature change to GUI temperature lable!//
@@ -27,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->chamberParams, SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
+    connect(ui->newProgramButton, SIGNAL(clicked()), ap, SLOT(show()));
 }
 
 MainWindow::~MainWindow()
@@ -43,7 +42,7 @@ void MainWindow::on_monitorButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(MONITOR_INDEX);
     ui->monitorButton->setEnabled(false);
-    ui->titleLabel->setText("<h3>Monitor</h3>");
+    this->setWindowTitle("Climate Chamber - Monitor");
 
     ui->auxButton->setEnabled(true);
     ui->programButton->setEnabled(true);
@@ -58,7 +57,7 @@ void MainWindow::on_programButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(PROGRAM_INDEX);
     ui->programButton->setEnabled(false);
-    ui->titleLabel->setText("<h3>Program Set</h3>");
+    this->setWindowTitle("Climate Chamber - Program Set");
 
     ui->monitorButton->setEnabled(true);
     ui->auxButton->setEnabled(true);
@@ -75,7 +74,7 @@ void MainWindow::on_auxButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(AUX_INDEX);
     ui->auxButton->setEnabled(false);
-    ui->titleLabel->setText("<h3>Aux Data</h3>");
+    this->setWindowTitle("Climate Chamber - Aux Data");
 
     ui->monitorButton->setEnabled(true);
     ui->programButton->setEnabled(true);
@@ -90,7 +89,7 @@ void MainWindow::on_helpButton_clicked()
 {
     ui->stackedWidget->setCurrentIndex(HELP_INDEX);
     ui->helpButton->setEnabled(false);
-    ui->titleLabel->setText("<h3>Help</h3>");
+    this->setWindowTitle("Climate Chamber - Help");
 
     ui->monitorButton->setEnabled(true);
     ui->programButton->setEnabled(true);
@@ -98,19 +97,18 @@ void MainWindow::on_helpButton_clicked()
 }
 
 
-void MainWindow::on_newProgramButton_clicked()
-{
-    ap->show();
-}
-
 //! ****************** PUBLIC SLOTS *************** !//
 
 void MainWindow::populateProgramsList(){
     QFileSystemModel *programsListModel = new QFileSystemModel();
     programsListModel->setFilter(QDir::Files);
+
     ui->programsTableView->setModel(programsListModel);
+    ui->programsTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->programsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     ui->programsTableView->setAlternatingRowColors(true);
+    ui->programsTableView->setWordWrap(true);
     ui->programsTableView->setColumnHidden(1, true);
     ui->programsTableView->setColumnHidden(2, true);
 
@@ -120,6 +118,10 @@ void MainWindow::populateProgramsList(){
 
     ui->programsTableView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
 
+}
 
+void MainWindow::initStyle(){
+
+    ui->monitorButton->clicked(true);
 
 }

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QFile>
 #include <QDir>
-#include <QFileInfo>
+#include <QFileSystemModel>
 
 #include "program.h"
 #include "step.h"
@@ -23,7 +23,7 @@ public:
 
     Program loadProgram(QString programName);
 
-    QFileInfoList listPrograms();
+    QFileSystemModel* listPrograms();
 
 private:
     static const QString PROGRAMS_DIR_NAME;

@@ -58,4 +58,5 @@ signals:
 public slots:
 };
 
+Q_DECLARE_METATYPE(Step*)
 #endif // STEP_H

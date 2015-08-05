@@ -32,7 +32,7 @@ private slots:
 
     void on_programButton_clicked();
 
-    void on_newProgramButton_clicked();
+    void initStyle();
 
 public slots:
     void populateProgramsList();

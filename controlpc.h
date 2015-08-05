@@ -176,3 +176,4 @@ public slots:
 };
 
 #endif // CONTROLLPC_H
+//correction is a must
