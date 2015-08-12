@@ -62,14 +62,58 @@ void Step::setMinutes(int value){
     }
 }
 
-Step::WaitState Step::getWaiting() const{
+int Step::getWaiting() const{
     return waiting;
 }
 
-void Step::setWaiting(Step::WaitState value){
+void Step::setWaiting(int value){
     if(waiting != value){
         waiting = value;
         emit waitingChanged(value);
+    }
+}
+
+int Step::getHR() const{
+    return hR;
+}
+
+void Step::setHR(int value){
+    if(hR != value){
+        hR = value;
+        emit hRChanged(value);
+    }
+}
+
+int Step::getOne() const {
+    return one;
+}
+
+int Step::getTwo() const{
+    return two;
+}
+
+int Step::getThree() const{
+    return three;
+}
+
+void Step::setOne(int value){
+    if(one != value){
+        one = value;
+        emit oneChanged(value);
+    }
+}
+
+void Step::setTwo(int value){
+    if(two != value){
+        two = value;
+        emit twoChanged(value);
+    }
+}
+
+void Step::setThree(int value){
+    if(three != value){
+        three = value;
+        emit threeChanged(value);
     }
 }
 

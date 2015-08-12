@@ -5,6 +5,8 @@
 #include <QFile>
 #include <QDir>
 #include <QFileSystemModel>
+#include <QTextStream>
+#include <QDataStream>
 
 #include "program.h"
 #include "step.h"
@@ -25,8 +27,11 @@ public:
 
     QFileSystemModel* listPrograms();
 
+    bool programExists(QString name);
+
 private:
     static const QString PROGRAMS_DIR_NAME;
+    static const QString FILE_EXT;
 
 signals:
     void dirNotFound(QString dirName);

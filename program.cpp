@@ -25,6 +25,7 @@ void Program::setProgramName(QString name){
         programName = name;
         emit programNameChanged(name);
     }
+
 }
 
 int Program::getCycle() const{
@@ -58,4 +59,14 @@ void Program::setSteps(QMap<int, Step *> value){
         steps = value;
         emit stepsChanged();
     }
+}
+
+int Program::addStep(Step *s){
+    int insertIndex = steps.size() + 1;
+    steps.insert(insertIndex, s);
+    int stepsSize = steps.size();
+    if(insertIndex == stepsSize){
+        emit stepsChanged();
+    }
+    return stepsSize;
 }

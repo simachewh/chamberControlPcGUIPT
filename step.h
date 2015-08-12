@@ -32,10 +32,31 @@ public:
 
     void setMinutes(int value);
 
-    Step::WaitState getWaiting() const;
+    int getWaiting() const;
 
-    void setWaiting(WaitState value);
+    void setWaiting(int value);
 
+    int getHR() const;
+
+    void setHR(int value);
+
+    int getOne() const;
+
+    int getTwo() const;
+
+    int getThree() const;
+
+    void setOne(int value);
+
+    void setTwo(int value);
+
+    void setThree(int value);
+    //!*************** END OF GETTERS AND SETTERS **************!//
+    /**
+     * @brief operator == . Overloaded operator
+     * @param step
+     * @return
+     */
     bool operator ==(const Step &step);
 
 private:
@@ -45,7 +66,12 @@ private:
     double humidity;
     double hours;
     double minutes;
-    WaitState waiting;
+    int waiting;
+
+    int hR;
+    int one;
+    int two;
+    int three;
 
 signals:
     void stepNumberChanged(int);
@@ -53,7 +79,12 @@ signals:
     void humidityChanged(double);
     void hoursChanged(int);
     void minutesChanged(int);
-    void waitingChanged(WaitState);
+    void waitingChanged(int);
+
+    void hRChanged(int);
+    void oneChanged(int);
+    void twoChanged(int);
+    void threeChanged(int);
 
 public slots:
 };

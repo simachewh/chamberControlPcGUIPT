@@ -34,13 +34,15 @@ private slots:
 
     void initStyle();
 
+    void on_newProgramButton_clicked();
+
 public slots:
     void populateProgramsList();
 
 private:
     Ui::MainWindow *ui;
     Communication *communication;
-    AddProgram *ap;
+    //AddProgram *ap;
 
     enum {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
 

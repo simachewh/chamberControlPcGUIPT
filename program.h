@@ -34,6 +34,8 @@ public:
 
     void setSteps(const QMap<int, Step *> value);
 
+    int addStep(Step* s);
+
 private:
     QString programName;
     int point;

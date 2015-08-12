@@ -17,7 +17,7 @@
    <iconset>
     <normaloff>../../../../../Downloads/technobothnia_logo.png</normaloff>../../../../../Downloads/technobothnia_logo.png</iconset>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -37,7 +37,11 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="programNameEdit"/>
+       <widget class="QLineEdit" name="programNameEdit">
+        <property name="maxLength">
+         <number>25</number>
+        </property>
+       </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="cycleLabel">

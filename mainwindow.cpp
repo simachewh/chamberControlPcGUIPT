@@ -12,7 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     communication = new Communication();
-    ap = new AddProgram(parent);
 
     initStyle();
 
@@ -25,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->chamberParams, SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
-    connect(ui->newProgramButton, SIGNAL(clicked()), ap, SLOT(show()));
+    //connect(ui->newProgramButton, SIGNAL(clicked()), ap, SLOT(show()));
 }
 
 MainWindow::~MainWindow()
@@ -103,20 +102,11 @@ void MainWindow::populateProgramsList(){
     QFileSystemModel *programsListModel = new QFileSystemModel();
     programsListModel->setFilter(QDir::Files);
 
-    ui->programsTableView->setModel(programsListModel);
-    ui->programsTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->programsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->programsListView->setModel(programsListModel);
+    ui->programsListView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    ui->programsTableView->setAlternatingRowColors(true);
-    ui->programsTableView->setWordWrap(true);
-    ui->programsTableView->setColumnHidden(1, true);
-    ui->programsTableView->setColumnHidden(2, true);
-
-
-    //programsListModel
+    ui->programsListView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
     programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
-
-    ui->programsTableView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
 
 }
 
@@ -124,4 +114,12 @@ void MainWindow::initStyle(){
 
     ui->monitorButton->clicked(true);
 
+}
+
+void MainWindow::on_newProgramButton_clicked()
+{
+    AddProgram *ap = new AddProgram();
+    ap->setAttribute(Qt::WA_DeleteOnClose);
+    ap->setModal(true);
+    ap->show();
 }
