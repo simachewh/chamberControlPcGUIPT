@@ -32,7 +32,7 @@ private:
     Ui::AddStep *ui;
     /**
      * @brief initStyle funciton to make initial styles when the add
-     * step widget is created.
+     * step dialogue is created.
      */
     void initStyle();
 };

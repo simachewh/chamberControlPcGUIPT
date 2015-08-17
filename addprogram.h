@@ -30,6 +30,10 @@ signals:
 private slots:
     void on_saveButton_clicked();
 
+    /**
+     * @brief initStyle function to setup initial styles before while creating
+     * the add program dialogue.
+     */
     void initStyle();
 
     /**
@@ -44,10 +48,12 @@ private slots:
     void on_addStepButton_clicked();
 
     /**
-     * @brief on_stepFormSubmited slot handels the form submitted up on
+     * @brief on_stepFormSubmited this slot handels the form submitted up on
      * adding a step to a program. It creates a step object, initializes
-     * it with the given params, and add it to the steps map of the
-     * program adding this step.
+     * it with the given params, then calls the addStep(Step *step) function
+     * that will add the step to the steps map of the program which inturn will make
+     * a call to writeStepToFile function of the DataBackup class to append the step
+     * to a file where the program is stored.
      * @param temp
      * @param humid
      * @param hrs
@@ -61,6 +67,19 @@ private slots:
     void on_stepFormSubmited(QString temp, QString humid, QString hrs,
                    QString mins, QString wait, QString hr,
                    QString one, QString two, QString three);
+
+//    bool addStep(QString name, Step * step);
+
+//    bool addStep(Program * prgm, Step *step);
+    /**
+     * @brief addStep adds this step to the steps map of the current program
+     * at the index of step->stepNumber, and makes a call to the writeStepToFile
+     * function fo the DataBackup class to append the step to a file where the
+     * program is being stored.
+     * @param step
+     * @return
+     */
+    bool addStep(Step *step);
 
 private:
     Ui::AddProgram *ui;

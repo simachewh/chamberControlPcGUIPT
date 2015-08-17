@@ -28,35 +28,20 @@ AddProgram::~AddProgram()
 
 void AddProgram::on_saveButton_clicked()
 {
-    Program *p = new Program();
+//    Program *p = new Program();
 
 
-    QString programName = ui->programNameEdit->text();
-    p->setProgramName(programName);
-    DataBackup *db = new DataBackup();
-    db->saveProgram(p);
-    qDebug() << "saved Program " << p->getProgramName();
+//    QString programName = ui->programNameEdit->text();
+//    p->setProgramName(programName);
+//    DataBackup *db = new DataBackup();
+//    db->saveProgram(p);
+//    qDebug() << "saved Program " << p->getProgramName();
 
     this->close();
 }
 
 void AddProgram::initStyle(){
     ui->cycleEdit->setValidator(new QIntValidator(1, 100, this));
-    //ui->programNameEdit->setValidator();
-
-//    Step *s1 = new Step();
-//    s1->setTemperature(25); s1->setHumidity(50); s1->setHours(1); s1->setMinutes(20);
-//    s1->setStepNumber(1); s1->setWaiting(Step::WAIT);
-//    QVariant variant;
-//    variant.setValue(s1);
-
-//    QStandardItemModel *model = new QStandardItemModel();
-//    QStandardItem *parentItem = model->invisibleRootItem();
-//    QStandardItem *item = new QStandardItem();
-//    item->setData(QVariant::fromValue(s1));
-//    parentItem->appendRow(item);
-
-//    ui->tableView->setModel(model);
 }
 
 void AddProgram::on_addStepButton_clicked()
@@ -121,14 +106,49 @@ void AddProgram::on_stepFormSubmited(QString temp, QString humid, QString hrs,
     s->setOne(one.toInt());
     s->setTwo(two.toInt());
     s->setThree(three.toInt());
-    p->addStep(s);
+    s->setStepNumber(p->getSteps().size() + 1);
+
+    addStep(s);
     qDebug() <<"sTEPS SIZE" <<  p->getSteps().size();
     QMap<int, Step*> st = p->getSteps();
     foreach (Step *s, st) {
         qDebug() << s->getTemperature();
     }
-    //how to add the step to the program?????????????
-    //! steps map is expecting to recive a poiunter to a step not a copy, so make
-    //! the step object local
 
 }
+
+bool AddProgram::addStep(Step *step)
+{
+    bool isAdded = false;
+    DataBackup *dbkp = new DataBackup();
+
+    QString prgmName = p->getProgramName();
+    p->getSteps().insert(p->getSteps().size() + 1, step);
+
+    QString path = dbkp->fileLives(DataBackup::PRGM, prgmName);
+    QFile prgmFile(path);
+
+    if(path.isEmpty()){
+        isAdded = false;
+        return isAdded;
+    }
+
+    p->addStep(step);
+    dbkp->writeStepToFile(step, p);
+
+    return isAdded;
+}
+
+//bool AddProgram::addStep(Program *prgm, Step *step)
+//{
+//    bool isAdded = false;
+
+//    return isAdded;
+//}
+
+//bool AddProgram::addStep(QString name, Step *step)
+//{
+//    bool isAded = false;
+
+//    return isAded;
+//}
