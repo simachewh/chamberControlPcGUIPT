@@ -28,6 +28,8 @@ private slots:
      */
     void on_addButton_clicked();
 
+    void on_cancelButton_clicked();
+
 private:
     Ui::AddStep *ui;
     /**
@@ -35,6 +37,11 @@ private:
      * step dialogue is created.
      */
     void initStyle();
+
+    /**
+     * @brief clearFields clears the contents of the form fields.
+     */
+    void clearFields();
 };
 
 #endif // ADDSTEP_H

@@ -7,13 +7,15 @@ AddStep::AddStep(QWidget *parent) :
 {
     ui->setupUi(this);
     initStyle();
-    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
+    //connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(close()));
 }
 
 AddStep::~AddStep()
 {
     delete ui;
 }
+
+//! ********************** PRIVATE FUNCTIONS ************ !//
 
 void AddStep::initStyle(){
     ui->hoursEdit->setValidator(new QIntValidator(0, 100, this));
@@ -26,6 +28,22 @@ void AddStep::initStyle(){
     ui->twoEdit->setValidator(new QIntValidator(0, 1, this));
     ui->threeEdit->setValidator(new QIntValidator(0, 1, this));
 }
+
+void AddStep::clearFields()
+{
+    ui->tempEdit->clear();
+    ui->humidityEdit->clear();
+    ui->hoursEdit->clear();
+    ui->minutesEdit->clear();
+    ui->waitEdit->clear();
+    ui->hrEdit->clear();
+    ui->oneEdit->clear();
+    ui->twoEdit->clear();
+    ui->threeEdit->clear();
+}
+
+//! ********************** END OF PRIVATE FUNCTIONS *********** !//
+
 
 //! ********************** PRIVATE SLOTS ********************** !//
 
@@ -54,7 +72,14 @@ void AddStep::on_addButton_clicked()
     QString three = ui->threeEdit->text();
     if(three.isEmpty()) three = "0";
     emit stepFormSubmitted(temp, humid, hrs, mins, wait, hr, one, two, three);
+    clearFields();
 }
 
 
 
+
+void AddStep::on_cancelButton_clicked()
+{
+    clearFields();
+    this->close();
+}

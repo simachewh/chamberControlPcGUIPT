@@ -54,33 +54,50 @@ void AddProgram::on_addStepButton_clicked()
     }
 
 
-   QString pName = ui->programNameEdit->text();
+    QString pName = ui->programNameEdit->text();
     pName = pName.trimmed();
     QString cycle = ui->cycleEdit->text();
     cycle = cycle.trimmed();
     int cy = cycle.toInt();
     QMessageBox::StandardButton reply;
+    DataBackup *dB = new DataBackup();
 
 //! check if a program by that name exists and deal with it accordingly !//
-    DataBackup *dB = new DataBackup();
+
     bool pLives = dB->programExists(pName);
+    //!if this program is saved in file
     if(pLives)
     {
-        QString text = "Program by the name " + pName + " already exists.\n"
-                                          "Do you want to replace it?";
-        reply = QMessageBox::question(this, "Warning", text,
-                              QMessageBox::Yes | QMessageBox::No,
-                                      QMessageBox::No);
-
-        if(reply == QMessageBox::Yes)
+        //! and if the program to be added is not the current program
+        if(p->getProgramName() != pName && p->getCycle() != cy)
         {
-            ///save the program
+            //! ask the user to overwrite the file or not
+            QString text = "Program by the name " + pName + " already exists.\n"
+                                              "Do you want to replace it?";
+            reply = QMessageBox::question(this, "Warning", text,
+                                  QMessageBox::Yes | QMessageBox::No,
+                                          QMessageBox::No);
+
+            if(reply == QMessageBox::Yes)
+            {
+                ///save the program
+                p->setProgramName(pName);
+                p->setCycle(cy);
+                dB->saveProgram(p);
+            }else{
+                return;
+            }
+        }
+        else //! if other wise it is the same program
+        {
+            //! continue adding steps
             p->setProgramName(pName);
             p->setCycle(cy);
-            dB->saveProgram(p);
         }
-
-    }else{
+    }
+    else //! if other wise the program is not in file
+    {
+        //! initialize and save it to file
         p->setProgramName(pName);
         p->setCycle(cy);
         dB->saveProgram(p);
