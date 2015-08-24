@@ -8,12 +8,15 @@
 #include <QTextStream>
 #include <QDataStream>
 
+#include <QDebug>
+
 #include "program.h"
 #include "step.h"
 
 class DataBackup : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(File_Type)
 public:
     enum File_Type {PRGM, TST_DATA, SYS_WARN, SYS_BOOT};
     static const QString PROGRAMS_DIR_PATH;
@@ -46,7 +49,7 @@ public:
      * @param programName
      * @return
      */
-    Program loadProgram(QString programName);
+    void loadTestProgram(QString pgmFileName, Program *prgm);
 
     /**
      * @brief listPrograms A function that reads the directory storing

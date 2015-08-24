@@ -9,7 +9,7 @@ class Program : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString programName READ getProgramName WRITE setProgramName NOTIFY programNameChanged)
-    Q_PROPERTY(int point READ getPoint WRITE setPoint NOTIFY pointChanged)
+    //Q_PROPERTY(int point READ getPoint WRITE setPoint NOTIFY pointChanged)
 public:
     explicit Program(QObject *parent = 0);
 
@@ -42,6 +42,7 @@ private:
     int cycle;
     int noOfSteps;
     QMap<int, Step*> steps;
+    Q_DISABLE_COPY(Program)
 
 signals:
     void programNameChanged(QString);

@@ -40,7 +40,7 @@ void Program::setCycle(int value){
 }
 
 int Program::getNoOfSteps() const{
-    return noOfSteps;
+    return steps.size();
 }
 
 void Program::setNoOfSteps(int value){

@@ -126,10 +126,10 @@ void AddProgram::on_stepFormSubmited(QString temp, QString humid, QString hrs,
     s->setStepNumber(p->getSteps().size() + 1);
 
     addStep(s);
-    qDebug() <<"sTEPS SIZE" <<  p->getSteps().size();
+    qDebug() <<"on_stepFormSubmited: STEPS SIZE" <<  p->getSteps().size();
     QMap<int, Step*> st = p->getSteps();
     foreach (Step *s, st) {
-        qDebug() << s->getTemperature();
+        qDebug() << "on_stepFormSubmited: " << s->getTemperature();
     }
 
 }

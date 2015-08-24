@@ -10,6 +10,8 @@
 #include "chamber.h"
 #include "process.h"
 #include "addprogram.h"
+#include "databackup.h"
+#include "stepsmodel.h"
 
 
 namespace Ui {
@@ -35,6 +37,8 @@ private slots:
     void initStyle();
 
     void on_newProgramButton_clicked();
+
+    void on_programsListView_clicked(const QModelIndex &index);
 
 public slots:
     void populateProgramsList();

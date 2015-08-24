@@ -52,7 +52,8 @@ QFileSystemModel * DataBackup::listPrograms(){
 
 bool DataBackup::programExists(QString name)
 {
-    QFile pFile(PROGRAMS_DIR_PATH + QDir::separator() + name + DataBackup::PRGM_FILE_EXT );
+    QFile pFile(PROGRAMS_DIR_PATH + QDir::separator()
+                + name + DataBackup::PRGM_FILE_EXT );
 
     return pFile.exists();
 }
@@ -71,14 +72,14 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
     if(prgmFile.open(QIODevice::Append)){
         QTextStream ts(&prgmFile);
         ts << step->getStepNumber() << " : "
-           << QString("%1").arg(step->getTemperature(), 6, 'f', 2, '0') << " : "
-           << QString("%1").arg(step->getHumidity(), 4, 'f', 1, '0') << " : "
-           << QString("%1").arg(step->getHours()) << " : "
-           << QString("%1").arg(step->getMinutes()) << " : "
-           << QString("%1").arg(step->getWaiting()) << " : "
-           << QString("%1").arg(step->getHR()) << " : "
-           << QString("%1").arg(step->getOne()) << " : "
-           << QString("%1").arg(step->getTwo()) << " : "
+           << QString("%1").arg(step->getTemperature(), 6, 'f', 2, '0') << ":"
+           << QString("%1").arg(step->getHumidity(), 4, 'f', 1, '0') << ":"
+           << QString("%1").arg(step->getHours()) << ":"
+           << QString("%1").arg(step->getMinutes()) << ":"
+           << QString("%1").arg(step->getWaiting()) << ":"
+           << QString("%1").arg(step->getHR()) << ":"
+           << QString("%1").arg(step->getOne()) << ":"
+           << QString("%1").arg(step->getTwo()) << ":"
            << QString("%1").arg(step->getThree()) << endl;
         isAdded = true;
     }else{
@@ -86,6 +87,61 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
     }
 
     return isAdded;
+}
+
+void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
+{
+    qDebug() << "loadTestProgram: Entered";
+    QString path = fileLives(PRGM, pgmFileName);
+    qDebug() << path;
+
+    if(path.isEmpty())
+    {
+        qDebug() << "loadTestProgram: " << "path is empty";
+        return;
+    }
+
+    QFile pgmFile(path);
+    QTextStream ts(&pgmFile);
+
+    if(!pgmFile.open(QIODevice::ReadOnly))
+    {
+        qDebug() << "loadTestProgram: Program cant open";
+        return;
+    }
+    QMap<int, Step*> loadedSteps;
+    prgm->getSteps().clear();
+    while(!ts.atEnd())
+    {
+        QString line = ts.readLine();
+        qDebug() << line;
+        if(line.startsWith('c', Qt::CaseInsensitive)){
+            QStringList pParams = line.split(':', QString::SkipEmptyParts);
+            prgm->setCycle(pParams.at(1).toInt());
+        }else{
+            QStringList stepParams = line.split(':', QString::SkipEmptyParts);
+            qDebug() << "loadTestProgram: steps split size" << stepParams.size();
+            foreach (QString s, stepParams) {
+                qDebug() << s ;
+            }
+            Step *s = new Step();
+            s->setStepNumber(stepParams.at(0).toInt());
+            s->setTemperature(stepParams.at(1).toDouble());
+            s->setHumidity(stepParams.at(2).toDouble());
+            s->setHours(stepParams.at(3).toInt());
+            s->setMinutes(stepParams.at(4).toInt());
+            s->setWaiting(stepParams.at(5).toInt());
+            s->setHR(stepParams.at(6).toInt());
+            s->setOne(stepParams.at(7).toInt());
+            s->setTwo(stepParams.at(8).toInt());
+            s->setThree(stepParams.at(9).toInt());
+
+            loadedSteps.insert(s->getStepNumber(), s);
+        }
+
+        qDebug() << "DataBackup::loadProgram: loadedSteps size" << loadedSteps.size();
+    }
+    prgm->setSteps(loadedSteps);
 }
 
 //! ************************ END OF PUBLIC FUNCTIONS *************** !//

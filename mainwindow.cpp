@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
     //connect(ui->newProgramButton, SIGNAL(clicked()), ap, SLOT(show()));
+
 }
 
 MainWindow::~MainWindow()
@@ -104,16 +105,18 @@ void MainWindow::populateProgramsList(){
 
     ui->programsListView->setModel(programsListModel);
     ui->programsListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->programsListView->setSelectionMode(QAbstractItemView::SingleSelection);
 
     ui->programsListView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
     programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
-
+    //ui->programsListView->setCurrentIndex(programsListModel->index(0, 0));
 }
 
 void MainWindow::initStyle(){
-
     ui->monitorButton->clicked(true);
-
+    ui->stepsTableView->setAlternatingRowColors(true);
+    ui->tableSpliter->setStretchFactor(0, 1);
+    ui->tableSpliter->setStretchFactor(1, 3);
 }
 
 void MainWindow::on_newProgramButton_clicked()
@@ -122,4 +125,26 @@ void MainWindow::on_newProgramButton_clicked()
     ap->setAttribute(Qt::WA_DeleteOnClose);
     ap->setModal(true);
     ap->show();
+}
+
+void MainWindow::on_programsListView_clicked(const QModelIndex &index)
+{
+    QString pgmName(index.data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    qDebug() << "on_programsListView_clicked: file name: " <<pgmName;
+
+    DataBackup *db = new DataBackup();
+    Program *prgmToDisplay = new Program();
+    db->loadTestProgram(pgmName, prgmToDisplay);
+//    QMap<int, Step*> stepsToShow = prgmToDisplay->getSteps();
+
+//    foreach (Step *s, stepsToShow.values()) {
+//        qDebug() << "on_programsListView_clicked" << s->getTemperature();
+//    }
+    StepsModel *stepModel = new StepsModel();
+    stepModel->setProgramToShow(prgmToDisplay);
+
+    ui->stepsTableView->setModel(stepModel);
+
+    qDebug() << "on_programsListView_clicked: " << pgmName << prgmToDisplay->getNoOfSteps();
 }
