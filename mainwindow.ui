@@ -78,7 +78,7 @@
           </widget>
           <widget class="QPushButton" name="helpButton">
            <property name="text">
-            <string>Help</string>
+            <string>Options</string>
            </property>
           </widget>
          </widget>

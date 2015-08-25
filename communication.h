@@ -14,7 +14,7 @@ class Communication : public QObject
     Q_OBJECT
 private:
     QByteArray *dataReceived;
-    QThread *processThread;
+//    QThread *processThread;
     ProcessTest *process;
 
 public:
@@ -22,7 +22,7 @@ public:
     ControlPC *controlParams;
     Chamber *chamberParams;
 
-   static QSerialPort *serial;
+    static QSerialPort *serial;
 
     //! ******************* public functions ****************** !//
 
@@ -59,14 +59,15 @@ public:
     ~Communication();
 
 signals:
-    void newDataArived(QByteArray newDataArived, ControlPC::chCommand);
+    void newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
+    void unusualDataArived(QByteArray unkownData);
     void dataArived(QByteArray);
     void idelState(bool);
     void idelStateChanged(bool);
 public slots:
     QByteArray readData();
     void on_idelStateChanged();
-    void on_newDataArived(QByteArray newDataArived, ControlPC::chCommand);
+    void on_newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
 };
 
 #endif // COMMUN_H

@@ -1,10 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "communication.h"
-#include "controlpc.h"
-#include "chamber.h"
-
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -109,14 +105,20 @@ void MainWindow::populateProgramsList(){
 
     ui->programsListView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
     programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
-    //ui->programsListView->setCurrentIndex(programsListModel->index(0, 0));
+
+    //trying to select the first item by default, not working correctly
+    //ui->programsListView->setSelection(new QItemSelectionModel(programsListModel));
+    ui->programsListView->setCurrentIndex(programsListModel->index(0,0));
 }
 
 void MainWindow::initStyle(){
     ui->monitorButton->clicked(true);
-    ui->stepsTableView->setAlternatingRowColors(true);
+    ui->loadProgramButton->setEnabled(false);
+
     ui->tableSpliter->setStretchFactor(0, 1);
     ui->tableSpliter->setStretchFactor(1, 3);
+
+    ui->stepsTableView->setAlternatingRowColors(true);
 }
 
 void MainWindow::on_newProgramButton_clicked()
@@ -131,20 +133,34 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
 {
     QString pgmName(index.data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
-    qDebug() << "on_programsListView_clicked: file name: " <<pgmName;
 
     DataBackup *db = new DataBackup();
     Program *prgmToDisplay = new Program();
     db->loadTestProgram(pgmName, prgmToDisplay);
-//    QMap<int, Step*> stepsToShow = prgmToDisplay->getSteps();
-
-//    foreach (Step *s, stepsToShow.values()) {
-//        qDebug() << "on_programsListView_clicked" << s->getTemperature();
-//    }
     StepsModel *stepModel = new StepsModel();
     stepModel->setProgramToShow(prgmToDisplay);
 
     ui->stepsTableView->setModel(stepModel);
+    if(!ui->loadProgramButton->isEnabled()){
+        ui->loadProgramButton->setEnabled(true);
+    }
+    qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
+}
 
-    qDebug() << "on_programsListView_clicked: " << pgmName << prgmToDisplay->getNoOfSteps();
+void MainWindow::on_loadProgramButton_clicked()
+{
+    ///try to set the test program by loadint it from file
+    /// and show a dialogue that allows edditing and startitng the test program.
+    Program *prepProgram = new Program();
+    QModelIndexList selectedIndeces = ui->programsListView->selectionModel()->selectedIndexes();
+    QModelIndex index = selectedIndeces.at(0);
+    QString pgmName(index.data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    DataBackup *db = new DataBackup();
+//    db->loadTestProgram(pgmName, communication->controlParams->testProgram);
+    db->loadTestProgram(pgmName, prepProgram);
+    LoadProgram *lp = new LoadProgram();
+    lp->setLoaded(prepProgram);
+    lp->setModal(true);
+    lp->show();
 }

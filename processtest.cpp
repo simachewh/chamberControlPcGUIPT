@@ -10,7 +10,7 @@ ProcessTest::~ProcessTest(){
 }
 
 void ProcessTest::idleCommunication(){
-    qDebug() << "startIdelCommunication(): entered";
+    qDebug() << "ProcessTest::idleCommunication(): entered";
     int i = 0;
     while(controlParams->getIsIdle()){
                //sendData(controlParams->iyCommand());

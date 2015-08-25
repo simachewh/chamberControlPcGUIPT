@@ -19,6 +19,8 @@ ControlPC::ControlPC(QObject *parent) : QObject(parent)
     aq.q = 0x71;
     br.b = 0x42;
     br.r = 0x72;
+
+    testProgram = new Program(parent);
 }
 
 ControlPC::~ControlPC(){

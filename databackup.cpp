@@ -111,6 +111,7 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
     }
     QMap<int, Step*> loadedSteps;
     prgm->getSteps().clear();
+    prgm->setProgramName(pgmFileName);
     while(!ts.atEnd())
     {
         QString line = ts.readLine();

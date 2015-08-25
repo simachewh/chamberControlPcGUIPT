@@ -134,15 +134,5 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-//QModelIndex StepsModel::index(int row, int column, const QModelIndex &parent) const
-//{
-//    return QModelIndex();
-//}
-
-//QModelIndex StepsModel::parent(const QModelIndex &child) const
-//{
-//    return QModelIndex();
-//}
-
 //! ********************** END OF REIMPLEMENTED FUNCTIONS ************* !//
 

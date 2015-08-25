@@ -5,6 +5,7 @@ QSerialPort *Communication::serial;
 
 Communication::Communication(int a)
 {
+    Q_UNUSED(a)
     qDebug() << "entered";
 }
 
@@ -21,8 +22,8 @@ Communication::Communication(QObject *parent) : QObject(parent)
     connect(serial, SIGNAL(readyRead()),
             this, SLOT(readData()));
 
-    connect(this, SIGNAL(newDataArived(QByteArray, ControlPC::chCommand)),
-            this, SLOT(on_newDataArived(QByteArray, ControlPC::chCommand)));
+    connect(this, SIGNAL(newDataArived(QByteArray, ControlPC::CH_COMMAND)),
+            this, SLOT(on_newDataArived(QByteArray, ControlPC::CH_COMMAND)));
 
     connect(controlParams, SIGNAL(idleStateChanged()),
             this, SLOT(on_idelStateChanged()));
@@ -84,8 +85,6 @@ void Communication::sendData(const QByteArray data){
  * @return the recieved data as QByteArray.
  */
 QByteArray Communication::readData(){
-
-    //QByteArray recievedData;
     *dataReceived->append(serial->readAll());
     QByteArray *end = new QByteArray(1, 0x0D);
     if(*dataReceived->data() == ControlPC::ACK ){
@@ -101,6 +100,7 @@ QByteArray Communication::readData(){
             emit newDataArived(*dataReceived, ControlPC::I);
         }else{
             qDebug() << "Unknown data recieved" << *dataReceived;
+            emit unusualDataArived(*dataReceived);
         }
 
         qDebug() << "before Clear" << *dataReceived;
@@ -119,7 +119,7 @@ void Communication::on_idelStateChanged(){
     }
 }
 
-void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::chCommand command){
+void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND command){
     QStringList list;
     double temp, humid;
 
@@ -149,7 +149,7 @@ void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::chComm
 
 
 void Communication::startIdelCommunication(){
-    qDebug() << "startIdelCommunication(): entered";
+    qDebug() << "Communication::startIdelCommunication(): entered";
     sendData(controlParams->idleCommand());
 }
 

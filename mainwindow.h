@@ -12,6 +12,7 @@
 #include "addprogram.h"
 #include "databackup.h"
 #include "stepsmodel.h"
+#include "loadprogram.h"
 
 
 namespace Ui {
@@ -40,6 +41,8 @@ private slots:
 
     void on_programsListView_clicked(const QModelIndex &index);
 
+    void on_loadProgramButton_clicked();
+
 public slots:
     void populateProgramsList();
 
@@ -48,7 +51,7 @@ private:
     Communication *communication;
     //AddProgram *ap;
 
-    enum {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
+    enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
 
 };
 

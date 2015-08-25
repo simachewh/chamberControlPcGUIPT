@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "program.h"
+
 
 /**
  * @brief The ControlPC class.
@@ -24,8 +26,10 @@ private:
 
 public:
 
-    enum pcCommand {BR, AQ, IY, O = 'O'};
-    enum chCommand {ACK = 0x06, A = 'A', B = 'B', I = 'I'};
+    enum PC_COMMAND {BR, AQ, IY, O = 'O'};
+    enum CH_COMMAND {ACK = 0x06, A = 'A', B = 'B', I = 'I'};
+
+    Program *testProgram;
 
     /**
      * @brief The Anonymous:1 struct holds vlues of hex
@@ -168,8 +172,8 @@ public:
 
 signals:
     void idleStateChanged();
-    void pcCommandChanged(ControlPC::pcCommand pcCommand);
-    void chCommandChanged(ControlPC::chCommand chCommand);
+    void pcCommandChanged(ControlPC::PC_COMMAND PC_COMMAND);
+    void chCommandChanged(ControlPC::CH_COMMAND CH_COMMAND);
 
 public slots:
     void setIdle(bool idelState);
