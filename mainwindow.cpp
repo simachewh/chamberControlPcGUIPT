@@ -20,7 +20,21 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->chamberParams, SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
-    //connect(ui->newProgramButton, SIGNAL(clicked()), ap, SLOT(show()));
+    connect(communication->controlParams, SIGNAL(chPartChanged(bool,ControlPC::CH_PART)),
+            this, SLOT(on_partsChanged(bool,ControlPC::CH_PART)));
+
+    //! connection bettwen ControlPC teperature power change and temperature progress bar !//
+    connect(communication->controlParams, SIGNAL(temperaturePowerChanged(int)),
+            this, SLOT(on_tempPowerChange(int)));
+
+    //! connection bettwen ControlPC humidity power change and humidity progress bar !//
+    connect(communication->controlParams, SIGNAL(humidityPowerChanged(int)),
+            this, SLOT(on_humidPowerChange(int)));
+
+
+    communication->controlParams->setC2V2(true);
+    communication->controlParams->setHumidityPower(220);
+    communication->controlParams->setTemperaturePower(150);
 
 }
 
@@ -60,6 +74,7 @@ void MainWindow::on_programButton_clicked()
     ui->helpButton->setEnabled(true);
 
     populateProgramsList();
+    this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
 }
 
 /**
@@ -163,4 +178,159 @@ void MainWindow::on_loadProgramButton_clicked()
     lp->setLoaded(prepProgram);
     lp->setModal(true);
     lp->show();
+}
+
+void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
+{
+    switch (part) {
+    case ControlPC::H1:
+        if(value){
+            ui->h1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->h1Label->update();
+        }else{
+            ui->h1Label->setStyleSheet("background-color: ");
+            ui->h1Label->update();
+        }
+        break;
+    case ControlPC::H2:
+        if(value){
+            ui->h2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->h2Label->update();
+        }else{
+            ui->h2Label->setStyleSheet("background-color: ");
+            ui->h2Label->update();
+        }
+        break;
+    case ControlPC::T1:
+        if(value){
+            ui->t1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->t1Label->update();
+        }else{
+            ui->t1Label->setStyleSheet("background-color: ");
+            ui->t1Label->update();
+        }
+        break;
+    case ControlPC::T2:
+        if(value){
+            ui->t2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->t2Label->update();
+        }else{
+            ui->t2Label->setStyleSheet("background-color: ");
+            ui->t2Label->update();
+        }
+        break;
+    case ControlPC::P1:
+        if(value){
+            ui->p1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p1Label->update();
+        }else{
+            ui->p1Label->setStyleSheet("background-color: ");
+            ui->p1Label->update();
+        }
+        break;
+    case ControlPC::P2:
+        if(value){
+            ui->p2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p2Label->update();
+        }else{
+            ui->p2Label->setStyleSheet("background-color: ");
+            ui->p2Label->update();
+        }
+        break;
+    case ControlPC::P3:
+        if(value){
+            ui->p3Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p3Label->update();
+        }else{
+            ui->p3Label->setStyleSheet("background-color: ");
+            ui->p3Label->update();
+        }
+        break;
+    case ControlPC::LNU:
+        if(value){
+            ui->lnvLabel->setStyleSheet("background-color: #0ABAF5");
+            ui->lnvLabel->update();
+        }else{
+            ui->lnvLabel->setStyleSheet("background-color: ");
+            ui->lnvLabel->update();
+        }
+        break;
+    case ControlPC::C1:
+        if(value){
+            ui->c1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->c1Label->update();
+        }else{
+            ui->c1Label->setStyleSheet("background-color: ");
+            ui->c1Label->update();
+        }
+        break;
+    case ControlPC::C2V2:
+        if(value){
+            ui->c2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->c2Label->update();
+            ui->v2Label->update();
+        }else{
+            ui->c2Label->setStyleSheet("background-color: ");
+            ui->v2Label->setStyleSheet("background-color: ");
+            ui->c2Label->update();
+            ui->v2Label->update();
+        }
+        break;
+    case ControlPC::V1:
+        if(value){
+            ui->v1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v1Label->update();
+        }else{
+
+        }
+        break;
+    case ControlPC::V3:
+        if(value){
+            ui->v3Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v3Label->update();
+        }else{
+            ui->v3Label->setStyleSheet("background-color: ");
+            ui->v3Label->update();
+        }
+        break;
+    case ControlPC::V4:
+        if(value){
+            ui->v4Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v4Label->update();
+        }else{
+            ui->v4Label->setStyleSheet("background-color: ");
+            ui->v4Label->update();
+        }
+        break;
+    case ControlPC::FAN:
+        if(value){
+            ui->fn1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->fn1Label->update();
+        }else{
+            ui->fn1Label->setStyleSheet("background-color: ");
+            ui->fn1Label->update();
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+void MainWindow::on_tempPowerChange(int value)
+{
+    int res = ((float)value / 255.0) * 100;
+    ui->t1ProgressBar->setValue(res);
+    ui->t2ProgressBar->setValue(res);
+    ui->t1ProgressBar->update();
+    ui->t2ProgressBar->update();
+}
+
+void MainWindow::on_humidPowerChange(int value)
+{
+    int res = ((float)value / 255) * 100;
+    ui->h1ProgressBar->setValue(res);
+    ui->h2ProgressBar->setValue(res);
+    ui->h1ProgressBar->update();
+    ui->h2ProgressBar->update();
 }

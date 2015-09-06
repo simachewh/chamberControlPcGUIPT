@@ -102,7 +102,7 @@
         <number>1</number>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="monitorPage">
         <layout class="QGridLayout" name="gridLayout_7">
@@ -123,6 +123,9 @@
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="2" column="2">
              <widget class="QLabel" name="h2Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -133,6 +136,9 @@
             </item>
             <item row="2" column="5">
              <widget class="QLabel" name="v4Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -143,6 +149,9 @@
             </item>
             <item row="1" column="2">
              <widget class="QLabel" name="h1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -165,7 +174,10 @@
              </spacer>
             </item>
             <item row="1" column="7">
-             <widget class="QLabel" name="v4Label_4">
+             <widget class="QLabel" name="p3Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -176,6 +188,9 @@
             </item>
             <item row="1" column="4">
              <widget class="QLabel" name="v1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -185,7 +200,10 @@
              </widget>
             </item>
             <item row="1" column="6">
-             <widget class="QLabel" name="v4Label_2">
+             <widget class="QLabel" name="p1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -196,6 +214,9 @@
             </item>
             <item row="1" column="3">
              <widget class="QLabel" name="c1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -206,6 +227,9 @@
             </item>
             <item row="2" column="3">
              <widget class="QLabel" name="c2Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -216,6 +240,9 @@
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="pwrLabel">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -225,7 +252,10 @@
              </widget>
             </item>
             <item row="2" column="6">
-             <widget class="QLabel" name="v4Label_3">
+             <widget class="QLabel" name="p2Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -235,7 +265,10 @@
              </widget>
             </item>
             <item row="2" column="7">
-             <widget class="QLabel" name="v4Label_5">
+             <widget class="QLabel" name="fn1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -246,6 +279,9 @@
             </item>
             <item row="2" column="4">
              <widget class="QLabel" name="v2Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -256,6 +292,9 @@
             </item>
             <item row="1" column="5">
              <widget class="QLabel" name="v3Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -266,6 +305,9 @@
             </item>
             <item row="2" column="0">
              <widget class="QLabel" name="lnvLabel">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -276,6 +318,9 @@
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="t1Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>
@@ -286,6 +331,9 @@
             </item>
             <item row="2" column="1">
              <widget class="QLabel" name="t2Label">
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
               <property name="frameShape">
                <enum>QFrame::Box</enum>
               </property>

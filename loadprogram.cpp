@@ -6,6 +6,7 @@ LoadProgram::LoadProgram(QWidget *parent) :
     ui(new Ui::LoadProgram)
 {
     ui->setupUi(this);
+    ui->tableView->setAlternatingRowColors(true);
 }
 
 LoadProgram::~LoadProgram()

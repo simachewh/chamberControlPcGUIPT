@@ -43,9 +43,13 @@ private slots:
 
     void on_loadProgramButton_clicked();
 
+    void on_partsChanged(bool value, ControlPC::CH_PART part);
+
 public slots:
     void populateProgramsList();
 
+    void on_humidPowerChange(int value);
+    void on_tempPowerChange(int value);
 private:
     Ui::MainWindow *ui;
     Communication *communication;
