@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QBitArray>
+#include <QByteArray>
 
 #include "program.h"
+#include "chamber.h"
 
 
 /**
@@ -48,12 +50,7 @@ private:
 
     bool fan;
 
-    //quint8 temperatureBar;
-    //quint8 humidityBar;
-
-
-
-
+    QByteArray *cksum;
 
     /**
      * @brief isIdel holds value true when there is no test program runing.
@@ -67,6 +64,8 @@ public:
     enum CH_PART {H1, H2, T1, T2, P1, P2, P3, LNU, C1, C2V2, V1, V3, V4, FAN, Temp_Power, Hum_Power};
 
     Program *testProgram;
+
+
 
     /**
      * @brief The Anonymous:1 struct holds vlues of hex
@@ -109,7 +108,7 @@ public:
      * @brief comleteCommand Holds values of the complete
      * command ready to be written on serial device.
      */
-    QByteArray *completeCommand;
+    QByteArray *comleteCommand;
 
     /**
      * @brief start Represents the STX, start of text, in the serial
@@ -207,12 +206,10 @@ public:
 
     QByteArray idleCommand();
 
-    QByteArray fullCommand();
+    QByteArray fullCommand(PC_COMMAND ctype);
 
-    QByteArray assembleFullCommand(PC_COMMAND ctype);
+    QByteArray calculatecksum();
 
-
-    //!************getters and setters are defined bellow **************!//
     bool getIsIdle();
 
     bool getH1();
@@ -279,6 +276,10 @@ public:
 
     void setHumidityBar(QByteArray value);
 
+    QByteArray getCksum();
+
+    void setCksum(QByteArray value);
+
 
 
     void setTemperaturePower(int value);
@@ -304,6 +305,7 @@ public:
      * @return
      */
     QByteArray convertToBytes(int value);
+    QByteArray calculatecksum(QByteArray value);
 signals:
     void idleStateChanged();
     void pcCommandChanged(ControlPC::PC_COMMAND PC_COMMAND);
@@ -330,6 +332,7 @@ signals:
     void v3Changed(bool v3);
     void v4Changed(bool v4);
     void fanChanged(bool fan);
+    void cksumChanged(QByteArray value);
 
 public slots:
     void setIdle(bool idelState);

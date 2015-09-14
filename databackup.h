@@ -87,6 +87,22 @@ public:
      */
     QString fileLives(File_Type type, QString name);
 
+    /**
+     * @brief renameProgram renames a program file of name oldName to a name given by newName.
+     * @param newName
+     * @param oldName
+     * @return
+     */
+    bool renameProgram(QString newName, QString oldName);
+
+    /**
+     * @brief removeProgram removes the file where the program by the given name is stored from the
+     * file system. The name of the program and the file name are the same.
+     * @param name
+     * @return
+     */
+    bool removeProgram(QString name);
+
 private:
     static const QString PROGRAMS_DIR_NAME;
     static const QString PRGM_FILE_EXT;

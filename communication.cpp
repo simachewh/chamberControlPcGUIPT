@@ -139,7 +139,7 @@ void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::CH_COM
     }else if (command == ControlPC::B){
         sendData(controlParams->aqCommand());
     }else if (command == ControlPC::I){
-        sendData(controlParams->idleCommand());
+        sendData(controlParams->brCommand());
     }else{
 
     }
@@ -150,7 +150,8 @@ void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::CH_COM
 
 void Communication::startIdelCommunication(){
     qDebug() << "Communication::startIdelCommunication(): entered";
-    sendData(controlParams->idleCommand());
+
+    sendData(controlParams->aqCommand());
 }
 
 

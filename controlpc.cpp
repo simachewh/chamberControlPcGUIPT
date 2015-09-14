@@ -86,17 +86,8 @@ QByteArray ControlPC::idleCommand(){
 
     return *commandIdeal;
 }
-//!maybe good for performance, consider implimenting!//
-QByteArray ControlPC::fullCommand(){
-    completeCommand->append(stx);
-    completeCommand->append(zero);
-    completeCommand->append(*commandBody);
-    completeCommand->append(lineBreak);
 
-    return *completeCommand;
-}
-
-QByteArray ControlPC::assembleFullCommand(PC_COMMAND ctype)
+QByteArray ControlPC::fullCommand(PC_COMMAND ctype)
 {
     QByteArray assembledCommand;
     assembledCommand.append(stx);
@@ -119,6 +110,8 @@ QByteArray ControlPC::assembleFullCommand(PC_COMMAND ctype)
         break;
     case O:
     {
+        *block1 = convertToBytes(*commandBlock1);
+        *block2 = convertToBytes(*commandBlock2);
         assembledCommand.append(capO);
         QString sixBytesOfZero(6, zero);
         assembledCommand.append(sixBytesOfZero);
@@ -127,7 +120,9 @@ QByteArray ControlPC::assembleFullCommand(PC_COMMAND ctype)
         assembledCommand.append(getTempratureBar());
         assembledCommand.append(getHumidityBar());
         assembledCommand.append(etx);
-        assembledCommand.append('?'); //! this here is still not known how it is made and appended
+        //! checksum calculated from the assembled command
+        assembledCommand.append(calculatecksum(assembledCommand));
+        //assembledCommand.append('?');
         break;
     }
     default:
@@ -137,10 +132,36 @@ QByteArray ControlPC::assembleFullCommand(PC_COMMAND ctype)
     return assembledCommand;
 }
 
+QByteArray ControlPC::calculatecksum(QByteArray value)
+{
+    char sum = 0;
+    for(int i = 0; i < value.size(); i++){
+        sum += value.at(i);
+    }
+    return QByteArray(1, sum);
+}
+
+QByteArray ControlPC::calculatecksum()
+{
+    QByteArray ba;
+    QString sixBytesOfZero(6, zero);
+    ba.append(zero);
+    ba.append(sixBytesOfZero);
+    ba.append(convertToBytes(*commandBlock1));
+    ba.append(convertToBytes(*commandBlock2));
+    ba.append(getTempratureBar());
+    ba.append(getHumidityBar());
+    char sum = 0;
+    for (int i = 0; i < ba.size(); i++) {
+        sum += ba.at(i);
+    }
+    return QByteArray(1, sum);
+}
+
 QByteArray ControlPC::convertToBytes(QBitArray bits){
     QByteArray bytes;
        bytes.resize(bits.count()/8+1);
-       bytes.fill(0);
+       bytes.fill(0x30);
        // Convert from QBitArray to QByteArray
        for(int b=0; b<bits.count(); ++b)
        {
@@ -157,7 +178,6 @@ QByteArray ControlPC::convertToBytes(int value){
     return bytes.mid(7);
 }
 
-//! ******* Getters and Setters ********** !//
 
 bool ControlPC::getIsIdle(){
     return ControlPC::isIdle;
@@ -334,7 +354,18 @@ QByteArray ControlPC::getHumidityBar()
 
 void ControlPC::setHumidityBar(QByteArray value)
 {
-   * humidityBar = value;
+    * humidityBar = value;
+}
+
+QByteArray ControlPC::getCksum()
+{
+    *cksum = calculatecksum();
+    return *cksum;
+}
+
+void ControlPC::setCksum(QByteArray value)
+{
+    *cksum = value;
 }
 
 void ControlPC::setTemperaturePower(int value){
@@ -359,7 +390,6 @@ int ControlPC::getHumidityPower(){
     return humidityPower;
 }
 
-//! ******* SLOTS ********** !//
 
 void ControlPC::setIdle(bool idelState){
     if(!(getIsIdle() == idelState)){

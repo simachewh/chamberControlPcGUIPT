@@ -44,13 +44,13 @@ QVariant StepsModel::headerData(int section, Qt::Orientation orientation, int ro
     {
         switch (section) {
         case 0:
-            return "STP. NO.";
+            return "NO.";
             break;
         case 1:
-            return "Temp.";
+            return "Temp.°C";
             break;
         case 2:
-            return "Humidity";
+            return "HUM %RH";
             break;
         case 3:
             return "Hrs.";

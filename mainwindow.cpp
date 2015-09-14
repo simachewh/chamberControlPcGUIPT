@@ -44,68 +44,56 @@ MainWindow::~MainWindow()
     delete communication;
 }
 
-/**
- * @brief MainWindow::on_monitorButton_clicked slot.
- * Updates the sacked widet view to monitors perspective.
- */
-void MainWindow::on_monitorButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(MONITOR_INDEX);
-    ui->monitorButton->setEnabled(false);
-    this->setWindowTitle("Climate Chamber - Monitor");
 
-    ui->auxButton->setEnabled(true);
-    ui->programButton->setEnabled(true);
-    ui->helpButton->setEnabled(true);
-}
+//void MainWindow::on_monitorButton_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(MONITOR_INDEX);
+//    ui->monitorButton->setEnabled(false);
+//    this->setWindowTitle("Climate Chamber - Monitor");
 
-/**
- * @brief MainWindow::on_programButton_clicked slot.
- * Updates the stacked widget view to program set perspective.
- */
-void MainWindow::on_programButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(PROGRAM_INDEX);
-    ui->programButton->setEnabled(false);
-    this->setWindowTitle("Climate Chamber - Program Set");
+//    ui->auxButton->setEnabled(true);
+//    ui->programButton->setEnabled(true);
+//    ui->helpButton->setEnabled(true);
+//}
 
-    ui->monitorButton->setEnabled(true);
-    ui->auxButton->setEnabled(true);
-    ui->helpButton->setEnabled(true);
 
-    populateProgramsList();
-    this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
-}
+//void MainWindow::on_programButton_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(PROGRAM_INDEX);
+//    ui->programButton->setEnabled(false);
+//    this->setWindowTitle("Climate Chamber - Program Set");
 
-/**
- * @brief MainWindow::on_auxButton_clicked slot.
- * Update the stacked widget view to aux data perspective.
- */
-void MainWindow::on_auxButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(AUX_INDEX);
-    ui->auxButton->setEnabled(false);
-    this->setWindowTitle("Climate Chamber - Aux Data");
+//    ui->monitorButton->setEnabled(true);
+//    ui->auxButton->setEnabled(true);
+//    ui->helpButton->setEnabled(true);
 
-    ui->monitorButton->setEnabled(true);
-    ui->programButton->setEnabled(true);
-    ui->helpButton->setEnabled(true);
-}
+//    populateProgramsList();
+//    this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
+//}
 
-/**
- * @brief MainWindow::on_helpButton_clicked slot.
- * Updates the stacked widget view to help's perspective.
- */
-void MainWindow::on_helpButton_clicked()
-{
-    ui->stackedWidget->setCurrentIndex(HELP_INDEX);
-    ui->helpButton->setEnabled(false);
-    this->setWindowTitle("Climate Chamber - Help");
 
-    ui->monitorButton->setEnabled(true);
-    ui->programButton->setEnabled(true);
-    ui->auxButton->setEnabled(true);
-}
+//void MainWindow::on_auxButton_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(AUX_INDEX);
+//    ui->auxButton->setEnabled(false);
+//    this->setWindowTitle("Climate Chamber - Aux Data");
+
+//    ui->monitorButton->setEnabled(true);
+//    ui->programButton->setEnabled(true);
+//    ui->helpButton->setEnabled(true);
+//}
+
+
+//void MainWindow::on_helpButton_clicked()
+//{
+//    ui->stackedWidget->setCurrentIndex(HELP_INDEX);
+//    ui->helpButton->setEnabled(false);
+//    this->setWindowTitle("Climate Chamber - Help");
+
+//    ui->monitorButton->setEnabled(true);
+//    ui->programButton->setEnabled(true);
+//    ui->auxButton->setEnabled(true);
+//}
 
 
 //! ****************** PUBLIC SLOTS *************** !//
@@ -127,8 +115,11 @@ void MainWindow::populateProgramsList(){
 }
 
 void MainWindow::initStyle(){
-    ui->monitorButton->clicked(true);
+    ui->tabWidget->setCurrentIndex(MONITOR_INDEX);
     ui->loadProgramButton->setEnabled(false);
+    ui->renameProgramButton->setEnabled(false);
+    ui->deleteProgramButton->setEnabled(false);
+    ui->startStopButton->setEnabled(false);
 
     ui->tableSpliter->setStretchFactor(0, 1);
     ui->tableSpliter->setStretchFactor(1, 3);
@@ -139,7 +130,7 @@ void MainWindow::initStyle(){
 void MainWindow::on_newProgramButton_clicked()
 {
     AddProgram *ap = new AddProgram();
-    ap->setAttribute(Qt::WA_DeleteOnClose);
+    ap->setAttribute(Qt::WA_DeleteOnClose); // so all objects created with it will also be deleted
     ap->setModal(true);
     ap->show();
 }
@@ -158,6 +149,15 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     ui->stepsTableView->setModel(stepModel);
     if(!ui->loadProgramButton->isEnabled()){
         ui->loadProgramButton->setEnabled(true);
+    }
+    if(!ui->renameProgramButton->isEnabled()){
+        ui->renameProgramButton->setEnabled(true);
+    }
+    if(!ui->deleteProgramButton->isEnabled()){
+        ui->deleteProgramButton->setEnabled(true);
+    }
+    if(!ui->startStopButton->isEnabled()){
+        ui->startStopButton->setEnabled(true);
     }
     qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
 }
@@ -333,4 +333,64 @@ void MainWindow::on_humidPowerChange(int value)
     ui->h2ProgressBar->setValue(res);
     ui->h1ProgressBar->update();
     ui->h2ProgressBar->update();
+}
+
+void MainWindow::on_tabWidget_currentChanged(int index)
+{
+    if(index == HELP_INDEX){
+        this->setWindowTitle("Climate Chamber - Help");
+    }else if(index == PROGRAM_INDEX){
+        this->setWindowTitle("Climate Chamber - Program");
+        populateProgramsList();
+        this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
+    }else if(index == MONITOR_INDEX){
+        this->setWindowTitle("Climate Chamber - Monitor");
+    }else if(index == AUX_INDEX){
+        this->setWindowTitle("Climate Chamber - AUX Data");
+    }
+}
+
+void MainWindow::on_removeStepFromSelectedButton_clicked()
+{
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+
+}
+
+void MainWindow::on_addStepOnSelectedButton_clicked()
+{
+
+}
+
+void MainWindow::on_renameProgramButton_clicked()
+{
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    RenameDialog *rd = new RenameDialog();
+    rd->setMessage("Renaming the program " + pgmName);
+    rd->setOldName(pgmName);
+    rd->setModal(true);
+    rd->show();
+}
+
+void MainWindow::on_deleteProgramButton_clicked()
+{
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Warning", "Are you sure you want to dlete program "
+                                  + pgmName, QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No);
+    if(reply == QMessageBox::No){
+        return;
+    }
+    DataBackup db;
+    bool removed = db.removeProgram(pgmName);
+    if(removed){
+        QMessageBox::information(this, "Success", "Program " + pgmName + "is removed.",
+                                 QMessageBox::Ok, QMessageBox::NoButton);
+    }else{
+        QMessageBox::information(this, "Failure", "Removing program " + pgmName + "failed.",
+                                 QMessageBox::Ok, QMessageBox::NoButton);
+    }
 }

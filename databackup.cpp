@@ -174,13 +174,41 @@ QString DataBackup::fileLives(File_Type type, QString name)
     }
 }
 
-//! ************************ PRIVATE FUNCTIONS ********************** !//
+bool DataBackup::renameProgram(QString newName, QString oldName)
+{
+    QString path = fileLives(PRGM, oldName);
+    if(path.isEmpty()){
+        return false;
+    }
+    QFile pgmFile(path);
 
+    if(!pgmFile.exists()){
+        return false;
+    }
+    bool renamed = false;
+    if(pgmFile.open(QIODevice::ReadWrite)){
+        renamed = pgmFile.rename(PROGRAMS_DIR_PATH + QDir::separator()
+                                 + newName + PRGM_FILE_EXT);
+        pgmFile.close();
+    }
+    return renamed;
+}
 
-//! ************************ END OF PRIVATE FUNCTIONS *************** !//
+bool DataBackup::removeProgram(QString name)
+{
+    QString path = fileLives(PRGM, name);
+    if(path.isEmpty()){
+        return false;
+    }
+    QFile pgmFile(path);
+    if(!pgmFile.open(QIODevice::ReadWrite)){
+        return false;
+    }
+    bool removed = pgmFile.remove();
 
+    return removed;
+}
 
-//! ************** PUBLIC SLOTS ******************* !//
 
 bool DataBackup::createDir(QString dirName){
     bool dirCreated;

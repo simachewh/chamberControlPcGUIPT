@@ -13,6 +13,7 @@
 #include "databackup.h"
 #include "stepsmodel.h"
 #include "loadprogram.h"
+#include "renamedialog.h"
 
 
 namespace Ui {
@@ -27,13 +28,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_monitorButton_clicked();
+//    void on_monitorButton_clicked();
 
-    void on_auxButton_clicked();
+//    void on_auxButton_clicked();
 
-    void on_helpButton_clicked();
+//    void on_helpButton_clicked();
 
-    void on_programButton_clicked();
+//    void on_programButton_clicked();
 
     void initStyle();
 
@@ -44,6 +45,16 @@ private slots:
     void on_loadProgramButton_clicked();
 
     void on_partsChanged(bool value, ControlPC::CH_PART part);
+
+    void on_tabWidget_currentChanged(int index);
+
+    void on_addStepOnSelectedButton_clicked();
+
+    void on_removeStepFromSelectedButton_clicked();
+
+    void on_renameProgramButton_clicked();
+
+    void on_deleteProgramButton_clicked();
 
 public slots:
     void populateProgramsList();
