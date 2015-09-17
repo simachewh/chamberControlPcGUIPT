@@ -8,7 +8,6 @@
 #include "controlpc.h"
 #include "communication.h"
 #include "chamber.h"
-#include "process.h"
 #include "addprogram.h"
 #include "databackup.h"
 #include "stepsmodel.h"
@@ -28,13 +27,6 @@ public:
     ~MainWindow();
 
 private slots:
-//    void on_monitorButton_clicked();
-
-//    void on_auxButton_clicked();
-
-//    void on_helpButton_clicked();
-
-//    void on_programButton_clicked();
 
     void initStyle();
 
@@ -56,15 +48,21 @@ private slots:
 
     void on_deleteProgramButton_clicked();
 
+    void on_startStopButton_clicked();
+
 public slots:
     void populateProgramsList();
 
     void on_humidPowerChange(int value);
     void on_tempPowerChange(int value);
+
+    void on_testProgramNameChanged(QString value);
+
+    void on_testProgramParamChanged(int value, Program::PGM_PARAM param);
+
 private:
     Ui::MainWindow *ui;
     Communication *communication;
-    //AddProgram *ap;
 
     enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
 

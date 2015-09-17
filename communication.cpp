@@ -1,13 +1,7 @@
 #include "communication.h"
-#include "processtest.h"
 
 QSerialPort *Communication::serial;
 
-Communication::Communication(int a)
-{
-    Q_UNUSED(a)
-    qDebug() << "entered";
-}
 
 Communication::Communication(QObject *parent) : QObject(parent)
 {
@@ -15,7 +9,6 @@ Communication::Communication(QObject *parent) : QObject(parent)
     dataReceived = new QByteArray();
 
     controlParams = new ControlPC();
-    chamberParams = new Chamber();
 
     openPort();
 
@@ -31,17 +24,11 @@ Communication::Communication(QObject *parent) : QObject(parent)
     controlParams->setIdle(true);
 }
 
-void Communication::prepCommunication(){
-
-}
-
 Communication::~Communication(){
     delete serial;
     delete dataReceived;
     delete controlParams;
-    delete chamberParams;
 }
-
 
 bool Communication::openPort(){
     bool open = false;
@@ -77,13 +64,7 @@ void Communication::sendData(const QByteArray data){
     qDebug() << "Sent: " << QString(data) << " size" << sentSize;
 }
 
-//!SLOTS implementation !//
-/**
- * @brief Communication::readData functopn.
- * Reads data available in the serial device. It calles the readAll() method from
- * QSerialPort class.
- * @return the recieved data as QByteArray.
- */
+
 QByteArray Communication::readData(){
     *dataReceived->append(serial->readAll());
     QByteArray *end = new QByteArray(1, 0x0D);
@@ -132,8 +113,8 @@ void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::CH_COM
         temp = list[0].mid(4,9).toDouble();
         humid = list[2].left(4).toDouble();
 
-        chamberParams->setDryTemprature(temp);
-        chamberParams->setHumidity(humid);
+        controlParams->climateChamber->setDryTemprature(temp);
+        controlParams->climateChamber->setHumidity(humid);
 
         sendData(controlParams->iyCommand());
     }else if (command == ControlPC::B){
@@ -145,13 +126,29 @@ void Communication::on_newDataArived(QByteArray newDataArived, ControlPC::CH_COM
     }
 }
 
-//! end of SLOTS implementaion !//
+void Communication::on_chamberConnectionChanged(bool value)
+{
+
+}
 
 
 void Communication::startIdelCommunication(){
     qDebug() << "Communication::startIdelCommunication(): entered";
 
-    sendData(controlParams->aqCommand());
+    sendData(controlParams->idleCommand());
+}
+
+bool Communication::isChamberConnected()
+{
+    return chamberConnected;
+}
+
+void Communication::setChamberConnected(bool value)
+{
+    if(chamberConnected != value){
+        chamberConnected = value;
+        emit chamberConnectionChanged(value);
+    }
 }
 
 

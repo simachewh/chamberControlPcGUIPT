@@ -64,7 +64,7 @@ public:
     enum CH_PART {H1, H2, T1, T2, P1, P2, P3, LNU, C1, C2V2, V1, V3, V4, FAN, Temp_Power, Hum_Power};
 
     Program *testProgram;
-
+    Chamber *climateChamber;
 
 
     /**

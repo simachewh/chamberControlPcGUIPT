@@ -38,7 +38,7 @@
       </property>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="monitorTab">
         <attribute name="title">
@@ -63,7 +63,7 @@
             <item>
              <widget class="QLabel" name="progNameLabel">
               <property name="text">
-               <string>Program name</string>
+               <string>Prgm. name</string>
               </property>
              </widget>
             </item>

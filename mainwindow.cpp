@@ -11,13 +11,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initStyle();
 
-    communication->prepCommunication();
     //!connection to update chamber's dry temperature change to GUI temperature lable!//
-    connect(communication->chamberParams, SIGNAL(dryTemperatureChanged(QString)),
+    connect(communication->controlParams->climateChamber, SIGNAL(dryTemperatureChanged(QString)),
             ui->tempRealValueLabel, SLOT(setText(QString)));
 
     //!connection to update chamber's humidity change to GUI humidity lable!//
-    connect(communication->chamberParams, SIGNAL(humidityChanged(QString)),
+    connect(communication->controlParams->climateChamber, SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
     connect(communication->controlParams, SIGNAL(chPartChanged(bool,ControlPC::CH_PART)),
@@ -31,6 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->controlParams, SIGNAL(humidityPowerChanged(int)),
             this, SLOT(on_humidPowerChange(int)));
 
+    //! program connections to gui !//
+    connect(communication->controlParams->testProgram, SIGNAL(programNameChanged(QString)),
+            this, SLOT(on_testProgramNameChanged(QString)));
+    connect(communication->controlParams->testProgram, SIGNAL(programParamChanged(int,Program::PGM_PARAM)),
+            this, SLOT(on_testProgramParamChanged(int,Program::PGM_PARAM)));
 
     communication->controlParams->setC2V2(true);
     communication->controlParams->setHumidityPower(220);
@@ -43,58 +47,6 @@ MainWindow::~MainWindow()
     delete ui;
     delete communication;
 }
-
-
-//void MainWindow::on_monitorButton_clicked()
-//{
-//    ui->stackedWidget->setCurrentIndex(MONITOR_INDEX);
-//    ui->monitorButton->setEnabled(false);
-//    this->setWindowTitle("Climate Chamber - Monitor");
-
-//    ui->auxButton->setEnabled(true);
-//    ui->programButton->setEnabled(true);
-//    ui->helpButton->setEnabled(true);
-//}
-
-
-//void MainWindow::on_programButton_clicked()
-//{
-//    ui->stackedWidget->setCurrentIndex(PROGRAM_INDEX);
-//    ui->programButton->setEnabled(false);
-//    this->setWindowTitle("Climate Chamber - Program Set");
-
-//    ui->monitorButton->setEnabled(true);
-//    ui->auxButton->setEnabled(true);
-//    ui->helpButton->setEnabled(true);
-
-//    populateProgramsList();
-//    this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
-//}
-
-
-//void MainWindow::on_auxButton_clicked()
-//{
-//    ui->stackedWidget->setCurrentIndex(AUX_INDEX);
-//    ui->auxButton->setEnabled(false);
-//    this->setWindowTitle("Climate Chamber - Aux Data");
-
-//    ui->monitorButton->setEnabled(true);
-//    ui->programButton->setEnabled(true);
-//    ui->helpButton->setEnabled(true);
-//}
-
-
-//void MainWindow::on_helpButton_clicked()
-//{
-//    ui->stackedWidget->setCurrentIndex(HELP_INDEX);
-//    ui->helpButton->setEnabled(false);
-//    this->setWindowTitle("Climate Chamber - Help");
-
-//    ui->monitorButton->setEnabled(true);
-//    ui->programButton->setEnabled(true);
-//    ui->auxButton->setEnabled(true);
-//}
-
 
 //! ****************** PUBLIC SLOTS *************** !//
 
@@ -167,9 +119,11 @@ void MainWindow::on_loadProgramButton_clicked()
     ///try to set the test program by loadint it from file
     /// and show a dialogue that allows edditing and startitng the test program.
     Program *prepProgram = new Program();
-    QModelIndexList selectedIndeces = ui->programsListView->selectionModel()->selectedIndexes();
-    QModelIndex index = selectedIndeces.at(0);
-    QString pgmName(index.data().toString());
+//    QModelIndexList selectedIndeces = ui->programsListView->selectionModel()->selectedIndexes();
+//    QModelIndex index = selectedIndeces.at(0);
+//    QString pgmName(index.data().toString());
+//    pgmName = pgmName.left(pgmName.indexOf('.'));
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
     DataBackup *db = new DataBackup();
 //    db->loadTestProgram(pgmName, communication->controlParams->testProgram);
@@ -326,6 +280,53 @@ void MainWindow::on_tempPowerChange(int value)
     ui->t2ProgressBar->update();
 }
 
+void MainWindow::on_testProgramNameChanged(QString value)
+{
+    ui->progNameLabel->setText("Pgm. Name: " + value);
+}
+
+void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
+{
+    switch (param) {
+    case Program::Cycl:
+    {
+        QString lbl("Cycle %1 of %2");
+        ui->cycleLabel->setText(lbl.
+                                arg(communication->controlParams->testProgram->getCurrentCycle()).
+                                arg(value));
+    }
+        break;
+    case Program::Curr_cycl:
+    {
+        QString lbl("Cycle %1 of %2");
+        ui->cycleLabel->setText(lbl.
+                                arg(value).
+                                arg(communication->controlParams->testProgram->getCycle()));
+    }
+
+        break;
+    case Program::Stp:
+    {
+        QString lbl("Step %1 of %2");
+        ui->stepLabel->setText(lbl.
+                               arg(communication->controlParams->testProgram->getCurrentStep()).
+                               arg(value));
+    }
+        break;
+    case Program::Curr_stp:
+    {
+         QString lbl("Step %1 of %2");
+         ui->stepLabel->setText(lbl.
+                                arg(value).
+                                arg(communication->controlParams->testProgram->getNoOfSteps()));
+    }
+        break;
+    default:
+        break;
+    }
+}
+
+
 void MainWindow::on_humidPowerChange(int value)
 {
     int res = ((float)value / 255) * 100;
@@ -341,6 +342,10 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         this->setWindowTitle("Climate Chamber - Help");
     }else if(index == PROGRAM_INDEX){
         this->setWindowTitle("Climate Chamber - Program");
+        ui->loadProgramButton->setEnabled(false);
+        ui->renameProgramButton->setEnabled(false);
+        ui->deleteProgramButton->setEnabled(false);
+        ui->startStopButton->setEnabled(false);
         populateProgramsList();
         this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
     }else if(index == MONITOR_INDEX){
@@ -393,4 +398,22 @@ void MainWindow::on_deleteProgramButton_clicked()
         QMessageBox::information(this, "Failure", "Removing program " + pgmName + "failed.",
                                  QMessageBox::Ok, QMessageBox::NoButton);
     }
+}
+
+void MainWindow::on_startStopButton_clicked()
+{
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    QMessageBox::StandardButton reply =
+            QMessageBox::question(this, "Confirm", "Start runing program "
+                                  + pgmName, QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No);
+    if(reply == QMessageBox::No){
+        return;
+    }else{
+        DataBackup db;
+        db.loadTestProgram(pgmName, communication->controlParams->testProgram);
+        communication->controlParams->setIdle(false);
+    }
+
 }

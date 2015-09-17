@@ -14,17 +14,21 @@ class Communication : public QObject
     Q_OBJECT
 private:
     QByteArray *dataReceived;
-//    QThread *processThread;
-    ProcessTest *process;
+    bool chamberConnected;
 
 public:
 
     ControlPC *controlParams;
-    Chamber *chamberParams;
 
     static QSerialPort *serial;
 
-    //! ******************* public functions ****************** !//
+    /**
+     * @brief Communication This constructor initializes the QSerialPort object and
+     * @param parent
+     */
+    explicit Communication(QObject *parent = 0);
+
+    ~Communication();
 
     /**
      * @brief openPort Opens the serial port for communication
@@ -42,21 +46,28 @@ public:
      * control box. it checks if communication is in idel mood or
      * program rinning using isIdel property of ControlPC class.
      */
-    void startIdelCommunication(); //! TO DO: NOT USED CURRENTLY !//
+    void startIdelCommunication(); //! TO DO: !//
 
-    void prepCommunication();
-
-     //! ******************* end of public functions ****************** !//
-
-
-     //! *************** constructors and destructor **************** !//
     /**
-     * @brief Communication This constructor initializes the QSerialPort object and
-     * @param parent
+     * @brief isChamberConnected gets the chamberconnection state value.
+     * Chamber connection value is represented by the chamberConnected
+     * property.
+     * @see Communication::chamberConnected
+     * @return Returns the value of Communication::chamberConnected
      */
-    explicit Communication(QObject *parent = 0);
-    explicit Communication(int a);
-    ~Communication();
+    bool isChamberConnected();
+
+    /**
+     * @brief setChamberConnected A functio to set the value of
+     * Communication::chamberConnected. If the given value is
+     * different from Communication::chamberConnected its value will
+     * be changed and notified.
+     * @param value A bool value to set Communication::chamberConnected
+     */
+    void setChamberConnected(bool value);
+
+
+
 
 signals:
     void newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
@@ -64,10 +75,20 @@ signals:
     void dataArived(QByteArray);
     void idelState(bool);
     void idelStateChanged(bool);
+    void chamberConnectionChanged(bool);
+
 public slots:
+
+    /**
+     * @brief Communication::readData functopn.
+     * Reads data available in the serial device. It calles the readAll() method from
+     * QSerialPort class.
+     * @return the recieved data as QByteArray.
+     */
     QByteArray readData();
     void on_idelStateChanged();
     void on_newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
+    void on_chamberConnectionChanged(bool value);
 };
 
 #endif // COMMUN_H

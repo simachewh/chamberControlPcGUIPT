@@ -24,7 +24,9 @@ ControlPC::ControlPC(QObject *parent) : QObject(parent)
     commandBlock2 = new QBitArray(8);
     humidityBar = new QByteArray();
     temperatureBar = new QByteArray();
+
     testProgram = new Program(parent);
+    climateChamber = new Chamber(parent);
 
     connect(this, SIGNAL(chPartChanged(bool,ControlPC::CH_PART)),
             this, SLOT(on_chPartChanged(bool,ControlPC::CH_PART)));

@@ -2,7 +2,11 @@
 
 Program::Program(QObject *parent) : QObject(parent)
 {
+    currentCycle = 0;
+    currentStep = 0;
 
+    connect(this, SIGNAL(stepsChanged()),
+            this, SLOT(on_stepsChanged()));
 }
 
 int Program::getPoint() const{
@@ -35,7 +39,7 @@ int Program::getCycle() const{
 void Program::setCycle(int value){
     if(cycle != value){
         cycle = value;
-        emit cycleChanged(value);
+        emit programParamChanged(value, Cycl);
     }
 }
 
@@ -46,7 +50,33 @@ int Program::getNoOfSteps() const{
 void Program::setNoOfSteps(int value){
     if(noOfSteps != value){
         noOfSteps = value;
-        emit noOfStepsChanged(value);
+        emit programParamChanged(value, Stp);
+    }
+}
+
+int Program::getCurrentCycle()
+{
+    return currentCycle;
+}
+
+int Program::getCurrentStep()
+{
+    return currentStep;
+}
+
+void Program::setCurrentStep(int value)
+{
+    if(currentStep != value){
+        currentStep = value;
+        emit programParamChanged(value, Curr_stp);
+    }
+}
+
+void Program::setCurrentCycle(int value)
+{
+    if(currentCycle != value){
+        currentCycle = value;
+        emit programParamChanged(value, Curr_cycl);
     }
 }
 
@@ -69,4 +99,9 @@ int Program::addStep(Step *s){
         emit stepsChanged();
     }
     return stepsSize;
+}
+
+void Program::on_stepsChanged()
+{
+    setNoOfSteps(steps.size());
 }

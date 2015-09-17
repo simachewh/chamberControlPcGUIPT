@@ -41,7 +41,6 @@ double Chamber::getHumidity(){
 void Chamber::setDryTemprature(double value){
     if(getDryTemperature() != value){
         dryTemperature = value;
-
         emit dryTemperatureChanged(QString::number(dryTemperature));
     }
 }
