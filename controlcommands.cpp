@@ -1,10 +1,10 @@
-#include "controlpc.h"
+#include "controlcommands.h"
 #include "communication.h"
 #include <QDebug>
 
-bool ControlPC::isIdle = false;
+bool ControlCommands::isIdle = false;
 
-ControlPC::ControlPC(QObject *parent) : QObject(parent)
+ControlCommands::ControlCommands(QObject *parent) : QObject(parent)
 {
     stx = 0x02;
     etx = 0x03;
@@ -22,25 +22,27 @@ ControlPC::ControlPC(QObject *parent) : QObject(parent)
 
     commandBlock1 = new QBitArray(8);
     commandBlock2 = new QBitArray(8);
+    block1 = new QByteArray();
+    block2 = new QByteArray();
     humidityBar = new QByteArray();
     temperatureBar = new QByteArray();
 
     testProgram = new Program(parent);
     climateChamber = new Chamber(parent);
 
-    connect(this, SIGNAL(chPartChanged(bool,ControlPC::CH_PART)),
-            this, SLOT(on_chPartChanged(bool,ControlPC::CH_PART)));
+    connect(this, SIGNAL(chPartChanged(bool,ControlCommands::CH_PART)),
+            this, SLOT(on_chPartChanged(bool,ControlCommands::CH_PART)));
     connect(this, SIGNAL(temperaturePowerChanged(int)),
             this,  SLOT(on_temperaturePowerChanged(int)));
     connect(this, SIGNAL(humidityPowerChanged(int)),
             this, SLOT(on_humidityPowerChanged(int)));
 }
 
-ControlPC::~ControlPC(){
+ControlCommands::~ControlCommands(){
 
 }
 
-QByteArray ControlPC::iyCommand(){
+QByteArray ControlCommands::iyCommand(){
     QByteArray * commandIy = new QByteArray();
     commandIy->append(stx);
     commandIy->append(zero);
@@ -52,7 +54,7 @@ QByteArray ControlPC::iyCommand(){
     return *commandIy;
 }
 
-QByteArray ControlPC::aqCommand(){
+QByteArray ControlCommands::aqCommand(){
     QByteArray * commandAq = new QByteArray();
     commandAq->append(stx);
     commandAq->append(zero);
@@ -64,7 +66,7 @@ QByteArray ControlPC::aqCommand(){
     return *commandAq;
 }
 
-QByteArray ControlPC::brCommand(){
+QByteArray ControlCommands::brCommand(){
     QByteArray * commandBr = new QByteArray();
     commandBr->append(stx);
     commandBr->append(zero);
@@ -76,7 +78,7 @@ QByteArray ControlPC::brCommand(){
     return *commandBr;
 }
 
-QByteArray ControlPC::idleCommand(){
+QByteArray ControlCommands::idleCommand(){
     QByteArray * commandIdeal = new QByteArray();
     QString zeros(20, zero);
     commandIdeal->append(stx);
@@ -89,7 +91,7 @@ QByteArray ControlPC::idleCommand(){
     return *commandIdeal;
 }
 
-QByteArray ControlPC::fullCommand(PC_COMMAND ctype)
+QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
 {
     QByteArray assembledCommand;
     assembledCommand.append(stx);
@@ -134,7 +136,7 @@ QByteArray ControlPC::fullCommand(PC_COMMAND ctype)
     return assembledCommand;
 }
 
-QByteArray ControlPC::calculatecksum(QByteArray value)
+QByteArray ControlCommands::calculatecksum(QByteArray value)
 {
     char sum = 0;
     for(int i = 0; i < value.size(); i++){
@@ -143,7 +145,7 @@ QByteArray ControlPC::calculatecksum(QByteArray value)
     return QByteArray(1, sum);
 }
 
-QByteArray ControlPC::calculatecksum()
+QByteArray ControlCommands::calculatecksum()
 {
     QByteArray ba;
     QString sixBytesOfZero(6, zero);
@@ -160,20 +162,21 @@ QByteArray ControlPC::calculatecksum()
     return QByteArray(1, sum);
 }
 
-QByteArray ControlPC::convertToBytes(QBitArray bits){
+QByteArray ControlCommands::convertToBytes(QBitArray bits){
     QByteArray bytes;
-       bytes.resize(bits.count()/8+1);
+//    bytes.resize(bits.count()/8+1);
+    bytes.resize(bits.count()/8);
        bytes.fill(0x30);
        // Convert from QBitArray to QByteArray
        for(int b=0; b<bits.count(); ++b)
        {
-           qDebug()<< b << " : " << bits[b] << " : " << bits.count();
+//           qDebug()<< "ControlCommands::convertToBytes: " << b << " : " << bits[b] << " : " << bits.count();
            bytes[b/8] = ( bytes.at(b/8) | ((bits[b]?1:0)<<(b%8)));
        }
        return bytes;
 }
 
-QByteArray ControlPC::convertToBytes(int value){
+QByteArray ControlCommands::convertToBytes(int value){
     QByteArray bytes;
     QDataStream stream(&bytes, QIODevice::ReadWrite);
     stream << 1 << value;
@@ -181,226 +184,226 @@ QByteArray ControlPC::convertToBytes(int value){
 }
 
 
-bool ControlPC::getIsIdle(){
-    return ControlPC::isIdle;
+bool ControlCommands::getIsIdle(){
+    return ControlCommands::isIdle;
 }
 
-bool ControlPC::getH1(){
+bool ControlCommands::getH1(){
     return h1;
 }
 
-bool ControlPC::getH2(){
+bool ControlCommands::getH2(){
     return h2;
 }
 
-bool ControlPC::getT1(){
+bool ControlCommands::getT1(){
     return t1;
 }
 
-bool ControlPC::getT2(){
+bool ControlCommands::getT2(){
     return t2;
 }
 
-bool ControlPC::getP1(){
+bool ControlCommands::getP1(){
     return p1;
 }
 
-bool ControlPC::getP2(){
+bool ControlCommands::getP2(){
     return p2;
 }
 
-bool ControlPC::getP3(){
+bool ControlCommands::getP3(){
     return p3;
 }
 
-bool ControlPC::getLNU(){
+bool ControlCommands::getLNU(){
     return lnu;
 }
 
-bool ControlPC::getC1(){
+bool ControlCommands::getC1(){
     return c1;
 }
 
-bool ControlPC::getC2V2(){
+bool ControlCommands::getC2V2(){
     return c2v2;
 }
 
-bool ControlPC::getV1(){
+bool ControlCommands::getV1(){
     return v1;
 }
 
-bool ControlPC::getV3(){
+bool ControlCommands::getV3(){
     return v3;
 }
 
-bool ControlPC::getV4(){
+bool ControlCommands::getV4(){
     return v4;
 }
 
-bool ControlPC::getFan(){
+bool ControlCommands::getFan(){
     return fan;
 }
 
-void ControlPC::setH1(bool value){
+void ControlCommands::setH1(bool value){
     if(h1 != value){
         h1 = value;
         emit chPartChanged(value, H1);
     }
 }
 
-void ControlPC::setH2(bool value){
+void ControlCommands::setH2(bool value){
     if(h2 != value){
         h2 = value;
         emit chPartChanged(value, H2);
     }
 }
 
-void ControlPC::setT1(bool value){
+void ControlCommands::setT1(bool value){
     if(t1 != value){
         t1 = value;
         emit chPartChanged(value, T1);
     }
 }
 
-void ControlPC::setT2(bool value){
+void ControlCommands::setT2(bool value){
     if(t2 != value){
         t2 = value;
         emit chPartChanged(value, T2);
     }
 }
 
-void ControlPC::setP1(bool value){
+void ControlCommands::setP1(bool value){
     if(p1 != value){
         p1 = value;
         emit chPartChanged(value, P1);
     }
 }
 
-void ControlPC::setP2(bool value){
+void ControlCommands::setP2(bool value){
     if(p2 != value){
         p2 = value;
         emit chPartChanged(value, P2);
     }
 }
 
-void ControlPC::setP3(bool value){
+void ControlCommands::setP3(bool value){
     if(p3 != value){
         p3 = value;
         emit chPartChanged(value, P3);
     }
 }
 
-void ControlPC::setLNU(bool value){
+void ControlCommands::setLNU(bool value){
     if(lnu != value){
         lnu = value;
         emit chPartChanged(value, LNU);
     }
 }
 
-void ControlPC::setC1(bool value){
+void ControlCommands::setC1(bool value){
     if(c1 != value){
         c1 = value;
         emit chPartChanged(value, C1);
     }
 }
 
-void ControlPC::setC2V2(bool value){
+void ControlCommands::setC2V2(bool value){
     if(c2v2 != value){
         c2v2 = value;
         emit chPartChanged(value, C2V2);
     }
 }
 
-void ControlPC::setV1(bool value){
+void ControlCommands::setV1(bool value){
     if(v1 != value){
         v1 = value;
         emit chPartChanged(value, V1);
     }
 }
 
-void ControlPC::setV3(bool value){
+void ControlCommands::setV3(bool value){
     if(v3 != value){
         v3 = value;
         emit chPartChanged(value, V3);
     }
 }
 
-void ControlPC::setV4(bool value){
+void ControlCommands::setV4(bool value){
     if(v4 != value){
         v4 = value;
         emit chPartChanged(value, V4);
     }
 }
 
-void ControlPC::setFan(bool value){
+void ControlCommands::setFan(bool value){
     if(fan != value){
         fan = value;
         emit chPartChanged(value, FAN);
     }
 }
 
-QByteArray ControlPC::getTempratureBar()
+QByteArray ControlCommands::getTempratureBar()
 {
     return *temperatureBar;
 }
 
-void ControlPC::setTemperatureBar(QByteArray value)
+void ControlCommands::setTemperatureBar(QByteArray value)
 {
     *temperatureBar = value;
 }
 
-QByteArray ControlPC::getHumidityBar()
+QByteArray ControlCommands::getHumidityBar()
 {
     return *humidityBar;
 }
 
-void ControlPC::setHumidityBar(QByteArray value)
+void ControlCommands::setHumidityBar(QByteArray value)
 {
     * humidityBar = value;
 }
 
-QByteArray ControlPC::getCksum()
+QByteArray ControlCommands::getCksum()
 {
     *cksum = calculatecksum();
     return *cksum;
 }
 
-void ControlPC::setCksum(QByteArray value)
+void ControlCommands::setCksum(QByteArray value)
 {
     *cksum = value;
 }
 
-void ControlPC::setTemperaturePower(int value){
+void ControlCommands::setTemperaturePower(int value){
     if(temperaturePower != value){
         temperaturePower = value;
         emit temperaturePowerChanged(value);
     }
 }
 
-int ControlPC::getTempraturePower(){
+int ControlCommands::getTempraturePower(){
     return temperaturePower;
 }
 
-void ControlPC::setHumidityPower(int value){
+void ControlCommands::setHumidityPower(int value){
     if(humidityPower != value){
         humidityPower = value;
         emit humidityPowerChanged(value);
     }
 }
 
-int ControlPC::getHumidityPower(){
+int ControlCommands::getHumidityPower(){
     return humidityPower;
 }
 
 
-void ControlPC::setIdle(bool idelState){
+void ControlCommands::setIdle(bool idelState){
     if(!(getIsIdle() == idelState)){
         isIdle = idelState;
         emit idleStateChanged();
     }
 }
 
-void ControlPC::on_chPartChanged(bool value, ControlPC::CH_PART part){
+void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part){
     switch (part) {
     case H1:
         (*commandBlock1)[6] = value;
@@ -449,11 +452,11 @@ void ControlPC::on_chPartChanged(bool value, ControlPC::CH_PART part){
     }
 }
 
-void ControlPC::on_temperaturePowerChanged(int value){
+void ControlCommands::on_temperaturePowerChanged(int value){
     setTemperatureBar(convertToBytes(value));
 }
 
-void ControlPC::on_humidityPowerChanged(int value){
+void ControlCommands::on_humidityPowerChanged(int value){
     setHumidityBar(convertToBytes(value));
 }
 

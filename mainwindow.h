@@ -5,7 +5,7 @@
 #include <QMainWindow>
 #include <QFileSystemModel>
 
-#include "controlpc.h"
+#include "controlcommands.h"
 #include "communication.h"
 #include "chamber.h"
 #include "addprogram.h"
@@ -36,7 +36,7 @@ private slots:
 
     void on_loadProgramButton_clicked();
 
-    void on_partsChanged(bool value, ControlPC::CH_PART part);
+    void on_partsChanged(bool value, ControlCommands::CH_PART part);
 
     void on_tabWidget_currentChanged(int index);
 

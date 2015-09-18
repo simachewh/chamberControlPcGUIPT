@@ -143,6 +143,8 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
         qDebug() << "DataBackup::loadProgram: loadedSteps size" << loadedSteps.size();
     }
     prgm->setSteps(loadedSteps);
+    prgm->setCurrentCycle(1);
+    prgm->setCurrentStep(1);
 }
 
 //! ************************ END OF PUBLIC FUNCTIONS *************** !//

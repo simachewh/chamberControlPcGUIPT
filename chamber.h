@@ -26,8 +26,11 @@ public:
 
 signals:
     void dryTemperatureChanged(QString value);
+    void dryTemperatureChanged(int);
     void wetTemperatureChanged(QString value);
+    void wetTemperatureChanged(int);
     void humidityChanged(QString value);
+    void humidityChanged(int);
     void chCommandChanged(Chamber::command chCommand);
 
 public slots:

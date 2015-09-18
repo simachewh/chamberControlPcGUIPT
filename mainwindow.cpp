@@ -11,34 +11,44 @@ MainWindow::MainWindow(QWidget *parent) :
 
     initStyle();
 
-    //!connection to update chamber's dry temperature change to GUI temperature lable!//
-    connect(communication->controlParams->climateChamber, SIGNAL(dryTemperatureChanged(QString)),
+    //!connection to update chamber's dry temperature change to
+    //! GUI temperature lable!//
+    connect(communication->pidController->chamberParams,
+            SIGNAL(dryTemperatureChanged(QString)),
             ui->tempRealValueLabel, SLOT(setText(QString)));
 
     //!connection to update chamber's humidity change to GUI humidity lable!//
-    connect(communication->controlParams->climateChamber, SIGNAL(humidityChanged(QString)),
+    connect(communication->pidController->chamberParams,
+            SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
-    connect(communication->controlParams, SIGNAL(chPartChanged(bool,ControlPC::CH_PART)),
-            this, SLOT(on_partsChanged(bool,ControlPC::CH_PART)));
+    connect(communication->pidController->controlCommands,
+            SIGNAL(chPartChanged(bool,ControlCommands::CH_PART)),
+            this, SLOT(on_partsChanged(bool,ControlCommands::CH_PART)));
 
-    //! connection bettwen ControlPC teperature power change and temperature progress bar !//
-    connect(communication->controlParams, SIGNAL(temperaturePowerChanged(int)),
+    //! connection bettwen ControlPC teperature power change and
+    //! temperature progress bar !//
+    connect(communication->pidController->controlCommands,
+            SIGNAL(temperaturePowerChanged(int)),
             this, SLOT(on_tempPowerChange(int)));
 
-    //! connection bettwen ControlPC humidity power change and humidity progress bar !//
-    connect(communication->controlParams, SIGNAL(humidityPowerChanged(int)),
+    //! connection bettwen ControlPC humidity power change and
+    //! humidity progress bar !//
+    connect(communication->pidController->controlCommands,
+            SIGNAL(humidityPowerChanged(int)),
             this, SLOT(on_humidPowerChange(int)));
 
     //! program connections to gui !//
-    connect(communication->controlParams->testProgram, SIGNAL(programNameChanged(QString)),
+    connect(communication->pidController->testPgm,
+            SIGNAL(programNameChanged(QString)),
             this, SLOT(on_testProgramNameChanged(QString)));
-    connect(communication->controlParams->testProgram, SIGNAL(programParamChanged(int,Program::PGM_PARAM)),
+    connect(communication->pidController->testPgm,
+            SIGNAL(programParamChanged(int,Program::PGM_PARAM)),
             this, SLOT(on_testProgramParamChanged(int,Program::PGM_PARAM)));
 
-    communication->controlParams->setC2V2(true);
-    communication->controlParams->setHumidityPower(220);
-    communication->controlParams->setTemperaturePower(150);
+//    communication->pidController->controlCommands->setC2V2(true);
+//    communication->pidController->controlCommands->setHumidityPower(220);
+//    communication->pidController->controlCommands->setTemperaturePower(150);
 
 }
 
@@ -134,10 +144,10 @@ void MainWindow::on_loadProgramButton_clicked()
     lp->show();
 }
 
-void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
+void MainWindow::on_partsChanged(bool value, ControlCommands::CH_PART part)
 {
     switch (part) {
-    case ControlPC::H1:
+    case ControlCommands::H1:
         if(value){
             ui->h1Label->setStyleSheet("background-color: #0ABAF5");
             ui->h1Label->update();
@@ -146,7 +156,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->h1Label->update();
         }
         break;
-    case ControlPC::H2:
+    case ControlCommands::H2:
         if(value){
             ui->h2Label->setStyleSheet("background-color: #0ABAF5");
             ui->h2Label->update();
@@ -155,7 +165,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->h2Label->update();
         }
         break;
-    case ControlPC::T1:
+    case ControlCommands::T1:
         if(value){
             ui->t1Label->setStyleSheet("background-color: #0ABAF5");
             ui->t1Label->update();
@@ -164,7 +174,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->t1Label->update();
         }
         break;
-    case ControlPC::T2:
+    case ControlCommands::T2:
         if(value){
             ui->t2Label->setStyleSheet("background-color: #0ABAF5");
             ui->t2Label->update();
@@ -173,7 +183,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->t2Label->update();
         }
         break;
-    case ControlPC::P1:
+    case ControlCommands::P1:
         if(value){
             ui->p1Label->setStyleSheet("background-color: #0ABAF5");
             ui->p1Label->update();
@@ -182,7 +192,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->p1Label->update();
         }
         break;
-    case ControlPC::P2:
+    case ControlCommands::P2:
         if(value){
             ui->p2Label->setStyleSheet("background-color: #0ABAF5");
             ui->p2Label->update();
@@ -191,7 +201,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->p2Label->update();
         }
         break;
-    case ControlPC::P3:
+    case ControlCommands::P3:
         if(value){
             ui->p3Label->setStyleSheet("background-color: #0ABAF5");
             ui->p3Label->update();
@@ -200,7 +210,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->p3Label->update();
         }
         break;
-    case ControlPC::LNU:
+    case ControlCommands::LNU:
         if(value){
             ui->lnvLabel->setStyleSheet("background-color: #0ABAF5");
             ui->lnvLabel->update();
@@ -209,7 +219,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->lnvLabel->update();
         }
         break;
-    case ControlPC::C1:
+    case ControlCommands::C1:
         if(value){
             ui->c1Label->setStyleSheet("background-color: #0ABAF5");
             ui->c1Label->update();
@@ -218,7 +228,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->c1Label->update();
         }
         break;
-    case ControlPC::C2V2:
+    case ControlCommands::C2V2:
         if(value){
             ui->c2Label->setStyleSheet("background-color: #0ABAF5");
             ui->v2Label->setStyleSheet("background-color: #0ABAF5");
@@ -231,7 +241,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->v2Label->update();
         }
         break;
-    case ControlPC::V1:
+    case ControlCommands::V1:
         if(value){
             ui->v1Label->setStyleSheet("background-color: #0ABAF5");
             ui->v1Label->update();
@@ -239,7 +249,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
 
         }
         break;
-    case ControlPC::V3:
+    case ControlCommands::V3:
         if(value){
             ui->v3Label->setStyleSheet("background-color: #0ABAF5");
             ui->v3Label->update();
@@ -248,7 +258,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->v3Label->update();
         }
         break;
-    case ControlPC::V4:
+    case ControlCommands::V4:
         if(value){
             ui->v4Label->setStyleSheet("background-color: #0ABAF5");
             ui->v4Label->update();
@@ -257,7 +267,7 @@ void MainWindow::on_partsChanged(bool value, ControlPC::CH_PART part)
             ui->v4Label->update();
         }
         break;
-    case ControlPC::FAN:
+    case ControlCommands::FAN:
         if(value){
             ui->fn1Label->setStyleSheet("background-color: #0ABAF5");
             ui->fn1Label->update();
@@ -292,7 +302,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
     {
         QString lbl("Cycle %1 of %2");
         ui->cycleLabel->setText(lbl.
-                                arg(communication->controlParams->testProgram->getCurrentCycle()).
+                                arg(communication->pidController->testPgm->getCurrentCycle()).
                                 arg(value));
     }
         break;
@@ -301,7 +311,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
         QString lbl("Cycle %1 of %2");
         ui->cycleLabel->setText(lbl.
                                 arg(value).
-                                arg(communication->controlParams->testProgram->getCycle()));
+                                arg(communication->pidController->testPgm->getCycle()));
     }
 
         break;
@@ -309,7 +319,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
     {
         QString lbl("Step %1 of %2");
         ui->stepLabel->setText(lbl.
-                               arg(communication->controlParams->testProgram->getCurrentStep()).
+                               arg(communication->pidController->testPgm->getCurrentStep()).
                                arg(value));
     }
         break;
@@ -318,7 +328,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
          QString lbl("Step %1 of %2");
          ui->stepLabel->setText(lbl.
                                 arg(value).
-                                arg(communication->controlParams->testProgram->getNoOfSteps()));
+                                arg(communication->pidController->testPgm->getNoOfSteps()));
     }
         break;
     default:
@@ -347,7 +357,8 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         ui->deleteProgramButton->setEnabled(false);
         ui->startStopButton->setEnabled(false);
         populateProgramsList();
-        this->communication->controlParams->setC2V2(!communication->controlParams->getC2V2()); //this is for demonestration
+//        this->communication->pidController->controlCommands->
+//                setC2V2(!communication->pidController->controlCommands->getC2V2()); //this is for demonestration
     }else if(index == MONITOR_INDEX){
         this->setWindowTitle("Climate Chamber - Monitor");
     }else if(index == AUX_INDEX){
@@ -412,8 +423,9 @@ void MainWindow::on_startStopButton_clicked()
         return;
     }else{
         DataBackup db;
-        db.loadTestProgram(pgmName, communication->controlParams->testProgram);
-        communication->controlParams->setIdle(false);
+        db.loadTestProgram(pgmName, communication->pidController->testPgm);
+        communication->pidController->controlCommands->setIdle(false);
+        communication->pidController->startTest();
     }
 
 }

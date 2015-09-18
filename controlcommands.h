@@ -16,7 +16,7 @@
  * protocol.
  * @author Simachew Tibebu
  */
-class ControlPC : public QObject
+class ControlCommands : public QObject
 {
     Q_OBJECT
 
@@ -183,8 +183,8 @@ public:
      * end to HEX 0D and the rest of blocks of command to HEX 30
      * @param parent
      */
-    explicit ControlPC(QObject *parent = 0);
-    ~ControlPC();
+    explicit ControlCommands(QObject *parent = 0);
+    ~ControlCommands();
 
     /**
      * @brief iyCommand constructs the command with 0iy
@@ -308,10 +308,10 @@ public:
     QByteArray calculatecksum(QByteArray value);
 signals:
     void idleStateChanged();
-    void pcCommandChanged(ControlPC::PC_COMMAND PC_COMMAND);
-    void chCommandChanged(ControlPC::CH_COMMAND CH_COMMAND);
+    void pcCommandChanged(ControlCommands::PC_COMMAND PC_COMMAND);
+    void chCommandChanged(ControlCommands::CH_COMMAND CH_COMMAND);
 
-    void chPartChanged(bool value, ControlPC::CH_PART);
+    void chPartChanged(bool value, ControlCommands::CH_PART);
     void temperaturePowerChanged(int);
     void humidityPowerChanged(int);
 
@@ -336,7 +336,7 @@ signals:
 
 public slots:
     void setIdle(bool idelState);
-    void on_chPartChanged(bool value, ControlPC::CH_PART part);
+    void on_chPartChanged(bool value, ControlCommands::CH_PART part);
     void on_temperaturePowerChanged(int value);
     void on_humidityPowerChanged(int value);
 };

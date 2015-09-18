@@ -3,13 +3,22 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QDebug>
+
 #include "chamber.h"
-#include "controlpc.h"
+#include "controlcommands.h"
+#include "program.h"
 
 class Controller : public QObject
 {
     Q_OBJECT
 public:
+
+    Program *testPgm;
+    Chamber *chamberParams;
+    ControlCommands *controlCommands;
+
+
     explicit Controller(QObject *parent = 0);
     ~Controller();
 
@@ -42,13 +51,11 @@ public:
 
     QTimer *timer;
 
-    void conrtolTestRun(ControlPC *contrlParams,
-                        Chamber *climateChamber, Program *testPgm);
+    void controlTestRun();
 
-    void setUpStart(ControlPC *conrolParams,
-                    Chamber *climateChamber, Program *testPgm);
+    void setUpStart();
 
-    void changeStep();
+    void startTest();
 
 
 
@@ -56,8 +63,17 @@ public:
 
 
 signals:
+    void stepsFinished(int totalStepsDone);
+    void stepsDone(bool);
+    void controlready(ControlCommands::CH_COMMAND);
 
-public slots:
+public slots:    
+
+    void changeStep();
+
+    void on_stepChange();
+
+    void on_controlRequested();
 };
 
 #endif // CONTROLLER_H

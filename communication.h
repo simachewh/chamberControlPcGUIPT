@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QtSerialPort/QtSerialPort>
 
-#include "controlpc.h"
+#include "controlcommands.h"
 #include "chamber.h"
+#include "controller.h"
 
 class ProcessTest;
 
@@ -18,7 +19,8 @@ private:
 
 public:
 
-    ControlPC *controlParams;
+   // ControlPC *controlParams;
+    Controller *pidController;
 
     static QSerialPort *serial;
 
@@ -70,7 +72,9 @@ public:
 
 
 signals:
-    void newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
+    void newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND);
+    void replyReady(ControlCommands::CH_COMMAND);
+    void requestControl();
     void unusualDataArived(QByteArray unkownData);
     void dataArived(QByteArray);
     void idelState(bool);
@@ -87,8 +91,10 @@ public slots:
      */
     QByteArray readData();
     void on_idelStateChanged();
-    void on_newDataArived(QByteArray newDataArived, ControlPC::CH_COMMAND);
+    void on_newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND chCommand);
     void on_chamberConnectionChanged(bool value);
+    void on_controlReady();
+    void reply(ControlCommands::CH_COMMAND chCommand);
 };
 
 #endif // COMMUN_H
