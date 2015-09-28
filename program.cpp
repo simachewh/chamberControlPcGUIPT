@@ -69,6 +69,7 @@ void Program::setCurrentStep(int value)
     if(currentStep != value){
         currentStep = value;
         emit programParamChanged(value, Curr_stp);
+        emit currentStepChanged(value);
     }
 }
 
@@ -77,6 +78,7 @@ void Program::setCurrentCycle(int value)
     if(currentCycle != value){
         currentCycle = value;
         emit programParamChanged(value, Curr_cycl);
+        emit currentCycleChanged(value);
     }
 }
 

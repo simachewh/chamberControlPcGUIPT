@@ -48,7 +48,11 @@ private slots:
 
     void on_deleteProgramButton_clicked();
 
-    void on_startStopButton_clicked();
+    void on_testFinished();
+
+    void on_stopButton_clicked();
+
+    void on_startButton_clicked();
 
 public slots:
     void populateProgramsList();

@@ -27,8 +27,8 @@ ControlCommands::ControlCommands(QObject *parent) : QObject(parent)
     humidityBar = new QByteArray();
     temperatureBar = new QByteArray();
 
-    testProgram = new Program(parent);
-    climateChamber = new Chamber(parent);
+//    testProgram = new Program(parent);
+//    climateChamber = new Chamber(parent);
 
     connect(this, SIGNAL(chPartChanged(bool,ControlCommands::CH_PART)),
             this, SLOT(on_chPartChanged(bool,ControlCommands::CH_PART)));
@@ -125,7 +125,7 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
         assembledCommand.append(getHumidityBar());
         assembledCommand.append(etx);
         //! checksum calculated from the assembled command
-        assembledCommand.append(calculatecksum(assembledCommand));
+        assembledCommand.append(calculateCksum(assembledCommand));
         //assembledCommand.append('?');
         break;
     }
@@ -136,16 +136,16 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
     return assembledCommand;
 }
 
-QByteArray ControlCommands::calculatecksum(QByteArray value)
+QByteArray ControlCommands::calculateCksum(QByteArray value)
 {
     char sum = 0;
-    for(int i = 0; i < value.size(); i++){
+    for(int i = 1; i < value.size() - 1; i++){
         sum += value.at(i);
     }
     return QByteArray(1, sum);
 }
 
-QByteArray ControlCommands::calculatecksum()
+QByteArray ControlCommands::getCalculatedCksum()
 {
     QByteArray ba;
     QString sixBytesOfZero(6, zero);
@@ -352,6 +352,31 @@ void ControlCommands::setTemperatureBar(QByteArray value)
     *temperatureBar = value;
 }
 
+void ControlCommands::resetAll()
+{
+    //! sitch of all devices & set power outputs to zero
+    bool on = true;
+    bool off = false;
+
+    setT1(off);
+    setT2(off);
+    setH1(off);
+    setH2(off);
+    setC1(off);
+    setC2V2(off);
+    setV1(off);
+    setV3(off);
+    setV4(off);
+    setLNU(off);
+    setP1(off);
+    setP2(off);
+    setP3(off);
+    setHumidityPower(0);
+    setTemperaturePower(0);
+    setFan(off);
+    setIdle(off);
+}
+
 QByteArray ControlCommands::getHumidityBar()
 {
     return *humidityBar;
@@ -364,7 +389,7 @@ void ControlCommands::setHumidityBar(QByteArray value)
 
 QByteArray ControlCommands::getCksum()
 {
-    *cksum = calculatecksum();
+    *cksum = getCalculatedCksum();
     return *cksum;
 }
 
@@ -374,7 +399,7 @@ void ControlCommands::setCksum(QByteArray value)
 }
 
 void ControlCommands::setTemperaturePower(int value){
-    if(temperaturePower != value){
+    if(temperaturePower != value && value >= 0 && value <= 255){
         temperaturePower = value;
         emit temperaturePowerChanged(value);
     }
@@ -385,7 +410,7 @@ int ControlCommands::getTempraturePower(){
 }
 
 void ControlCommands::setHumidityPower(int value){
-    if(humidityPower != value){
+    if(humidityPower != value && value >= 0 && value <= 255){
         humidityPower = value;
         emit humidityPowerChanged(value);
     }

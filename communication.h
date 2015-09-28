@@ -16,6 +16,12 @@ class Communication : public QObject
 private:
     QByteArray *dataReceived;
     bool chamberConnected;
+    /**
+     * @brief connectionTimer This timer is used
+     * to check connnection of the pc to controll
+     * box
+     */
+    QTimer *connectionTimer;
 
 public:
 

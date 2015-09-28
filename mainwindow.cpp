@@ -46,6 +46,10 @@ MainWindow::MainWindow(QWidget *parent) :
             SIGNAL(programParamChanged(int,Program::PGM_PARAM)),
             this, SLOT(on_testProgramParamChanged(int,Program::PGM_PARAM)));
 
+    //! controller connection to gui !//
+    connect(communication->pidController, SIGNAL(stepsDone(bool)),
+            this, SLOT(on_testFinished()));
+
 //    communication->pidController->controlCommands->setC2V2(true);
 //    communication->pidController->controlCommands->setHumidityPower(220);
 //    communication->pidController->controlCommands->setTemperaturePower(150);
@@ -81,7 +85,8 @@ void MainWindow::initStyle(){
     ui->loadProgramButton->setEnabled(false);
     ui->renameProgramButton->setEnabled(false);
     ui->deleteProgramButton->setEnabled(false);
-    ui->startStopButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
 
     ui->tableSpliter->setStretchFactor(0, 1);
     ui->tableSpliter->setStretchFactor(1, 3);
@@ -118,8 +123,8 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     if(!ui->deleteProgramButton->isEnabled()){
         ui->deleteProgramButton->setEnabled(true);
     }
-    if(!ui->startStopButton->isEnabled()){
-        ui->startStopButton->setEnabled(true);
+    if(!ui->startButton->isEnabled()){
+        ui->startButton->setEnabled(true);
     }
     qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
 }
@@ -284,6 +289,8 @@ void MainWindow::on_partsChanged(bool value, ControlCommands::CH_PART part)
 void MainWindow::on_tempPowerChange(int value)
 {
     int res = ((float)value / 255.0) * 100;
+    qDebug() << "MainWindow::on_tempPowerChange: value" << value;
+    qDebug() << "MainWindow::on_tempPowerChange: res" << res;
     ui->t1ProgressBar->setValue(res);
     ui->t2ProgressBar->setValue(res);
     ui->t1ProgressBar->update();
@@ -329,6 +336,16 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
          ui->stepLabel->setText(lbl.
                                 arg(value).
                                 arg(communication->pidController->testPgm->getNoOfSteps()));
+         double humSet = communication->pidController
+                 ->testPgm->getSteps().value(communication->pidController
+                                             ->testPgm->getCurrentStep())
+                 ->getHumidity();
+         double tempset = communication->pidController
+                 ->testPgm->getSteps().value(communication->pidController
+                                             ->testPgm->getCurrentStep())
+                 ->getTemperature();
+         ui->humidSetValueLabel->setText(QString("%1").arg(humSet));
+         ui->tempSetValueLabel->setText(QString("%1").arg(tempset));
     }
         break;
     default:
@@ -355,7 +372,7 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         ui->loadProgramButton->setEnabled(false);
         ui->renameProgramButton->setEnabled(false);
         ui->deleteProgramButton->setEnabled(false);
-        ui->startStopButton->setEnabled(false);
+        ui->startButton->setEnabled(false);
         populateProgramsList();
 //        this->communication->pidController->controlCommands->
 //                setC2V2(!communication->pidController->controlCommands->getC2V2()); //this is for demonestration
@@ -411,7 +428,22 @@ void MainWindow::on_deleteProgramButton_clicked()
     }
 }
 
-void MainWindow::on_startStopButton_clicked()
+
+void MainWindow::on_testFinished()
+{
+    QMessageBox::information(this, "Information", "Runing Test Program has Finished",
+                             QMessageBox::Ok, QMessageBox::NoButton);
+    return;
+}
+
+void MainWindow::on_stopButton_clicked()
+{
+    communication->pidController->testPgm = new Program();
+    communication->pidController->controlCommands->setIdle(false);
+    ui->stopButton->setEnabled(false);
+}
+
+void MainWindow::on_startButton_clicked()
 {
     QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
@@ -426,6 +458,6 @@ void MainWindow::on_startStopButton_clicked()
         db.loadTestProgram(pgmName, communication->pidController->testPgm);
         communication->pidController->controlCommands->setIdle(false);
         communication->pidController->startTest();
+        ui->stopButton->setEnabled(true);
     }
-
 }

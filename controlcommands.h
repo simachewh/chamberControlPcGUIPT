@@ -63,8 +63,8 @@ public:
     enum CH_COMMAND {ACK = 0x06, A = 'A', B = 'B', I = 'I'};
     enum CH_PART {H1, H2, T1, T2, P1, P2, P3, LNU, C1, C2V2, V1, V3, V4, FAN, Temp_Power, Hum_Power};
 
-    Program *testProgram;
-    Chamber *climateChamber;
+//    Program *testProgram;
+//    Chamber *climateChamber;
 
 
     /**
@@ -208,7 +208,7 @@ public:
 
     QByteArray fullCommand(PC_COMMAND ctype);
 
-    QByteArray calculatecksum();
+    QByteArray getCalculatedCksum();
 
     bool getIsIdle();
 
@@ -270,11 +270,11 @@ public:
 
     QByteArray getTempratureBar();
 
-    void setTemperatureBar(QByteArray value);
+
 
     QByteArray getHumidityBar();
 
-    void setHumidityBar(QByteArray value);
+
 
     QByteArray getCksum();
 
@@ -305,7 +305,7 @@ public:
      * @return
      */
     QByteArray convertToBytes(int value);
-    QByteArray calculatecksum(QByteArray value);
+    QByteArray calculateCksum(QByteArray value);
 signals:
     void idleStateChanged();
     void pcCommandChanged(ControlCommands::PC_COMMAND PC_COMMAND);
@@ -336,9 +336,23 @@ signals:
 
 public slots:
     void setIdle(bool idelState);
-    void on_chPartChanged(bool value, ControlCommands::CH_PART part);
+    void on_chPartChanged(bool value,
+                          ControlCommands::CH_PART part);
+
+    /**
+     * @brief on_temperaturePowerChanged This function
+     * takes the given integer convert it to byte and
+     * sets the temperatureBar progperty. It will make
+     * a call to setTemperatureBar().
+     * @param value the integer value of tempertature power.
+     * this value shoul be [0, 255]
+     */
     void on_temperaturePowerChanged(int value);
     void on_humidityPowerChanged(int value);
+
+    void setHumidityBar(QByteArray value);
+    void setTemperatureBar(QByteArray value);
+    void resetAll();
 };
 
 #endif // CONTROLLPC_H

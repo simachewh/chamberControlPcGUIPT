@@ -10,6 +10,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
 
     //controlParams = new ControlPC();
     pidController = new Controller(parent);
+    connectionTimer = new QTimer(parent);
 
     openPort();
 
@@ -103,17 +104,17 @@ void Communication::on_idelStateChanged(){
     bool isIdel = pidController->controlCommands->getIsIdle();
     if(isIdel){
         qDebug() << "state changed: " << isIdel;
-        disconnect(pidController->chamberParams, SIGNAL(dryTemperatureChanged(int)),
-                   pidController, SLOT(on_realvaluesChanged(int)));
-        disconnect(pidController->chamberParams, SIGNAL(humidityChanged(int)),
-                   pidController, SLOT(on_realvaluesChanged(int)));
-        startIdelCommunication();
+//        disconnect(pidController->chamberParams, SIGNAL(dryTemperatureChanged(int)),
+//                   pidController, SLOT(on_realvaluesChanged(int)));
+//        disconnect(pidController->chamberParams, SIGNAL(humidityChanged(int)),
+//                   pidController, SLOT(on_realvaluesChanged(int)));
+       startIdelCommunication();
     }else{
         qDebug() << "state changed: " << isIdel;
-        connect(pidController->chamberParams, SIGNAL(dryTemperatureChanged(int)),
-                   pidController, SLOT(on_realvaluesChanged(int)));
-        connect(pidController->chamberParams, SIGNAL(humidityChanged(int)),
-                   pidController, SLOT(on_realvaluesChanged(int)));
+//        connect(pidController->chamberParams, SIGNAL(dryTemperatureChanged(int)),
+//                   pidController, SLOT(on_realvaluesChanged(int)));
+//        connect(pidController->chamberParams, SIGNAL(humidityChanged(int)),
+//                   pidController, SLOT(on_realvaluesChanged(int)));
     }
 }
 
