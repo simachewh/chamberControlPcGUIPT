@@ -206,6 +206,13 @@ public:
 
     QByteArray idleCommand();
 
+    /**
+     * @brief fullCommand Function constracts the type of command
+     * described by the given enum type, PC_COMMAND, in to a QByteArray
+     * and returns it.
+     * @param ctype
+     * @return
+     */
     QByteArray fullCommand(PC_COMMAND ctype);
 
     QByteArray getCalculatedCksum();

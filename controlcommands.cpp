@@ -117,16 +117,17 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
         *block1 = convertToBytes(*commandBlock1);
         *block2 = convertToBytes(*commandBlock2);
         assembledCommand.append(capO);
-        QString sixBytesOfZero(6, zero);
-        assembledCommand.append(sixBytesOfZero);
+        QString twelveZeros(12, zero);
+        assembledCommand.append(twelveZeros);
         assembledCommand.append(*block1);
         assembledCommand.append(*block2);
         assembledCommand.append(getTempratureBar());
         assembledCommand.append(getHumidityBar());
         assembledCommand.append(etx);
         //! checksum calculated from the assembled command
-        assembledCommand.append(calculateCksum(assembledCommand));
-        //assembledCommand.append('?');
+        assembledCommand.append(getCalculatedCksum());
+        qDebug() << "ControlCommands::fullCommand(PC_COMMAND ctype)"
+                 << assembledCommand;
         break;
     }
     default:
@@ -148,18 +149,21 @@ QByteArray ControlCommands::calculateCksum(QByteArray value)
 QByteArray ControlCommands::getCalculatedCksum()
 {
     QByteArray ba;
-    QString sixBytesOfZero(6, zero);
+    QString sixBytesOfZero(12, zero);
     ba.append(zero);
+    ba.append(capO);
     ba.append(sixBytesOfZero);
     ba.append(convertToBytes(*commandBlock1));
     ba.append(convertToBytes(*commandBlock2));
     ba.append(getTempratureBar());
     ba.append(getHumidityBar());
-    char sum = 0;
-    for (int i = 0; i < ba.size(); i++) {
-        sum += ba.at(i);
-    }
-    return QByteArray(1, sum);
+    qint8 sum = 0;
+    ba = ba.toHex();
+    qint16 cks = qChecksum(ba.data(), ba.length());
+//    for (int i = 0; i < ba.size(); i++) {
+//        sum += ba.at(i);
+//    }
+    return QByteArray(1, cks);
 }
 
 QByteArray ControlCommands::convertToBytes(QBitArray bits){

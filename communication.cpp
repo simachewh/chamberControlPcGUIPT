@@ -11,6 +11,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
     //controlParams = new ControlPC();
     pidController = new Controller(parent);
     connectionTimer = new QTimer(parent);
+    setStateCounter(0);
 
     openPort();
 
@@ -21,10 +22,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
             this, SLOT(on_newDataArived(QByteArray, ControlCommands::CH_COMMAND)));
 
     connect(this, SIGNAL(replyReady(ControlCommands::CH_COMMAND)),
-            this, SLOT(reply(ControlCommands::CH_COMMAND)));
-
-    connect(pidController->controlCommands, SIGNAL(idleStateChanged()),
-            this, SLOT(on_idelStateChanged()));
+            this, SLOT(reply(ControlCommands::CH_COMMAND)));    
 
     connect(this, SIGNAL(requestControl()),
             pidController, SLOT(on_controlRequested()));
@@ -32,7 +30,22 @@ Communication::Communication(QObject *parent) : QObject(parent)
     connect(pidController, SIGNAL(controlready(ControlCommands::CH_COMMAND)),
             this, SLOT(reply(ControlCommands::CH_COMMAND)));
 
+    connect(this, SIGNAL(stateCounterChanged(int)),
+            this, SLOT(on_stateCounterChanged(int)));
+
+    //! conntrol comands signals connection to this
+//    connect(pidController->controlCommands, SIGNAL(idleStateChanged()),
+//            this, SLOT(on_idelStateChanged()));
+
+    //! connection timer signal connection to this
+    connect(connectionTimer, SIGNAL(timeout()),
+            this, SLOT(on_connectionTimerOut()));
+
+    //! set the state of connection to false !//
+   // setChamberConnected(false);
+
     pidController->controlCommands->setIdle(true);
+    connectionTimer->start(1000);
 }
 
 Communication::~Communication(){
@@ -59,6 +72,7 @@ bool Communication::openPort(){
                  << "Parity: " << serial->parity();
     }else{
         open = serial->isOpen();
+        setChamberConnected(open);
     }
 return open;
 
@@ -100,6 +114,9 @@ QByteArray Communication::readData(){
     return *dataReceived;
 }
 
+
+
+
 void Communication::on_idelStateChanged(){
     bool isIdel = pidController->controlCommands->getIsIdle();
     if(isIdel){
@@ -118,7 +135,9 @@ void Communication::on_idelStateChanged(){
     }
 }
 
-void Communication::on_newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND chCommand){
+void Communication::on_newDataArived(QByteArray newDataArived,
+                                     ControlCommands::CH_COMMAND chCommand)
+{
 
 if(chCommand == ControlCommands::A){
         QStringList list;
@@ -131,14 +150,26 @@ if(chCommand == ControlCommands::A){
 
         pidController->chamberParams->setDryTemprature(temp);
         pidController->chamberParams->setHumidity(humid);
-        if(pidController->controlCommands->getIsIdle()){
+
+        if(pidController->controlCommands->getIsIdle())
+        {
             emit replyReady(chCommand);
         }else{
             emit requestControl();
         }
-    }else {
-        emit replyReady(chCommand);
+}else if(chCommand == ControlCommands::B){
+    if(!isChamberConnected() && getStateCounter() > 2){
+        setStateCounter(0);
     }
+    setStateCounter(1);
+    setChamberConnected(true);
+    emit replyReady(chCommand);
+}else if(chCommand == ControlCommands::A){
+    emit replyReady(chCommand);
+}else if(chCommand == ControlCommands::I){
+    setChamberConnected(false);
+    return;
+}
 }
 
 void Communication::on_chamberConnectionChanged(bool value)
@@ -186,6 +217,37 @@ void Communication::reply(ControlCommands::CH_COMMAND chCommand)
     }
 }
 
+void Communication::on_connectionTimerOut()
+{
+
+    if(!isChamberConnected()){
+        if(!serial->isOpen()){
+            openPort();
+        }
+        stateCounterIncrement();
+    }else{
+        if(2 < getStateCounter() &&
+                getStateCounter() < 5){
+            setStateCounter(0);
+            //emit connectionLost(false);
+        }
+        setStateCounter(1);
+    }
+    sendData(pidController->controlCommands->
+             fullCommand(ControlCommands::BR));
+}
+
+void Communication::on_stateCounterChanged(int value)
+{
+    if(value > 2){
+        emit connectionLost(true);
+    }
+
+    if(value == 0){
+        emit connectionLost(false);
+    }
+}
+
 
 void Communication::startIdelCommunication(){
     qDebug() << "Communication::startIdelCommunication(): entered";
@@ -204,4 +266,23 @@ void Communication::setChamberConnected(bool value)
         chamberConnected = value;
         emit chamberConnectionChanged(value);
     }
+}
+
+int Communication::getStateCounter()
+{
+    return stateCounter;
+}
+
+void Communication::setStateCounter(int value)
+{
+    if(stateCounter != value){
+        stateCounter = value;
+        emit stateCounterChanged(value);
+    }
+}
+
+void Communication::stateCounterIncrement()
+{
+    stateCounter++;
+    emit stateCounterChanged(stateCounter);
 }

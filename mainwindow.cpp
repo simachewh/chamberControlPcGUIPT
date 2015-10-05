@@ -8,8 +8,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     communication = new Communication();
-
+    statusLabel = new QLabel();
     initStyle();
+
+    //!communication object signals connection to this
+    connect(communication, SIGNAL(connectionLost(bool)),
+            this, SLOT(on_connectionLost(bool)));
 
     //!connection to update chamber's dry temperature change to
     //! GUI temperature lable!//
@@ -92,6 +96,9 @@ void MainWindow::initStyle(){
     ui->tableSpliter->setStretchFactor(1, 3);
 
     ui->stepsTableView->setAlternatingRowColors(true);
+
+    //!configure the status bar here
+    this->statusBar()->addPermanentWidget(statusLabel, 5);
 }
 
 void MainWindow::on_newProgramButton_clicked()
@@ -459,5 +466,20 @@ void MainWindow::on_startButton_clicked()
         communication->pidController->controlCommands->setIdle(false);
         communication->pidController->startTest();
         ui->stopButton->setEnabled(true);
+    }
+}
+
+void MainWindow::on_connectionLost(bool disconnected)
+{
+    if(disconnected){
+        statusLabel->setText("Connection to chamber is lost!");
+        statusLabel->setStyleSheet("QLabel { color: red }");
+        statusBar()->update();
+//         this->statusBar()->
+//                showMessage("Connection to chamber is lost!", 1000);
+    }else{
+        statusLabel->setText("Connection to chamber established");
+        statusLabel->setStyleSheet("QLabel { color: green }");
+//        this->statusBar()->showMessage("Connection to chamber established", 2000);
     }
 }

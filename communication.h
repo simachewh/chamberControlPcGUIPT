@@ -15,13 +15,23 @@ class Communication : public QObject
     Q_OBJECT
 private:
     QByteArray *dataReceived;
+
+    /**
+     * @brief chamberConnected Property to hold the connection state
+     * of the control Pc to the control box. Proper use would be to set
+     * it true for when the connection is established and false when it
+     * is lost.
+     */
     bool chamberConnected;
+
     /**
      * @brief connectionTimer This timer is used
      * to check connnection of the pc to controll
      * box
      */
     QTimer *connectionTimer;
+
+    int stateCounter;
 
 public:
 
@@ -74,6 +84,12 @@ public:
      */
     void setChamberConnected(bool value);
 
+    int getStateCounter();
+
+    void setStateCounter(int value);
+
+    void stateCounterIncrement();
+
 
 
 
@@ -86,6 +102,8 @@ signals:
     void idelState(bool);
     void idelStateChanged(bool);
     void chamberConnectionChanged(bool);
+    void connectionLost(bool);
+    void stateCounterChanged(int);
 
 public slots:
 
@@ -101,6 +119,14 @@ public slots:
     void on_chamberConnectionChanged(bool value);
     void on_controlReady();
     void reply(ControlCommands::CH_COMMAND chCommand);
+
+    /**
+     * @brief on_connectionTimerOut this slot is convinently made to be connected
+     * with the connectionTimer->timeout() signal.
+     */
+    void on_connectionTimerOut();
+
+    void on_stateCounterChanged(int value);
 };
 
 #endif // COMMUN_H
