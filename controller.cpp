@@ -29,7 +29,7 @@ void Controller::controlTestRun()
 
     runDeviceControll();
     qDebug() << "CController::controlTestRun: control finishsed";
-    emit controlready(ControlCommands::A);
+    emit controlready(ControlCommands::I);
 }
 
 void Controller::setUpStart()
@@ -92,46 +92,47 @@ void Controller::runDeviceControll()
              <<" humErr: " << humErr;
 
     //! heaters On or Off
-    if(tempErr > 25){
-        controlCommands->setT1(true);
-        controlCommands->setT2(true);
-        controlCommands->setTemperaturePower(255);
-    }else if(tempErr > 5 && tempErr < 25){
-        controlCommands->setT1(true);
-        controlCommands->setT2(false);
-        controlCommands->setTemperaturePower(127);
-    }else if(tempErr < 5 && tempErr > 0){
-        controlCommands->setT1(true);
-        controlCommands->setT2(false);
-        controlCommands->setTemperaturePower(8);
-    }else if(tempErr <= 0.01){
-        //check time and use switch
-        qDebug() << "Temperror less than 0";
-        controlCommands->setTemperaturePower(0);
-        controlCommands->setT1(false);
-        controlCommands->setT2(false);
-        qDebug() << "Temperror less than 0, values changed";
-    }
+    controlCommands->resetAll();
+//    if(tempErr > 25){
+//        controlCommands->setT1(true);
+//        controlCommands->setT2(true);
+//        controlCommands->setTemperaturePower(255);
+//    }else if(tempErr > 5 && tempErr < 25){
+//        controlCommands->setT1(true);
+//        controlCommands->setT2(false);
+//        controlCommands->setTemperaturePower(127);
+//    }else if(tempErr < 5 && tempErr > 0){
+//        controlCommands->setT1(true);
+//        controlCommands->setT2(false);
+//        controlCommands->setTemperaturePower(8);
+//    }else if(tempErr <= 0.01){
+//        //check time and use switch
+//        qDebug() << "Temperror less than 0";
+//        controlCommands->setTemperaturePower(0);
+//        controlCommands->setT1(false);
+//        controlCommands->setT2(false);
+//        qDebug() << "Temperror less than 0, values changed";
+//    }
 
-    //! humidifier On or Off
-    if(humErr > 25){
-        controlCommands->setH1(true);
-        controlCommands->setH2(true);
-        controlCommands->setHumidityPower(255);
-    }else if(humErr > 5 && humErr < 25){
-        controlCommands->setH1(true);
-        controlCommands->setH2(false);
-        controlCommands->setHumidityPower(127);
-    }else if(humErr < 5 && humErr > 0){
-        controlCommands->setH1(true);
-        controlCommands->setH2(false);
-        controlCommands->setHumidityPower(16);
-    }else if(humErr <= 0.1){
-        qDebug() << "Humerror less than 0";
-        controlCommands->setHumidityPower(0);
-        controlCommands->setH1(false);
-        controlCommands->setH2(false);
-    }
+//    //! humidifier On or Off
+//    if(humErr > 25){
+//        controlCommands->setH1(true);
+//        controlCommands->setH2(true);
+//        controlCommands->setHumidityPower(255);
+//    }else if(humErr > 5 && humErr < 25){
+//        controlCommands->setH1(true);
+//        controlCommands->setH2(false);
+//        controlCommands->setHumidityPower(127);
+//    }else if(humErr < 5 && humErr > 0){
+//        controlCommands->setH1(true);
+//        controlCommands->setH2(false);
+//        controlCommands->setHumidityPower(16);
+//    }else if(humErr <= 0.1){
+//        qDebug() << "Humerror less than 0";
+//        controlCommands->setHumidityPower(0);
+//        controlCommands->setH1(false);
+//        controlCommands->setH2(false);
+//    }
 
 }
 
@@ -142,6 +143,7 @@ void Controller::on_stepsDone(bool)
 
 void Controller::startTest()
 {
+    //controlCommands->setH1(true);
     setUpStart();
     controlTestRun();
 }

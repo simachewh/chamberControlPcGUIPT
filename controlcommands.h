@@ -151,7 +151,6 @@ public:
      */
     QBitArray * commandBlock1;
 
-    QByteArray * block1;
     /**
      * @brief command2 Represents the second byte of the command block
      * in the serial protocol, each bit representing ?, ?, C1, V4, V3, V2/C2, V1, FAN
@@ -159,7 +158,55 @@ public:
      */
     QBitArray * commandBlock2;
 
-    QByteArray * block2;
+    /**
+     * @brief htBlock this array represents the command block that holds information
+     * about H1, H2, T1, and T2 devices activation.
+     */
+    QBitArray * htBlock;
+
+
+    /**
+     * @brief plBlock represents the command block that holds information about P1, P2,
+     * P3 and LNV devices activation.
+     */
+    QBitArray * plBlock;
+
+    /**
+     * @brief cvBlock represents the command block that holds information about C1 and V4
+     * device activation.
+     */
+    QBitArray * cvBlock;
+
+    /**
+     * @brief vFBlock represents the command block that holds information about V1, V2/C2,
+     * V3 and FAN devices activation.
+     */
+    QBitArray * vFBlock;
+
+    /**
+     * @brief humidityBar1 represents the first section of the humidity power block.
+     */
+    QBitArray *humidityPowerRate1;
+
+    /**
+     * @brief humidityBar2 represents the second section of the humidity power block.
+     */
+    QBitArray *humidityPowerRate2;
+
+    /**
+     * @brief temperatureBar1 represents the first section of the temprature power block.
+     */
+    QBitArray * temperaturePowerRate1;
+
+    /**
+     * @brief temperaturePowerRate2 represents the second section of the tempreature power block.
+     */
+    QBitArray *temperaturePowerRate2;
+
+    /**
+     * @brief filler
+     */
+    QBitArray * filler;
 
     /**
      * @brief humidityBar Represents the third byte of the command block in the serial
@@ -312,7 +359,22 @@ public:
      * @return
      */
     QByteArray convertToBytes(int value);
-    QByteArray calculateCksum(QByteArray value);
+    QByteArray calculateCksum(QByteArray *value);
+    void initBlocks();
+    QBitArray toBitArray(int value);
+    QBitArray *getTemperaturePowerRate1() const;
+    void setTemperaturePowerRate1(QBitArray *value);
+
+    QBitArray *getTemperaturePowerRate2() const;
+    void setTemperaturePowerRate2(QBitArray *value);
+
+    QBitArray *getHumidityPowerRate2() const;
+    void setHumidityPowerRate2(QBitArray *value);
+
+    QBitArray *getHumidityPowerRate1() const;
+    void setHumidityPowerRate1(QBitArray *value);
+
+    void appendChecksum(QByteArray *value);
 signals:
     void idleStateChanged();
     void pcCommandChanged(ControlCommands::PC_COMMAND PC_COMMAND);

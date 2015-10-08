@@ -445,8 +445,8 @@ void MainWindow::on_testFinished()
 
 void MainWindow::on_stopButton_clicked()
 {
-    communication->pidController->testPgm = new Program();
     communication->pidController->controlCommands->setIdle(false);
+    communication->pidController->testPgm = new Program();
     ui->stopButton->setEnabled(false);
 }
 
