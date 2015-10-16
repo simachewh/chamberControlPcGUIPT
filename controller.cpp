@@ -1,5 +1,145 @@
 #include "controller.h"
 
+
+double Controller::getKpTemp() const
+{
+    return kpTemp;
+}
+
+void Controller::setKpTemp(double value)
+{
+    kpTemp = value;
+}
+
+double Controller::getKiTemp() const
+{
+    return kiTemp;
+}
+
+void Controller::setKiTemp(double value)
+{
+    kiTemp = value;
+}
+
+double Controller::getKdTemp() const
+{
+    return kdTemp;
+}
+
+void Controller::setKdTemp(double value)
+{
+    kdTemp = value;
+}
+
+double Controller::getIntegralTemp() const
+{
+    return integralTemp;
+}
+
+void Controller::setIntegralTemp(double value)
+{
+    integralTemp = value;
+}
+
+double Controller::getProportionalTemp() const
+{
+    return proportionalTemp;
+}
+
+void Controller::setProportionalTemp(double value)
+{
+    proportionalTemp = value;
+}
+
+double Controller::getDerivativeTemp() const
+{
+    return derivativeTemp;
+}
+
+void Controller::setDerivativeTemp(double value)
+{
+    derivativeTemp = value;
+}
+
+double Controller::getDtTemp() const
+{
+    return dtTemp;
+}
+
+void Controller::setDtTemp(double value)
+{
+    dtTemp = value;
+}
+
+double Controller::getKpHumd() const
+{
+    return kpHumd;
+}
+
+void Controller::setKpHumd(double value)
+{
+    kpHumd = value;
+}
+
+double Controller::getKiHumid() const
+{
+    return kiHumid;
+}
+
+void Controller::setKiHumid(double value)
+{
+    kiHumid = value;
+}
+
+double Controller::getKdHumid() const
+{
+    return kdHumid;
+}
+
+void Controller::setKdHumid(double value)
+{
+    kdHumid = value;
+}
+
+double Controller::getIntegralHumid() const
+{
+    return integralHumid;
+}
+
+void Controller::setIntegralHumid(double value)
+{
+    integralHumid = value;
+}
+
+double Controller::getProportionalHumid() const
+{
+    return proportionalHumid;
+}
+
+void Controller::setProportionalHumid(double value)
+{
+    proportionalHumid = value;
+}
+
+double Controller::getDerivativeHumid() const
+{
+    return derivativeHumid;
+}
+
+void Controller::setDerivativeHumid(double value)
+{
+    derivativeHumid = value;
+}
+
+double Controller::getDtHumid() const
+{
+    return dtHumid;
+}
+
+void Controller::setDtHumid(double value)
+{
+    dtHumid = value;
+}
 Controller::Controller(QObject *parent) : QObject(parent)
 {
     testPgm = new Program(parent);
@@ -9,6 +149,15 @@ Controller::Controller(QObject *parent) : QObject(parent)
     chamberParams->setHumidity(0);
 
     timer = new QTimer(parent);
+
+    integralTemp = derivativeTemp = proportionalTemp = 0;
+    integralHumid = derivativeHumid = proportionalHumid = 0;
+    tempError = previousTempError = 0;
+    humidError = previousHumidError = 0;
+    tempError = humidError = 0;
+    dtTemp = 2.1;
+    dtHumid = 3.1;
+
 
     connect(timer, SIGNAL(timeout()),
             this, SLOT(changeStep()));
@@ -22,6 +171,28 @@ Controller::Controller(QObject *parent) : QObject(parent)
 Controller::~Controller()
 {
     delete timer;
+}
+
+int Controller::pidTempControl()
+{
+    tempError = temperatureSetValue - measuredTemp;
+    integralTemp = integralTemp + (tempError * dtTemp);
+    derivativeTemp = (tempError - previousTempError) / dtTemp;
+
+    int tempPower = (kpTemp * tempError) + (kiTemp * integralTemp)
+            + (kdTemp * derivativeTemp);
+    return tempPower;
+}
+
+int Controller::pidHumidControl()
+{
+    humidError = HumiditySetValue - measuredHumid;
+    integralHumid = integralHumid + (humidError * dtHumid);
+    derivativeHumid = (humidError - previousHumidError) / dtHumid;
+
+    int humidPower = (kpHumd * humidError) + (kiHumid * integralHumid)
+            + (kdHumid * derivativeHumid);
+    return humidPower;
 }
 
 void Controller::controlTestRun()
@@ -93,46 +264,7 @@ void Controller::runDeviceControll()
 
     //! heaters On or Off
     controlCommands->resetAll();
-//    if(tempErr > 25){
-//        controlCommands->setT1(true);
-//        controlCommands->setT2(true);
-//        controlCommands->setTemperaturePower(255);
-//    }else if(tempErr > 5 && tempErr < 25){
-//        controlCommands->setT1(true);
-//        controlCommands->setT2(false);
-//        controlCommands->setTemperaturePower(127);
-//    }else if(tempErr < 5 && tempErr > 0){
-//        controlCommands->setT1(true);
-//        controlCommands->setT2(false);
-//        controlCommands->setTemperaturePower(8);
-//    }else if(tempErr <= 0.01){
-//        //check time and use switch
-//        qDebug() << "Temperror less than 0";
-//        controlCommands->setTemperaturePower(0);
-//        controlCommands->setT1(false);
-//        controlCommands->setT2(false);
-//        qDebug() << "Temperror less than 0, values changed";
-//    }
 
-//    //! humidifier On or Off
-//    if(humErr > 25){
-//        controlCommands->setH1(true);
-//        controlCommands->setH2(true);
-//        controlCommands->setHumidityPower(255);
-//    }else if(humErr > 5 && humErr < 25){
-//        controlCommands->setH1(true);
-//        controlCommands->setH2(false);
-//        controlCommands->setHumidityPower(127);
-//    }else if(humErr < 5 && humErr > 0){
-//        controlCommands->setH1(true);
-//        controlCommands->setH2(false);
-//        controlCommands->setHumidityPower(16);
-//    }else if(humErr <= 0.1){
-//        qDebug() << "Humerror less than 0";
-//        controlCommands->setHumidityPower(0);
-//        controlCommands->setH1(false);
-//        controlCommands->setH2(false);
-//    }
 
 }
 
@@ -146,4 +278,114 @@ void Controller::startTest()
     //controlCommands->setH1(true);
     setUpStart();
     controlTestRun();
+}
+
+double Controller::getPreviousTempError() const
+{
+    return previousTempError;
+}
+
+void Controller::setPreviousTempError(double value)
+{
+    previousTempError = value;
+}
+
+double Controller::getTempError() const
+{
+    return tempError;
+}
+
+void Controller::setTempError(double value)
+{
+    tempError = value;
+}
+
+double Controller::getPreviousHumidError() const
+{
+    return previousHumidError;
+}
+
+void Controller::setPreviousHumidError(double value)
+{
+    previousHumidError = value;
+}
+
+double Controller::getHumidError() const
+{
+    return humidError;
+}
+
+void Controller::setHumidError(double value)
+{
+    humidError = value;
+}
+
+double Controller::getTemperatureSetValue() const
+{
+    return temperatureSetValue;
+}
+
+void Controller::setTemperatureSetValue(double value)
+{
+    temperatureSetValue = value;
+}
+
+double Controller::getHumiditySetValue() const
+{
+    return HumiditySetValue;
+}
+
+void Controller::setHumiditySetValue(double value)
+{
+    HumiditySetValue = value;
+}
+
+double Controller::getMeasuredTemp() const
+{
+    return measuredTemp;
+}
+
+void Controller::setMeasuredTemp(double value)
+{
+    measuredTemp = value;
+}
+
+double Controller::getMeasuredHumid() const
+{
+    return measuredHumid;
+}
+
+void Controller::setMeasuredHumid(double value)
+{
+    measuredHumid = value;
+}
+
+Step *Controller::getCurrentStep() const
+{
+    return currentStep;
+}
+
+void Controller::setCurrentStep(Step *value)
+{
+    currentStep = value;
+}
+
+Step *Controller::getPreviousStep() const
+{
+    return previousStep;
+}
+
+void Controller::setPreviousStep(Step *value)
+{
+    previousStep = value;
+}
+
+Step *Controller::getNextStep() const
+{
+    return nextStep;
+}
+
+void Controller::setNextStep(Step *value)
+{
+    nextStep = value;
 }

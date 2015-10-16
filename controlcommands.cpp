@@ -5,57 +5,7 @@
 bool ControlCommands::isIdle = false;
 
 
-QBitArray *ControlCommands::getTemperaturePowerRate1() const
-{
-    return temperaturePowerRate1;
-}
 
-void ControlCommands::setTemperaturePowerRate1(QBitArray *value)
-{
-    (*temperaturePowerRate1)[4] = (*value)[0];
-    (*temperaturePowerRate1)[5] = (*value)[1];
-    (*temperaturePowerRate1)[6] = (*value)[2];
-    (*temperaturePowerRate1)[7] = (*value)[3];
-}
-
-QBitArray *ControlCommands::getTemperaturePowerRate2() const
-{
-    return temperaturePowerRate2;
-}
-
-void ControlCommands::setTemperaturePowerRate2(QBitArray *value)
-{
-    (*temperaturePowerRate2)[4] = (*value)[4];
-    (*temperaturePowerRate2)[5] = (*value)[5];
-    (*temperaturePowerRate2)[6] = (*value)[6];
-    (*temperaturePowerRate2)[7] = (*value)[7];
-}
-
-QBitArray *ControlCommands::getHumidityPowerRate2() const
-{
-    return humidityPowerRate2;
-}
-
-void ControlCommands::setHumidityPowerRate2(QBitArray *value)
-{
-    (*humidityPowerRate2)[4] = (*value)[4];
-    (*humidityPowerRate2)[5] = (*value)[5];
-    (*humidityPowerRate2)[6] = (*value)[6];
-    (*humidityPowerRate2)[7] = (*value)[7];
-}
-
-QBitArray *ControlCommands::getHumidityPowerRate1() const
-{
-    return humidityPowerRate1;
-}
-
-void ControlCommands::setHumidityPowerRate1(QBitArray *value)
-{
-    (*humidityPowerRate1)[4] = (*value)[0];
-    (*humidityPowerRate1)[5] = (*value)[1];
-    (*humidityPowerRate1)[6] = (*value)[2];
-    (*humidityPowerRate1)[7] = (*value)[3];
-}
 ControlCommands::ControlCommands(QObject *parent) : QObject(parent)
 {
     stx = 0x02;
@@ -72,11 +22,6 @@ ControlCommands::ControlCommands(QObject *parent) : QObject(parent)
     br.b = 0x42;
     br.r = 0x72;
 
-    commandBlock1 = new QBitArray(8);
-    commandBlock2 = new QBitArray(8);
-
-    humidityBar = new QByteArray();
-    temperatureBar = new QByteArray();
     initBlocks();
 
 //    testProgram = new Program(parent);
@@ -94,31 +39,19 @@ ControlCommands::~ControlCommands(){
 
 }
 
+
 void ControlCommands::initBlocks(){
-    htBlock = new QBitArray(8);
-    plBlock = new QBitArray(8);
-    cvBlock = new QBitArray(8);
-    vFBlock = new QBitArray(8);
-
-    humidityPowerRate1 = new QBitArray(8);
-    humidityPowerRate2 = new QBitArray(8);
-    temperaturePowerRate1 = new QBitArray(8);
-    temperaturePowerRate2 = new QBitArray(8);
-
-
-
-    (*temperaturePowerRate1)[0] = (*temperaturePowerRate2)[0] =
-            (*humidityPowerRate2)[0] = (*humidityPowerRate1)[0] =
-            (*htBlock)[0] = (*plBlock)[0] = (*cvBlock)[0] = (*vFBlock)[0] = 0;
-    (*temperaturePowerRate1)[1] = (*temperaturePowerRate2)[1] =
-            (*humidityPowerRate2)[1] = (*humidityPowerRate1)[1] =
-            (*htBlock)[1] = (*plBlock)[1] = (*cvBlock)[1] = (*vFBlock)[1] = 0;
-    (*temperaturePowerRate1)[2] = (*temperaturePowerRate2)[2] =
-            (*humidityPowerRate2)[2] = (*humidityPowerRate1)[2] =
-            (*htBlock)[2] = (*plBlock)[2] = (*cvBlock)[2] = (*vFBlock)[2] = 1;
-    (*temperaturePowerRate1)[3] = (*temperaturePowerRate2)[3] =
-            (*humidityPowerRate2)[3] = (*humidityPowerRate1)[3] =
-            (*htBlock)[3] = (*plBlock)[3] = (*cvBlock)[3] = (*vFBlock)[3] = 1;
+    htBlock = 48;
+    plBlock = 48;
+    cvBlock = 48;
+    vFBlock = 48;
+    humidityPowerRate1 = 48;
+    humidityPowerRate2 = 48;
+    temperaturePowerRate1 = 48;
+    temperaturePowerRate2 = 48;
+    temperaturePower = 0;
+    humidityPower = 0;
+    cksum = new QByteArray();
 }
 
 QByteArray ControlCommands::iyCommand(){
@@ -197,25 +130,26 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
 //        *plBlock = convertToBytes(*commandBlock2);
         QString twelveZeros(12, zero);
         assembledCommand.append(capO);
+        qDebug() << "capO " << capO;
         assembledCommand.append(twelveZeros);
-        assembledCommand.append(convertToBytes(*htBlock));
-        qDebug() << convertToBytes(*htBlock);
-        assembledCommand.append(convertToBytes(*plBlock));
-        qDebug() << convertToBytes(*plBlock);
-        assembledCommand.append(convertToBytes(*cvBlock));
-        qDebug() << convertToBytes(*cvBlock);
-        assembledCommand.append(convertToBytes(*vFBlock));
-        qDebug() << convertToBytes(*vFBlock);
-        assembledCommand.append(convertToBytes(*humidityPowerRate1));
-        qDebug() << convertToBytes(*humidityPowerRate1);
-        assembledCommand.append(convertToBytes(*humidityPowerRate2));
-        qDebug() << convertToBytes(*humidityPowerRate2);
-        assembledCommand.append(convertToBytes(*temperaturePowerRate1));
-        qDebug() << convertToBytes(*temperaturePowerRate1);
-        assembledCommand.append(convertToBytes(*temperaturePowerRate2));
-        qDebug() << convertToBytes(*temperaturePowerRate2);
-        appendChecksum(&assembledCommand);
+        assembledCommand.append(htBlock);
+        qDebug() << "htBlock" << htBlock;
+        assembledCommand.append(plBlock);
+        qDebug() << "plBlock" << plBlock;
+        assembledCommand.append(cvBlock);
+        qDebug() << "cvBlock" << cvBlock;
+        assembledCommand.append(vFBlock);
+        qDebug() <<"vfBlock " << vFBlock;
+        assembledCommand.append(humidityPowerRate1);
+        qDebug() << "humidrate1" << humidityPowerRate1;
+        assembledCommand.append(humidityPowerRate2);
+        qDebug() << "humidrate2" << humidityPowerRate2;
+        assembledCommand.append(temperaturePowerRate1);
+        qDebug() << "temprate1" << temperaturePowerRate1;
+        assembledCommand.append(temperaturePowerRate2);
+        qDebug() << "temprate2 " << temperaturePowerRate2;
         assembledCommand.append(etx);
+        appendChecksum(&assembledCommand);
         //! checksum calculated from the assembled command
 //        assembledCommand.append(calculateCksum(&assembledCommand));
         qDebug() << "ControlCommands::fullCommand(PC_COMMAND ctype)"
@@ -232,7 +166,7 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
 void ControlCommands::appendChecksum(QByteArray *value)
 {
     quint8 cks = 0;
-    for(int i = 0; i < value->size(); i++){
+    for(int i = 1; i < value->size() - 1; i++){
         cks += value->at(i);
     }
     QByteArray sum(1, cks);
@@ -257,54 +191,296 @@ QByteArray ControlCommands::getCalculatedCksum()
     ba.append(zero);
     ba.append(capO);
     ba.append(zeros);
-    ba.append(convertToBytes(*htBlock));
-    ba.append(convertToBytes(*plBlock));
-    ba.append(convertToBytes(*cvBlock));
-    ba.append(convertToBytes(*vFBlock));
-    ba.append(convertToBytes(*humidityPowerRate1));
-    ba.append(convertToBytes(*humidityPowerRate2));
-    ba.append(convertToBytes(*temperaturePowerRate1));
-    ba.append(convertToBytes(*temperaturePowerRate2));
+    ba.append(toByte(htBlock));
+    ba.append(toByte(plBlock));
+    ba.append(toByte(cvBlock));
+    ba.append(toByte(vFBlock));
+    ba.append(toByte(humidityPowerRate1));
+    ba.append(toByte(humidityPowerRate2));
+    ba.append(toByte(temperaturePowerRate1));
+    ba.append(toByte(temperaturePowerRate2));
 
     return calculateCksum(&ba);
 }
 
-QByteArray ControlCommands::convertToBytes(QBitArray bits){
-    QByteArray bytes;
-//    bytes.resize(bits.count()/8+1);
-    bytes.resize(bits.count()/8);
-//       bytes.fill(0x30);
-       // Convert from QBitArray to QByteArray
-       for(int b=0; b<bits.count(); ++b)
-       {
-          qDebug()<< "ControlCommands::convertToBytes: " << b << " : " << bits[b] << " : " << bits.count();
-           bytes[b/8] = ( bytes.at(b/8) | ((bits[b]?1:0)<<(b%8)));
-       }
-       return bytes;
+QByteArray ControlCommands::toByte(std::bitset<8> bits){
+    QByteArray byte;
+    char c;
+    unsigned long i = bits.to_ulong();
+    c = static_cast<char>(i);
+    byte.append(c);
+    return byte;
 }
 
-QByteArray ControlCommands::convertToBytes(int value){
+QByteArray ControlCommands::toByte(int value){
     QByteArray bytes;
-    QDataStream stream(&bytes, QIODevice::ReadWrite);
-    stream << 1 << value;
+    if(value > 255){
+        /// do nothing, return, log this error
+    }
+    char c = value;
+    bytes.append(c);
     return bytes.mid(7);
 }
 
-QBitArray ControlCommands::toBitArray(int value){
-    QBitArray bits(8);
-    bits.fill(false);
-    for(int i = 0; i < 8; i++){
-        int remain = value % 2;
-        if(remain > 0){
-            bits[i] = true;
-        }else{
-            bits[i] = false;
-        }
-        value /= 2;
-    }
+std::bitset<8> ControlCommands::toBitArray(int value){
+    std::bitset<8> bits(value);
     return bits;
 }
 
+void ControlCommands::resetAll()
+{
+    //! sitch of all devices & set power outputs to zero
+    bool off = false;
+
+    setT1(off);
+    setT2(off);
+    setH1(off);
+    setH2(off);
+    setC1(off);
+    setC2V2(off);
+    setV1(off);
+    setV3(off);
+    setV4(off);
+    setLNU(off);
+    setP1(off);
+    setP2(off);
+    setP3(off);
+    setHumidityPower(0);
+    setTemperaturePower(0);
+    setFan(off);
+    setIdle(off);
+    qDebug() << "ControlCommands::resetAll : finishing";
+}
+
+void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part){
+    switch (part) {
+    case H1:
+    {
+        qDebug() << "on_chPartChanged: " << "H1 = " << value;
+        std::bitset<8> bits(htBlock);
+        if(value){
+            bits.set(2);
+        }else{
+            bits.reset(2);
+        }
+        htBlock = static_cast<char>(bits.to_ulong());
+    }
+        break;
+    case H2:
+    {
+        std::bitset<8> bits(htBlock);
+        if(value){
+            bits.set(3);
+        }else{
+            bits.reset(3);
+        }
+        break;
+        htBlock = static_cast<char>(bits.to_ulong());
+    }
+    case T1:
+    {
+        std::bitset<8> bits(htBlock);
+        if(value){
+           bits.set(0);
+        }else{
+            bits.reset(0);
+        }
+        break;
+        htBlock = static_cast<char>(bits.to_ulong());
+    }
+    case T2:
+    {
+        std::bitset<8> bits(htBlock);
+        if(value){
+            bits.set(1);
+        }else{
+         bits.reset(1);
+        }
+        break;
+        htBlock = static_cast<char>(bits.to_ulong());
+    }
+    case P1:
+    {
+        std::bitset<8> bits(plBlock);
+        if(value){
+         bits.set(1);
+        }else{
+            bits.reset(1);
+        }
+        break;
+        plBlock = static_cast<char>(bits.to_ulong());
+    }
+    case P2:
+    {
+        std::bitset<8> bits(plBlock);
+        if(value){
+         bits.set(2)   ;
+        }else{
+            bits.reset(2);
+        }
+        break;
+        plBlock = static_cast<char>(bits.to_ulong());
+    }
+    case P3:
+    {
+        std::bitset<8> bits(plBlock);
+        if(value){
+         bits.set(3);
+        }else{
+            bits.reset(3);
+        }
+        break;
+        plBlock = static_cast<char>(bits.to_ulong());
+    }
+    case LNU:
+    {
+        std::bitset<8> bits(plBlock);
+        if(value){
+         bits.set(0);
+        }else{
+            bits.reset(0);
+        }
+        break;
+        plBlock = static_cast<char>(bits.to_ulong());
+    }
+    case C1:
+    {
+        std::bitset<8> bits(cvBlock);
+        if(value){
+         bits.set(1)   ;
+        }else{
+            bits.reset(1);
+        }
+        break;
+        cvBlock = static_cast<char>(bits.to_ulong());
+    }
+    case V4:
+    {
+        std::bitset<8> bits(cvBlock);
+        if(value){
+            bits.set(0);
+        }else{
+         bits.reset(0);
+        }
+        break;
+        cvBlock = static_cast<char>(bits.to_ulong());
+    }
+    case C2V2:
+    {
+        std::bitset<8> bits(vFBlock);
+        if(value){
+            bits.set(2);
+        }else{
+         bits.reset(2);
+        }
+        break;
+        vFBlock = static_cast<char>(bits.to_ulong());
+    }
+    case V1:
+    {
+        std::bitset<8> bits(vFBlock);
+        if(value){
+         bits.set(1)   ;
+        }else{
+            bits.reset(1);
+        }
+        break;
+        vFBlock = static_cast<char>(bits.to_ulong());
+    }
+    case V3:
+    {
+        std::bitset<8> bits(vFBlock);
+        if(value){
+         bits.set(3);
+        }else{
+            bits.reset(3);
+        }
+        break;
+        vFBlock = static_cast<char>(bits.to_ulong());
+    }
+    case FAN:
+    {
+        std::bitset<8> bits(vFBlock);
+        if(value){
+         bits.set(0);
+        }else{
+            bits.reset(0);
+        }
+        break;
+        vFBlock = static_cast<char>(bits.to_ulong());
+    }
+    default:
+        break;
+    }
+}
+
+void ControlCommands::on_temperaturePowerChanged(int value){
+    std::bitset<8> b = toBitArray(value);
+    setTemperaturePowerRate1(&b);
+    setTemperaturePowerRate2(&b);
+}
+
+void ControlCommands::on_humidityPowerChanged(int value){
+    std::bitset<8> b = toBitArray(value);
+    setHumidityPowerRate1(&b);
+    setHumidityPowerRate2(&b);
+}
+
+char ControlCommands::getTemperaturePowerRate1() const
+{
+    return temperaturePowerRate1;
+}
+
+void ControlCommands::setTemperaturePowerRate1(std::bitset<8> *value)
+{
+    std::bitset<8> bits(temperaturePowerRate1);
+    bits[4] = (*value)[0];
+    bits[5] = (*value)[1];
+    bits[6] = (*value)[2];
+    bits[7] = (*value)[3];
+}
+
+char ControlCommands::getTemperaturePowerRate2() const
+{
+    return temperaturePowerRate2;
+}
+
+void ControlCommands::setTemperaturePowerRate2(std::bitset<8> *value)
+{
+    std::bitset<8> bits(temperaturePowerRate2);
+    bits[4] = (*value)[4];
+    bits[5] = (*value)[5];
+    bits[6] = (*value)[6];
+    bits[7] = (*value)[7];
+}
+
+char ControlCommands::getHumidityPowerRate2() const
+{
+    return humidityPowerRate2;
+}
+
+void ControlCommands::setHumidityPowerRate2(std::bitset<8> *value)
+{
+    std::bitset<8> bits(humidityPowerRate2);
+    bits[4] = (*value)[4];
+    bits[5] = (*value)[5];
+    bits[6] = (*value)[6];
+    bits[7] = (*value)[7];
+}
+
+char ControlCommands::getHumidityPowerRate1() const
+{
+    return humidityPowerRate1;
+}
+
+void ControlCommands::setHumidityPowerRate1(std::bitset<8> *value)
+{
+    std::bitset<8> bits(humidityPowerRate1);
+    bits[4] = (*value)[0];
+    bits[5] = (*value)[1];
+    bits[6] = (*value)[2];
+    bits[7] = (*value)[3];
+}
 
 bool ControlCommands::getIsIdle(){
     return ControlCommands::isIdle;
@@ -464,50 +640,6 @@ void ControlCommands::setFan(bool value){
     }
 }
 
-QByteArray ControlCommands::getTempratureBar()
-{
-    return *temperatureBar;
-}
-
-void ControlCommands::setTemperatureBar(QByteArray value)
-{
-    *temperatureBar = value;
-}
-
-void ControlCommands::resetAll()
-{
-    //! sitch of all devices & set power outputs to zero
-    bool off = false;
-
-    setT1(off);
-    setT2(off);
-    setH1(off);
-    setH2(off);
-    setC1(off);
-    setC2V2(off);
-    setV1(off);
-    setV3(off);
-    setV4(off);
-    setLNU(off);
-    setP1(off);
-    setP2(off);
-    setP3(off);
-    setHumidityPower(0);
-    setTemperaturePower(0);
-    setFan(off);
-    setIdle(off);
-    qDebug() << "ControlCommands::resetAll : finishing";
-}
-
-QByteArray ControlCommands::getHumidityBar()
-{
-    return *humidityBar;
-}
-
-void ControlCommands::setHumidityBar(QByteArray value)
-{
-    * humidityBar = value;
-}
 
 QByteArray ControlCommands::getCksum()
 {
@@ -549,66 +681,3 @@ void ControlCommands::setIdle(bool idelState){
         emit idleStateChanged();
     }
 }
-
-void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part){
-    switch (part) {
-    case H1:
-        qDebug() << "on_chPartChanged: " << "H1 = " << value;
-        (*htBlock)[2] = value;
-        break;
-    case H2:
-        (*htBlock)[3] = value;
-        break;
-    case T1:
-        (*htBlock)[0] = value;
-        break;
-    case T2:
-        (*htBlock)[1] = value;
-        break;
-    case P1:
-        (*plBlock)[1] = value;
-        break;
-    case P2:
-        (*plBlock)[2] = value;
-        break;
-    case P3:
-        (*plBlock)[3] = value;
-        break;
-    case LNU:
-        (*plBlock)[0] = value;
-        break;
-    case C1:
-        (*cvBlock)[1] = value;
-        break;
-    case C2V2:
-        (*vFBlock)[2] = value;
-        break;
-    case V1:
-        (*vFBlock)[1] = value;
-        break;
-    case V3:
-        (*vFBlock)[3] = value;
-        break;
-    case V4:
-        (*cvBlock)[0] = value;
-        break;
-    case FAN:
-        (*vFBlock)[0] = value;
-        break;
-    default:
-        break;
-    }
-}
-
-void ControlCommands::on_temperaturePowerChanged(int value){
-    QBitArray b = toBitArray(value);
-    setTemperaturePowerRate1(&b);
-    setTemperaturePowerRate2(&b);
-}
-
-void ControlCommands::on_humidityPowerChanged(int value){
-    QBitArray b = toBitArray(value);
-    setHumidityPowerRate1(&b);
-    setHumidityPowerRate2(&b);
-}
-

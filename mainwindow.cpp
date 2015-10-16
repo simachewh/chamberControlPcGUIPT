@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     communication = new Communication();
-    statusLabel = new QLabel();
     initStyle();
 
     //!communication object signals connection to this
@@ -97,8 +96,6 @@ void MainWindow::initStyle(){
 
     ui->stepsTableView->setAlternatingRowColors(true);
 
-    //!configure the status bar here
-    this->statusBar()->addPermanentWidget(statusLabel, 5);
 }
 
 void MainWindow::on_newProgramButton_clicked()
@@ -471,15 +468,11 @@ void MainWindow::on_startButton_clicked()
 
 void MainWindow::on_connectionLost(bool disconnected)
 {
-    if(disconnected){
-        statusLabel->setText("Connection to chamber is lost!");
-        statusLabel->setStyleSheet("QLabel { color: red }");
-        statusBar()->update();
-//         this->statusBar()->
-//                showMessage("Connection to chamber is lost!", 1000);
+    if(disconnected){       
+         this->statusBar()->
+                showMessage("Connection to chamber is lost!", 1000);
     }else{
-        statusLabel->setText("Connection to chamber established");
-        statusLabel->setStyleSheet("QLabel { color: green }");
-//        this->statusBar()->showMessage("Connection to chamber established", 2000);
+
+        this->statusBar()->showMessage("Connection to chamber established", 2000);
     }
 }

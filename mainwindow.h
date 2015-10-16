@@ -69,7 +69,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Communication *communication;
-    QLabel *statusLabel;
 
     enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
 
