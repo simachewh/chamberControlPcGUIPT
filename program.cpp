@@ -3,10 +3,48 @@
 Program::Program(QObject *parent) : QObject(parent)
 {
     currentCycle = 0;
-    currentStep = 0;
+    currentStepNum = 0;
 
     connect(this, SIGNAL(stepsChanged()),
             this, SLOT(on_stepsChanged()));
+}
+
+Step *Program::getCurrentStep()
+{
+    return steps.value(getCurrentStepNum(), new Step());
+}
+
+Step *Program::getNextStep()
+{
+        return steps.value(getCurrentStepNum() + 1, new Step());
+}
+
+Step *Program::getPreviousStep()
+{
+    return steps.value(getCurrentStepNum() - 1, new Step());
+}
+
+bool Program::goToNextStep()
+{
+    qDebug() << "cycle " << cycle
+             << "Curr cycl " << currentCycle
+             << "no of steps " << noOfSteps
+             << "curr step " << currentStepNum;
+    ///if step and cycle are the last ones
+    if(currentCycle == cycle && currentStepNum == noOfSteps){
+        qDebug() << "Finnnnished";
+        return false;
+    }
+    ///if cycle is not the last one but step is the last for this cycle
+    if(currentStepNum == noOfSteps){
+        qDebug() << "Nextttt cyc";
+        setCurrentStepNum(1);
+        setCurrentCycle(currentCycle + 1);
+        return true;
+    }
+    qDebug() << "Nexttt";
+    setCurrentStepNum(currentStepNum + 1);
+    return true;
 }
 
 int Program::getPoint() const{
@@ -54,20 +92,20 @@ void Program::setNoOfSteps(int value){
     }
 }
 
-int Program::getCurrentCycle()
+int Program::getCurrentCycleNum()
 {
     return currentCycle;
 }
 
-int Program::getCurrentStep()
+int Program::getCurrentStepNum()
 {
-    return currentStep;
+    return currentStepNum;
 }
 
-void Program::setCurrentStep(int value)
+void Program::setCurrentStepNum(int value)
 {
-    if(currentStep != value){
-        currentStep = value;
+    if(currentStepNum != value && value <= noOfSteps){
+        currentStepNum = value;
         emit programParamChanged(value, Curr_stp);
         emit currentStepChanged(value);
     }
@@ -75,7 +113,7 @@ void Program::setCurrentStep(int value)
 
 void Program::setCurrentCycle(int value)
 {
-    if(currentCycle != value){
+    if(currentCycle != value && value <= cycle){
         currentCycle = value;
         emit programParamChanged(value, Curr_cycl);
         emit currentCycleChanged(value);

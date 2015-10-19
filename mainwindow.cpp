@@ -313,7 +313,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
     {
         QString lbl("Cycle %1 of %2");
         ui->cycleLabel->setText(lbl.
-                                arg(communication->pidController->testPgm->getCurrentCycle()).
+                                arg(communication->pidController->testPgm->getCurrentCycleNum()).
                                 arg(value));
     }
         break;
@@ -330,7 +330,7 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
     {
         QString lbl("Step %1 of %2");
         ui->stepLabel->setText(lbl.
-                               arg(communication->pidController->testPgm->getCurrentStep()).
+                               arg(communication->pidController->testPgm->getCurrentStepNum()).
                                arg(value));
     }
         break;
@@ -342,11 +342,11 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
                                 arg(communication->pidController->testPgm->getNoOfSteps()));
          double humSet = communication->pidController
                  ->testPgm->getSteps().value(communication->pidController
-                                             ->testPgm->getCurrentStep())
+                                             ->testPgm->getCurrentStepNum())
                  ->getHumidity();
          double tempset = communication->pidController
                  ->testPgm->getSteps().value(communication->pidController
-                                             ->testPgm->getCurrentStep())
+                                             ->testPgm->getCurrentStepNum())
                  ->getTemperature();
          ui->humidSetValueLabel->setText(QString("%1").arg(humSet));
          ui->tempSetValueLabel->setText(QString("%1").arg(tempset));
@@ -458,10 +458,7 @@ void MainWindow::on_startButton_clicked()
     if(reply == QMessageBox::No){
         return;
     }else{
-        DataBackup db;
-        db.loadTestProgram(pgmName, communication->pidController->testPgm);
-        communication->pidController->controlCommands->setIdle(false);
-        communication->pidController->startTest();
+        communication->pidController->startTest(pgmName);
         ui->stopButton->setEnabled(true);
     }
 }

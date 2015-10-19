@@ -144,7 +144,7 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
     }
     prgm->setSteps(loadedSteps);
     prgm->setCurrentCycle(1);
-    prgm->setCurrentStep(1);
+    prgm->setCurrentStepNum(1);
 }
 
 //! ************************ END OF PUBLIC FUNCTIONS *************** !//

@@ -9,6 +9,7 @@
 #include "controlcommands.h"
 #include "program.h"
 #include "step.h"
+#include "databackup.h"
 
 /**
  * @brief The Controller class is where control of a test program
@@ -20,6 +21,9 @@ class Controller : public QObject
     Q_OBJECT
 
 private:
+
+    enum {MAX_OUT = 255, MIN_OUT = 0};
+
     /**
      * @brief currentStep Representaion of the current step
      * in the runing program.
@@ -148,7 +152,7 @@ public:
 
     void setUpStart();
 
-    void startTest();
+    void startTest(QString programName);
 
 
     Step *getCurrentStep() const;

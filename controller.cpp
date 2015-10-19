@@ -1,5 +1,176 @@
 #include "controller.h"
 
+Controller::Controller(QObject *parent) : QObject(parent)
+{ 
+    testPgm = new Program(parent);
+    chamberParams = new Chamber(parent);
+    controlCommands = new ControlCommands(parent);
+
+    chamberParams->setDryTemprature(0);
+    chamberParams->setHumidity(0);
+
+    timer = new QTimer(parent);
+
+    ///initialize class members
+    previousStep = new Step();
+    currentStep = new Step();
+    nextStep = new Step();
+
+    integralTemp = derivativeTemp = proportionalTemp = 0;
+    integralHumid = derivativeHumid = proportionalHumid = 0;
+    tempError = previousTempError = 0;
+    humidError = previousHumidError = 0;
+    tempError = humidError = 0;
+    dtTemp = 2.1;
+    dtHumid = 3.1;
+
+
+    connect(timer, SIGNAL(timeout()),
+            this, SLOT(changeStep()));
+
+    connect(this->testPgm, SIGNAL(currentStepChanged(int)),
+            this, SLOT(on_stepChange()));
+
+    connect(this, SIGNAL(stepsDone(bool)),
+            this, SLOT(on_stepsDone(bool)));
+}
+
+Controller::~Controller()
+{
+    delete timer;
+}
+
+int Controller::pidTempControl()
+{
+    tempError = temperatureSetValue - measuredTemp;
+    integralTemp = integralTemp + (tempError * dtTemp);
+    derivativeTemp = (tempError - previousTempError) / dtTemp;
+
+    int tempPower = (kpTemp * tempError)
+            + (kiTemp * integralTemp)
+            + (kdTemp * derivativeTemp);
+    previousTempError = tempError;
+
+    if(tempPower < MIN_OUT){
+        tempPower = MIN_OUT;
+    }
+    if(tempPower > MAX_OUT){
+        tempPower = MAX_OUT;
+    }
+    return tempPower;
+}
+
+int Controller::pidHumidControl()
+{
+    humidError = HumiditySetValue - measuredHumid;
+    integralHumid = integralHumid + (humidError * dtHumid);
+    derivativeHumid = (humidError - previousHumidError) / dtHumid;
+
+    int humidPower = (kpHumd * humidError) + (kiHumid * integralHumid)
+            + (kdHumid * derivativeHumid);
+    previousHumidError = humidError;
+    if(humidPower < MIN_OUT){
+        humidPower = MIN_OUT;
+    }
+    if(humidPower > MAX_OUT){
+        humidPower = MAX_OUT;
+    }
+    return humidPower;
+}
+
+void Controller::controlTestRun()
+{
+
+    runDeviceControll();
+    qDebug() << "CController::controlTestRun: control finishsed";
+    emit controlready(ControlCommands::I);
+}
+
+void Controller::setUpStart()
+{
+    qDebug() << "Controller::setUpStart: entered";
+    timer->setSingleShot(true);
+    int hrs = testPgm->getSteps().value(testPgm->getCurrentStepNum())->getHours();
+    int min = testPgm->getSteps().value(testPgm->getCurrentStepNum())->getMinutes();
+    int timeOut = hrs * 3600000;
+    timeOut += (min * 60000);
+    //timer->start(timeOut);
+    timer->start(2000);
+}
+
+void Controller::changeStep()
+{
+    if(testPgm->goToNextStep()){
+
+    }else{
+        emit stepsDone(true);
+    }
+}
+
+void Controller::on_stepChange()
+{
+    setUpStart();
+    controlTestRun();
+}
+
+void Controller::on_controlRequested()
+{
+    controlTestRun();
+}
+
+void Controller::runDeviceControll()
+{
+    currentStep = testPgm->getCurrentStep();
+    nextStep = testPgm->getNextStep();
+
+    double realTemp = chamberParams->getDryTemperature();
+    double realHumid = chamberParams->getHumidity();
+    int stepNo = testPgm->getCurrentStepNum();
+    double setTemp = testPgm->getSteps().value(stepNo)
+            ->getTemperature();
+    double setHumid = testPgm->getSteps().value(stepNo)
+            ->getHumidity();
+    int timeLeft = timer->remainingTime();
+
+    double tempErr = setTemp -realTemp;
+    double humErr = setHumid -realHumid;
+
+    qDebug() << "runDeviceControll : tempErr: " << tempErr
+             <<" humErr: " << humErr;
+
+    //! heaters On or Off
+    controlCommands->resetAll();
+    controlCommands->setT1(true);
+    controlCommands->setT2(true);
+    qDebug() << "runDeviceControll curent step temp "
+             << currentStep->getTemperature()
+             << "next step " << nextStep->getTemperature();
+
+}
+
+void Controller::on_stepsDone(bool)
+{
+    controlCommands->resetAll();
+}
+
+void Controller::startTest(QString programName)
+{
+    DataBackup db;
+    db.loadTestProgram(programName, this->testPgm);
+    currentStep = testPgm->getCurrentStep();
+    nextStep = testPgm->getNextStep();
+    qDebug() << "Current step temperature "
+             << currentStep->getTemperature();
+
+    controlCommands->setIdle(false);
+    setUpStart();
+    controlTestRun();
+}
+
+double Controller::getPreviousTempError() const
+{
+    return previousTempError;
+}
 
 double Controller::getKpTemp() const
 {
@@ -139,150 +310,6 @@ double Controller::getDtHumid() const
 void Controller::setDtHumid(double value)
 {
     dtHumid = value;
-}
-Controller::Controller(QObject *parent) : QObject(parent)
-{
-    testPgm = new Program(parent);
-    chamberParams = new Chamber(parent);
-    controlCommands = new ControlCommands(parent);
-    chamberParams->setDryTemprature(0);
-    chamberParams->setHumidity(0);
-
-    timer = new QTimer(parent);
-
-    integralTemp = derivativeTemp = proportionalTemp = 0;
-    integralHumid = derivativeHumid = proportionalHumid = 0;
-    tempError = previousTempError = 0;
-    humidError = previousHumidError = 0;
-    tempError = humidError = 0;
-    dtTemp = 2.1;
-    dtHumid = 3.1;
-
-
-    connect(timer, SIGNAL(timeout()),
-            this, SLOT(changeStep()));
-    //connect
-    connect(this->testPgm, SIGNAL(currentStepChanged(int)),
-            this, SLOT(on_stepChange()));
-    connect(this, SIGNAL(stepsDone(bool)),
-            this, SLOT(on_stepsDone(bool)));
-}
-
-Controller::~Controller()
-{
-    delete timer;
-}
-
-int Controller::pidTempControl()
-{
-    tempError = temperatureSetValue - measuredTemp;
-    integralTemp = integralTemp + (tempError * dtTemp);
-    derivativeTemp = (tempError - previousTempError) / dtTemp;
-
-    int tempPower = (kpTemp * tempError) + (kiTemp * integralTemp)
-            + (kdTemp * derivativeTemp);
-    return tempPower;
-}
-
-int Controller::pidHumidControl()
-{
-    humidError = HumiditySetValue - measuredHumid;
-    integralHumid = integralHumid + (humidError * dtHumid);
-    derivativeHumid = (humidError - previousHumidError) / dtHumid;
-
-    int humidPower = (kpHumd * humidError) + (kiHumid * integralHumid)
-            + (kdHumid * derivativeHumid);
-    return humidPower;
-}
-
-void Controller::controlTestRun()
-{
-
-    runDeviceControll();
-    qDebug() << "CController::controlTestRun: control finishsed";
-    emit controlready(ControlCommands::I);
-}
-
-void Controller::setUpStart()
-{
-    qDebug() << "Controller::setUpStart: entered";
-    timer->setSingleShot(true);
-    int hrs = testPgm->getSteps().value(testPgm->getCurrentStep())->getHours();
-    int min = testPgm->getSteps().value(testPgm->getCurrentStep())->getMinutes();
-    int timeOut = hrs * 3600000;
-    timeOut += (min * 60000);
-    //timer->start(timeOut);
-    timer->start(5000);
-}
-
-void Controller::changeStep()
-{
-    //! check if wait is on and relvals reached setvals
-    //! and return
-    int totalSteps = this->testPgm->getSteps().size();
-    int nowStep = this->testPgm->getCurrentStep();
-    int totalCycle = this->testPgm->getCycle();
-    int nowCycle = this->testPgm->getCurrentCycle();
-
-    if(nowStep < totalSteps){
-        this->testPgm->setCurrentStep(nowStep + 1);        
-    }else if(nowStep == totalSteps && nowCycle < totalCycle){
-        testPgm->setCurrentCycle(nowCycle + 1);
-        testPgm->setCurrentStep(1);
-    }else if(nowStep == totalSteps && nowCycle == totalCycle){
-        emit stepsDone(true);
-    }
-}
-
-void Controller::on_stepChange()
-{
-    setUpStart();
-    controlTestRun();
-}
-
-void Controller::on_controlRequested()
-{
-    controlTestRun();
-}
-
-void Controller::runDeviceControll()
-{
-    double realTemp = chamberParams->getDryTemperature();
-    double realHumid = chamberParams->getHumidity();
-    int stepNo = testPgm->getCurrentStep();
-    double setTemp = testPgm->getSteps().value(stepNo)
-            ->getTemperature();
-    double setHumid = testPgm->getSteps().value(stepNo)
-            ->getHumidity();
-    int timeLeft = timer->remainingTime();
-
-    double tempErr = setTemp -realTemp;
-    double humErr = setHumid -realHumid;
-
-    qDebug() << "runDeviceControll : tempErr: " << tempErr
-             <<" humErr: " << humErr;
-
-    //! heaters On or Off
-    controlCommands->resetAll();
-
-
-}
-
-void Controller::on_stepsDone(bool)
-{
-    controlCommands->resetAll();
-}
-
-void Controller::startTest()
-{
-    //controlCommands->setH1(true);
-    setUpStart();
-    controlTestRun();
-}
-
-double Controller::getPreviousTempError() const
-{
-    return previousTempError;
 }
 
 void Controller::setPreviousTempError(double value)
