@@ -174,6 +174,32 @@ void ControlCommands::appendChecksum(QByteArray *value)
     value->append(sum);
 }
 
+void ControlCommands::switchValves(bool value)
+{
+    setV1(value);
+    setV3(value);
+    setV4(value);
+    setC2V2(value);
+}
+
+void ControlCommands::switchHeaters(bool value)
+{
+    setT1(value);
+    setT2(value);
+}
+
+void ControlCommands::switchCooler(bool value)
+{
+    setC1(value);
+    setC2V2(value);
+}
+
+void ControlCommands::switchHumidifiers(bool value)
+{
+    setH1(value);
+    setH2(value);
+}
+
 
 QByteArray ControlCommands::calculateCksum(QByteArray *value)
 {
@@ -230,25 +256,14 @@ std::bitset<8> ControlCommands::toBitArray(int value){
 void ControlCommands::resetAll()
 {
     //! sitch of all devices & set power outputs to zero
-    bool off = false;
-
-    setT1(off);
-    setT2(off);
-    setH1(off);
-    setH2(off);
-    setC1(off);
-    setC2V2(off);
-    setV1(off);
-    setV3(off);
-    setV4(off);
-    setLNU(off);
-    setP1(off);
-    setP2(off);
-    setP3(off);
+    setIdle(true);
     setHumidityPower(0);
     setTemperaturePower(0);
-    setFan(off);
-    setIdle(off);
+    switchCooler(false);
+    switchHeaters(false);
+    switchHumidifiers(false);
+    switchValves(false);
+
     qDebug() << "ControlCommands::resetAll : finishing";
 }
 
@@ -274,9 +289,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(3);
         }
-        break;
         htBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case T1:
     {
         std::bitset<8> bits(htBlock);
@@ -285,9 +300,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(0);
         }
-        break;
         htBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case T2:
     {
         std::bitset<8> bits(htBlock);
@@ -296,9 +311,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
          bits.reset(1);
         }
-        break;
         htBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case P1:
     {
         std::bitset<8> bits(plBlock);
@@ -307,9 +322,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(1);
         }
-        break;
         plBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case P2:
     {
         std::bitset<8> bits(plBlock);
@@ -318,9 +333,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(2);
         }
-        break;
         plBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case P3:
     {
         std::bitset<8> bits(plBlock);
@@ -329,9 +344,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(3);
         }
-        break;
         plBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case LNU:
     {
         std::bitset<8> bits(plBlock);
@@ -340,9 +355,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(0);
         }
-        break;
         plBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case C1:
     {
         std::bitset<8> bits(cvBlock);
@@ -351,9 +366,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(1);
         }
-        break;
         cvBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case V4:
     {
         std::bitset<8> bits(cvBlock);
@@ -362,9 +377,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
          bits.reset(0);
         }
-        break;
         cvBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case C2V2:
     {
         std::bitset<8> bits(vFBlock);
@@ -373,9 +388,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
          bits.reset(2);
         }
-        break;
         vFBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case V1:
     {
         std::bitset<8> bits(vFBlock);
@@ -384,9 +399,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(1);
         }
-        break;
         vFBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case V3:
     {
         std::bitset<8> bits(vFBlock);
@@ -395,9 +410,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(3);
         }
-        break;
         vFBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     case FAN:
     {
         std::bitset<8> bits(vFBlock);
@@ -406,9 +421,9 @@ void ControlCommands::on_chPartChanged(bool value, ControlCommands::CH_PART part
         }else{
             bits.reset(0);
         }
-        break;
         vFBlock = static_cast<char>(bits.to_ulong());
     }
+        break;
     default:
         break;
     }
@@ -545,98 +560,98 @@ bool ControlCommands::getFan(){
 void ControlCommands::setH1(bool value){
     if(h1 != value){
         h1 = value;
-        emit chPartChanged(value, H1);
+        emit chPartChanged(value, ControlCommands::H1);
     }
 }
 
 void ControlCommands::setH2(bool value){
     if(h2 != value){
         h2 = value;
-        emit chPartChanged(value, H2);
+        emit chPartChanged(value, ControlCommands::H2);
     }
 }
 
 void ControlCommands::setT1(bool value){
     if(t1 != value){
         t1 = value;
-        emit chPartChanged(value, T1);
+        emit chPartChanged(value, ControlCommands::T1);
     }
 }
 
 void ControlCommands::setT2(bool value){
     if(t2 != value){
         t2 = value;
-        emit chPartChanged(value, T2);
+        emit chPartChanged(value, ControlCommands::T2);
     }
 }
 
 void ControlCommands::setP1(bool value){
     if(p1 != value){
         p1 = value;
-        emit chPartChanged(value, P1);
+        emit chPartChanged(value, ControlCommands::P1);
     }
 }
 
 void ControlCommands::setP2(bool value){
     if(p2 != value){
         p2 = value;
-        emit chPartChanged(value, P2);
+        emit chPartChanged(value, ControlCommands::P2);
     }
 }
 
 void ControlCommands::setP3(bool value){
     if(p3 != value){
         p3 = value;
-        emit chPartChanged(value, P3);
+        emit chPartChanged(value, ControlCommands::P3);
     }
 }
 
 void ControlCommands::setLNU(bool value){
     if(lnu != value){
         lnu = value;
-        emit chPartChanged(value, LNU);
+        emit chPartChanged(value, ControlCommands::LNU);
     }
 }
 
 void ControlCommands::setC1(bool value){
     if(c1 != value){
         c1 = value;
-        emit chPartChanged(value, C1);
+        emit chPartChanged(value, ControlCommands::C1);
     }
 }
 
 void ControlCommands::setC2V2(bool value){
     if(c2v2 != value){
         c2v2 = value;
-        emit chPartChanged(value, C2V2);
+        emit chPartChanged(value, ControlCommands::C2V2);
     }
 }
 
 void ControlCommands::setV1(bool value){
     if(v1 != value){
         v1 = value;
-        emit chPartChanged(value, V1);
+        emit chPartChanged(value, ControlCommands::V1);
     }
 }
 
 void ControlCommands::setV3(bool value){
     if(v3 != value){
         v3 = value;
-        emit chPartChanged(value, V3);
+        emit chPartChanged(value, ControlCommands::V3);
     }
 }
 
 void ControlCommands::setV4(bool value){
     if(v4 != value){
         v4 = value;
-        emit chPartChanged(value, V4);
+        emit chPartChanged(value, ControlCommands::V4);
     }
 }
 
 void ControlCommands::setFan(bool value){
     if(fan != value){
         fan = value;
-        emit chPartChanged(value, FAN);
+        emit chPartChanged(value, ControlCommands::FAN);
     }
 }
 

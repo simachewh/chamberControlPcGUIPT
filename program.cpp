@@ -11,17 +11,17 @@ Program::Program(QObject *parent) : QObject(parent)
 
 Step *Program::getCurrentStep()
 {
-    return steps.value(getCurrentStepNum(), new Step());
+    return steps.value(getCurrentStepNum(), 0);
 }
 
 Step *Program::getNextStep()
 {
-        return steps.value(getCurrentStepNum() + 1, new Step());
+        return steps.value(getCurrentStepNum() + 1, 0);
 }
 
 Step *Program::getPreviousStep()
 {
-    return steps.value(getCurrentStepNum() - 1, new Step());
+    return steps.value(getCurrentStepNum() - 1, 0);
 }
 
 bool Program::goToNextStep()

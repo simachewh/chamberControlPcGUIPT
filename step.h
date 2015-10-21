@@ -66,7 +66,8 @@ private:
     double humidity;
     double hours;
     double minutes;
-    int waiting;
+    //this is changed from int to bool, follow possible issues.
+    bool waiting;
 
     int hR;
     int one;

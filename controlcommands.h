@@ -378,6 +378,36 @@ signals:
     void cksumChanged(QByteArray value);
 
 public slots:
+
+    /**
+     * @brief swithValves Swithes all valves including C2V2
+     * to the given bool value.
+     * @param value The swith state.
+     */
+    void switchValves(bool value);
+
+    /**
+     * @brief swithHeaters Swithes both heaters T1 and T2
+     * to the given value.
+     * @param value The state to swith the heaters to.
+     */
+    void switchHeaters(bool value);
+
+    /**
+     * @brief swithCooler Switches all coolers to the given
+     * state.
+     * @param value The state to which the coolers will be
+     * switched to.
+     */
+    void switchCooler(bool value);
+
+    /**
+     * @brief switchHumidifiers Switches all humidifiers to
+     * the given value.
+     * @param value The sate to swith the humidifiers to.
+     */
+    void switchHumidifiers(bool value);
+
     void setIdle(bool idelState);
     void on_chPartChanged(bool value,
                           ControlCommands::CH_PART part);

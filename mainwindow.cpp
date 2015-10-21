@@ -14,29 +14,24 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication, SIGNAL(connectionLost(bool)),
             this, SLOT(on_connectionLost(bool)));
 
-    //!connection to update chamber's dry temperature change to
-    //! GUI temperature lable!//
+    //!chamber connection to gui!//
     connect(communication->pidController->chamberParams,
             SIGNAL(dryTemperatureChanged(QString)),
             ui->tempRealValueLabel, SLOT(setText(QString)));
 
-    //!connection to update chamber's humidity change to GUI humidity lable!//
     connect(communication->pidController->chamberParams,
             SIGNAL(humidityChanged(QString)),
             ui->humidRealValueLabel, SLOT(setText(QString)));
 
+    //! controlCommands connection to gui !//
     connect(communication->pidController->controlCommands,
             SIGNAL(chPartChanged(bool,ControlCommands::CH_PART)),
             this, SLOT(on_partsChanged(bool,ControlCommands::CH_PART)));
 
-    //! connection bettwen ControlPC teperature power change and
-    //! temperature progress bar !//
     connect(communication->pidController->controlCommands,
             SIGNAL(temperaturePowerChanged(int)),
             this, SLOT(on_tempPowerChange(int)));
 
-    //! connection bettwen ControlPC humidity power change and
-    //! humidity progress bar !//
     connect(communication->pidController->controlCommands,
             SIGNAL(humidityPowerChanged(int)),
             this, SLOT(on_humidPowerChange(int)));
@@ -53,9 +48,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->pidController, SIGNAL(stepsDone(bool)),
             this, SLOT(on_testFinished()));
 
-//    communication->pidController->controlCommands->setC2V2(true);
-//    communication->pidController->controlCommands->setHumidityPower(220);
-//    communication->pidController->controlCommands->setTemperaturePower(150);
+    connect(communication->pidController, SIGNAL(stepsDone(bool)),
+            this->ui->stopButton, SLOT(setDisabled(bool)));
 
 }
 
@@ -158,130 +152,131 @@ void MainWindow::on_partsChanged(bool value, ControlCommands::CH_PART part)
     switch (part) {
     case ControlCommands::H1:
         if(value){
-            ui->h1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->h1Label->setStyleSheet("background-color: #FB6B00");
             ui->h1Label->update();
         }else{
-            ui->h1Label->setStyleSheet("background-color: ");
+            ui->h1Label->setStyleSheet("background-color: #FFFFFF");
             ui->h1Label->update();
         }
         break;
     case ControlCommands::H2:
         if(value){
-            ui->h2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->h2Label->setStyleSheet("background-color: #FB6B00");
             ui->h2Label->update();
         }else{
-            ui->h2Label->setStyleSheet("background-color: ");
+            ui->h2Label->setStyleSheet("background-color: #FFFFFF");
             ui->h2Label->update();
         }
         break;
     case ControlCommands::T1:
         if(value){
-            ui->t1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->t1Label->setStyleSheet("background-color: #FB6B00");
             ui->t1Label->update();
         }else{
-            ui->t1Label->setStyleSheet("background-color: ");
+            ui->t1Label->setStyleSheet("background-color: #FFFFFF");
             ui->t1Label->update();
         }
         break;
     case ControlCommands::T2:
         if(value){
-            ui->t2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->t2Label->setStyleSheet("background-color: #FB6B00");
             ui->t2Label->update();
         }else{
-            ui->t2Label->setStyleSheet("background-color: ");
+            ui->t2Label->setStyleSheet("background-color: #FFFFFF");
             ui->t2Label->update();
         }
         break;
     case ControlCommands::P1:
         if(value){
-            ui->p1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p1Label->setStyleSheet("background-color: #FB6B00");
             ui->p1Label->update();
         }else{
-            ui->p1Label->setStyleSheet("background-color: ");
+            ui->p1Label->setStyleSheet("background-color: #FFFFFF");
             ui->p1Label->update();
         }
         break;
     case ControlCommands::P2:
         if(value){
-            ui->p2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p2Label->setStyleSheet("background-color: #FB6B00");
             ui->p2Label->update();
         }else{
-            ui->p2Label->setStyleSheet("background-color: ");
+            ui->p2Label->setStyleSheet("background-color: #FFFFFF");
             ui->p2Label->update();
         }
         break;
     case ControlCommands::P3:
         if(value){
-            ui->p3Label->setStyleSheet("background-color: #0ABAF5");
+            ui->p3Label->setStyleSheet("background-color: #FB6B00");
             ui->p3Label->update();
         }else{
-            ui->p3Label->setStyleSheet("background-color: ");
+            ui->p3Label->setStyleSheet("background-color: #FFFFFF");
             ui->p3Label->update();
         }
         break;
     case ControlCommands::LNU:
         if(value){
-            ui->lnvLabel->setStyleSheet("background-color: #0ABAF5");
+            ui->lnvLabel->setStyleSheet("background-color: #FB6B00");
             ui->lnvLabel->update();
         }else{
-            ui->lnvLabel->setStyleSheet("background-color: ");
+            ui->lnvLabel->setStyleSheet("background-color: #FFFFFF");
             ui->lnvLabel->update();
         }
         break;
     case ControlCommands::C1:
         if(value){
-            ui->c1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->c1Label->setStyleSheet("background-color: #FB6B00");
             ui->c1Label->update();
         }else{
-            ui->c1Label->setStyleSheet("background-color: ");
+            ui->c1Label->setStyleSheet("background-color: #FFFFFF");
             ui->c1Label->update();
         }
         break;
     case ControlCommands::C2V2:
         if(value){
-            ui->c2Label->setStyleSheet("background-color: #0ABAF5");
-            ui->v2Label->setStyleSheet("background-color: #0ABAF5");
+            ui->c2Label->setStyleSheet("background-color: #FB6B00");
+            ui->v2Label->setStyleSheet("background-color: #FB6B00");
             ui->c2Label->update();
             ui->v2Label->update();
         }else{
-            ui->c2Label->setStyleSheet("background-color: ");
-            ui->v2Label->setStyleSheet("background-color: ");
+            ui->c2Label->setStyleSheet("background-color: #FFFFFF");
+            ui->v2Label->setStyleSheet("background-color: #FFFFFF");
             ui->c2Label->update();
             ui->v2Label->update();
         }
         break;
     case ControlCommands::V1:
         if(value){
-            ui->v1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v1Label->setStyleSheet("background-color: #FB6B00");
             ui->v1Label->update();
         }else{
-
+            ui->v1Label->setStyleSheet("background-color: #FFFFFF");
+            ui->v1Label->update();
         }
         break;
     case ControlCommands::V3:
         if(value){
-            ui->v3Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v3Label->setStyleSheet("background-color: #FB6B00");
             ui->v3Label->update();
         }else{
-            ui->v3Label->setStyleSheet("background-color: ");
+            ui->v3Label->setStyleSheet("background-color: #FFFFFF");
             ui->v3Label->update();
         }
         break;
     case ControlCommands::V4:
         if(value){
-            ui->v4Label->setStyleSheet("background-color: #0ABAF5");
+            ui->v4Label->setStyleSheet("background-color: #FB6B00");
             ui->v4Label->update();
         }else{
-            ui->v4Label->setStyleSheet("background-color: ");
+            ui->v4Label->setStyleSheet("background-color: #FFFFFF");
             ui->v4Label->update();
         }
         break;
     case ControlCommands::FAN:
         if(value){
-            ui->fn1Label->setStyleSheet("background-color: #0ABAF5");
+            ui->fn1Label->setStyleSheet("background-color: #FB6B00");
             ui->fn1Label->update();
         }else{
-            ui->fn1Label->setStyleSheet("background-color: ");
+            ui->fn1Label->setStyleSheet("background-color: #FFFFFF");
             ui->fn1Label->update();
         }
         break;

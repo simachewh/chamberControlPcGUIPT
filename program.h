@@ -17,10 +17,29 @@ public:
 
     enum PGM_PARAM {Cycl, Curr_cycl, Stp, Curr_stp};
 
+    /**
+     * @brief getCurrentStep Gets the Current step being excuted by this
+     * program.
+     * @return If found it return a pointer to the current step, if not
+     * returns 0 (NULL).
+     */
     Step *getCurrentStep();
 
+    /**
+     * @brief getNextStep Gets the next step to be excuted in this program.
+     * @return If found it return the a pointer to the next step, if not
+     * return 0 (NULL)
+     */
     Step *getNextStep();
 
+    /**
+     * @brief getPreviousStep Gets the previous step in this program.
+     * It tries to find the step executed before the currennt one and
+     * returns a pointer to it. If incase the current step is the
+     * first one then it returns zero (NULL).
+     * @return if found it returns a pointer to the previous step, if
+     * not returns 0 (NULL)
+     */
     Step *getPreviousStep();
 
     /**

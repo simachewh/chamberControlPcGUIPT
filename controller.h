@@ -183,10 +183,8 @@ public:
     void setHumiditySetValue(double value);
 
     double getMeasuredTemp() const;
-    void setMeasuredTemp(double value);
 
     double getMeasuredHumid() const;
-    void setMeasuredHumid(double value);
 
     double getKp() const;
     void setKp(double value);
@@ -256,7 +254,13 @@ signals:
     void stepsDone(bool);
     void controlready(ControlCommands::CH_COMMAND);
 
-public slots:    
+public slots:
+
+    void on_TemperatureRealChanged(double value);
+
+    void setMeasuredTemp(double value);
+
+    void setMeasuredHumid(double value);
 
     void changeStep();
 
