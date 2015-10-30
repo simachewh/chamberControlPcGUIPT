@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/op-ico">
+        <file>images/info.png</file>
+        <file>images/settings.png</file>
+        <file>images/technobothnia_logo.png</file>
+        <file>images/control.png</file>
+    </qresource>
+</RCC>

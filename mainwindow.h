@@ -13,6 +13,7 @@
 #include "stepsmodel.h"
 #include "loadprogram.h"
 #include "renamedialog.h"
+#include "optionswidget.h"
 
 
 namespace Ui {
@@ -26,6 +27,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void monitorProgramInit();
+    void helpProgramInit();
+    void monitorHelpInit();
+    void programTabInit();
+    void helpTabInit();
+    void monitorTabInit();
+    void optionsTabInit();
 private slots:
 
     void initStyle();
@@ -70,7 +78,7 @@ private:
     Ui::MainWindow *ui;
     Communication *communication;
 
-    enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, HELP_INDEX = 3};
+    enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, OPTIONS_INDEX = 3};
 
 };
 

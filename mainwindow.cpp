@@ -85,10 +85,11 @@ void MainWindow::initStyle(){
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
 
-    ui->tableSpliter->setStretchFactor(0, 1);
-    ui->tableSpliter->setStretchFactor(1, 3);
+    ui->programStepsSpliter->setStretchFactor(0, 1);
+    ui->programStepsSpliter->setStretchFactor(1, 3);
 
     ui->stepsTableView->setAlternatingRowColors(true);
+    ui->stepsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
 }
 
@@ -362,23 +363,49 @@ void MainWindow::on_humidPowerChange(int value)
     ui->h2ProgressBar->update();
 }
 
+void MainWindow::programTabInit()
+{
+    this->setWindowTitle("Climate Chamber - Program");
+    ui->loadProgramButton->setEnabled(false);
+    ui->renameProgramButton->setEnabled(false);
+    ui->deleteProgramButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
+    populateProgramsList();
+}
+
+void MainWindow::helpTabInit()
+{
+    this->setWindowTitle("Climate Chamber - Help");
+}
+
+void MainWindow::monitorTabInit()
+{
+    this->setWindowTitle("Climate Chamber - Monitor");
+}
+
+void MainWindow::optionsTabInit()
+{
+    this->setWindowTitle("Climate Chamber - AUX Data");
+
+    QButtonGroup *optionsButtonGroup = new QButtonGroup(this);
+    optionsButtonGroup->addButton(ui->sysInfoPushButton);
+    optionsButtonGroup->addButton(ui->sysParamPushButton);
+    optionsButtonGroup->addButton(ui->controlParamPushButton);
+    optionsButtonGroup->setExclusive(true);
+
+
+}
+
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    if(index == HELP_INDEX){
-        this->setWindowTitle("Climate Chamber - Help");
+    if(index == OPTIONS_INDEX){
+        helpTabInit();
     }else if(index == PROGRAM_INDEX){
-        this->setWindowTitle("Climate Chamber - Program");
-        ui->loadProgramButton->setEnabled(false);
-        ui->renameProgramButton->setEnabled(false);
-        ui->deleteProgramButton->setEnabled(false);
-        ui->startButton->setEnabled(false);
-        populateProgramsList();
-//        this->communication->pidController->controlCommands->
-//                setC2V2(!communication->pidController->controlCommands->getC2V2()); //this is for demonestration
+        programTabInit();
     }else if(index == MONITOR_INDEX){
-        this->setWindowTitle("Climate Chamber - Monitor");
+        monitorTabInit();
     }else if(index == AUX_INDEX){
-        this->setWindowTitle("Climate Chamber - AUX Data");
+        optionsTabInit();
     }
 }
 
