@@ -23,6 +23,12 @@
    <iconset resource="res.qrc">
     <normaloff>:/icons/images/technobothnia_logo.png</normaloff>:/icons/images/technobothnia_logo.png</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWindow
+{
+	background-color: rgb(208, 241, 247);
+}</string>
+  </property>
   <property name="iconSize">
    <size>
     <width>98</width>
@@ -43,179 +49,417 @@
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QTabWidget" name="tabWidget">
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QTabWidget::pane 
+{ /* The tab widget frame */
+    /*border-top: 2px solid rgb(119, 205, 240); */
+	background-color: rgb(119, 205, 240);
+}
+
+QTabBar::tab {
+/* background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #E1E1E1, stop: 0.4 #DDDDDD, stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3); */
+	border: 2px solid gray;
+	border: none;
+	border-bottom-color: rgb(119, 205, 240); /* same as the pane color */
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	padding-left: 14px;
+	padding-right: 14px;
+	padding-top: 6px;
+	min-width: 8ex;
+	
+}
+
+QTabWidget::tab-bar 
+{
+    left: 5px; /* move to the right by 5px */
+}
+
+QTabBar::tab:selected
+{	
+	background-color: rgb(119, 205, 240);
+}
+
+QTabBar::tab:!selected {
+	
+}</string>
+       </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="monitorTab">
         <attribute name="title">
          <string>Monitor</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_9">
-         <item row="0" column="0">
-          <widget class="QFrame" name="infoFrame">
+         <item row="1" column="2">
+          <widget class="QFrame" name="deviceFrame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QFrame
+{ 
+	background-color: rgb(119, 205, 240);
+	border-radius: 7px;
+}</string>
+           </property>
            <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+            <enum>QFrame::Box</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-             <widget class="QLabel" name="progNameLabel">
-              <property name="text">
-               <string>Prgm. name</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="cycleLabel">
-              <property name="text">
-               <string>Cycle: </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="stepLabel">
-              <property name="text">
-               <string>Step: </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="timeLabel">
-              <property name="text">
-               <string>Time: </string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="1" colspan="2">
-          <widget class="QFrame" name="stateFrame">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="0" column="3" rowspan="3" colspan="2">
-             <widget class="Line" name="lineSeparator">
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="1">
+             <spacer name="verticalSpacer">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
-             </widget>
-            </item>
-            <item row="1" column="4" colspan="3">
-             <widget class="QLabel" name="humidRealValueLabel">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
               </property>
-              <property name="font">
-               <font>
-                <pointsize>20</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
+             </spacer>
+            </item>
+            <item row="2" column="3">
+             <widget class="QLabel" name="c2Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
               </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;center style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;--.--&lt;/center&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="labelTemp">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>&lt;p&gt;TEMP &amp;#8451;&lt;/p&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>SV</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="6">
-             <widget class="QLabel" name="labelHumid">
-              <property name="text">
-               <string>&lt;p&gt;HUMIDITY %RH&lt;/p&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="5">
-             <widget class="QLabel" name="humidSetValueLabel">
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;00.00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;b&gt;C2&lt;/b&gt;</string>
               </property>
              </widget>
             </item>
             <item row="2" column="4">
-             <widget class="QLabel" name="label_2">
+             <widget class="QLabel" name="v2Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
               <property name="text">
-               <string>SV</string>
+               <string>&lt;b&gt;V2&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="t1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;T1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="6">
+             <widget class="QLabel" name="p1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;P1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="7">
+             <widget class="QLabel" name="fn1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;FN1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="6">
+             <widget class="QLabel" name="p2Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;P2&lt;/b&gt;</string>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="tempSetValueLabel">
+             <widget class="QLabel" name="t2Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;00.00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;b&gt;T2&lt;/b&gt;</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="3">
-             <widget class="QLabel" name="tempRealValueLabel">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+            <item row="2" column="2">
+             <widget class="QLabel" name="h2Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
               </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
               </property>
-              <property name="font">
-               <font>
-                <pointsize>20</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
               </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;center style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;--.--&lt;/center&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;b&gt;H2&lt;/b&gt;</string>
               </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <widget class="QLabel" name="v1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;V1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="7">
+             <widget class="QLabel" name="p3Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;P3&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1" colspan="3">
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="2">
+             <widget class="QLabel" name="h1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;H1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="5">
+             <widget class="QLabel" name="v4Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;V4&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QLabel" name="c1Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;C1&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="5">
+             <widget class="QLabel" name="v3Label">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;V3&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="8">
+             <widget class="QLabel" name="pwrLabel">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;Pwr&lt;/b&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="8">
+             <widget class="QLabel" name="lnvLabel">
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel 
+{ 
+border: 2px solid white;
+background: white;
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="text">
+               <string>&lt;b&gt;LNV&lt;/b&gt;</string>
               </property>
              </widget>
             </item>
@@ -225,10 +469,17 @@
          <item row="1" column="0" colspan="2">
           <widget class="QFrame" name="barsFrame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QFrame
+{ 
+	background-color: rgb(119, 205, 240);
+	border-radius: 7px;
+}</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::StyledPanel</enum>
@@ -296,254 +547,252 @@
            </layout>
           </widget>
          </item>
-         <item row="1" column="2">
-          <widget class="QFrame" name="deviceFrame">
+         <item row="0" column="1" colspan="2">
+          <widget class="QFrame" name="stateFrame">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QFrame
+{ 
+	background-color: rgb(119, 205, 240);
+	border-radius: 7px;
+}</string>
+           </property>
            <property name="frameShape">
-            <enum>QFrame::Box</enum>
+            <enum>QFrame::StyledPanel</enum>
            </property>
            <property name="frameShadow">
             <enum>QFrame::Raised</enum>
            </property>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="2" column="2">
-             <widget class="QLabel" name="h2Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="4" colspan="3">
+             <widget class="QLabel" name="humidRealValueLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
+              <property name="font">
+               <font>
+                <family>Serif</family>
+                <pointsize>48</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+	border: 2px solid white;
+	padding: 3px;
+}</string>
               </property>
               <property name="text">
-               <string>&lt;b&gt;H2&lt;/b&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;center style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;--.--&lt;/center&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
-            <item row="2" column="5">
-             <widget class="QLabel" name="v4Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
+            <item row="0" column="0">
+             <widget class="QLabel" name="labelTemp">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
               <property name="text">
-               <string>&lt;b&gt;V4&lt;/b&gt;</string>
+               <string>&lt;p&gt;TEMP &amp;#8451;&lt;/p&gt;</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="2">
-             <widget class="QLabel" name="h1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
+            <item row="1" column="0" colspan="3">
+             <widget class="QLabel" name="tempRealValueLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;H1&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
+              <property name="maximumSize">
                <size>
-                <width>20</width>
-                <height>30</height>
+                <width>16777215</width>
+                <height>16777215</height>
                </size>
               </property>
-             </spacer>
-            </item>
-            <item row="1" column="7">
-             <widget class="QLabel" name="p3Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
+              <property name="font">
+               <font>
+                <family>Serif</family>
+                <pointsize>48</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;P3&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="4">
-             <widget class="QLabel" name="v1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+	border: 2px solid white;
+	padding: 3px;
+}</string>
               </property>
               <property name="text">
-               <string>&lt;b&gt;V1&lt;/b&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;center style=&quot; font-size:xx-large; font-weight:600;&quot;&gt;--.--&lt;/center&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-             </widget>
-            </item>
-            <item row="1" column="6">
-             <widget class="QLabel" name="p1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;P1&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QLabel" name="c1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;C1&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3">
-             <widget class="QLabel" name="c2Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;C2&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="pwrLabel">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;Pwr&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="6">
-             <widget class="QLabel" name="p2Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;P2&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="7">
-             <widget class="QLabel" name="fn1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;FN1&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="4">
-             <widget class="QLabel" name="v2Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;V2&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="5">
-             <widget class="QLabel" name="v3Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;V3&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lnvLabel">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;LNV&lt;/b&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="t1Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="text">
-               <string>&lt;b&gt;T1&lt;/b&gt;</string>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="t2Label">
-              <property name="autoFillBackground">
-               <bool>true</bool>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
+             <widget class="QLabel" name="tempSetValueLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
               <property name="text">
-               <string>&lt;b&gt;T2&lt;/b&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;00.00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="1" colspan="3">
-             <spacer name="verticalSpacer_2">
+            <item row="0" column="3" rowspan="3" colspan="2">
+             <widget class="Line" name="lineSeparator">
               <property name="orientation">
                <enum>Qt::Vertical</enum>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>30</height>
-               </size>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
-             </spacer>
+              <property name="text">
+               <string>SV</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="6">
+             <widget class="QLabel" name="humidSetValueLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <family>Serif</family>
+                <pointsize>24</pointsize>
+                <weight>75</weight>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;00.00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="5">
+             <widget class="QLabel" name="label_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>SV</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5" colspan="2">
+             <widget class="QLabel" name="labelHumid">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QLabel
+{
+	text-align: right;
+}</string>
+              </property>
+              <property name="text">
+               <string>&lt;p&gt;HUMIDITY %RH&lt;/p&gt;</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QFrame" name="infoFrame">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QFrame
+{
+	border-radius: 7px;
+	background-color: rgb(119, 205, 240);
+}</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QLabel" name="progNameLabel">
+              <property name="text">
+               <string>Prgm. name</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="cycleLabel">
+              <property name="text">
+               <string>Cycle: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="stepLabel">
+              <property name="text">
+               <string>Step: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="timeLabel">
+              <property name="text">
+               <string>Time: </string>
+              </property>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -754,22 +1003,52 @@
           </layout>
          </item>
          <item row="0" column="0">
-          <widget class="QFrame" name="frame">
+          <widget class="QGroupBox" name="groupBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox
+{
+	border: none;
+	border-radius: 4px;	
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
+}</string>
            </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <property name="checked">
+            <bool>false</bool>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>3</number>
+            </property>
+            <property name="sizeConstraint">
+             <enum>QLayout::SetMinimumSize</enum>
+            </property>
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>5</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
             <item>
-             <widget class="QPushButton" name="sysInfoPushButton">
+             <widget class="QToolButton" name="sysInfoToolButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -780,25 +1059,26 @@
                <enum>Qt::LeftToRight</enum>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 3px;
+               <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-	border: none;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), 		stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 	rgba(229, 240, 238, 255));
+	border: none;	
+	background-color: rgb(208, 241, 247);
 	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
-}
-</string>
+	background-color: rgb(240, 119, 70);
+}</string>
               </property>
               <property name="text">
                <string>System Info</string>
@@ -819,29 +1099,19 @@ QPushButton:flat
               <property name="checked">
                <bool>true</bool>
               </property>
-              <property name="flat">
+              <property name="autoExclusive">
+               <bool>true</bool>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextUnderIcon</enum>
+              </property>
+              <property name="autoRaise">
                <bool>true</bool>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>5</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="sysParamPushButton">
+             <widget class="QToolButton" name="sysParamToolButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -849,24 +1119,26 @@ QPushButton:flat
                </sizepolicy>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 3px;
+               <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-  border: 1px solid white;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 rgba(229, 240, 238, 255));
+	border: none;		
+	background-color: rgb(208, 241, 247);
+	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
-}
-</string>
+	background-color: rgb(240, 119, 70);
+}</string>
               </property>
               <property name="text">
                <string>System Params</string>
@@ -884,29 +1156,16 @@ QPushButton:flat
               <property name="checkable">
                <bool>true</bool>
               </property>
-              <property name="flat">
+              <property name="autoExclusive">
                <bool>true</bool>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextUnderIcon</enum>
               </property>
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>5</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="controlParamPushButton">
+             <widget class="QToolButton" name="controlParamToolButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
@@ -914,22 +1173,25 @@ QPushButton:flat
                </sizepolicy>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 3px;
+               <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-  	border: 1px solid white;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 rgba(229, 240, 238, 255));
+	border: none;	
+	background-color: rgb(208, 241, 247);
+	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
+	background-color: rgb(240, 119, 70);
 }</string>
               </property>
               <property name="text">
@@ -948,8 +1210,11 @@ QPushButton:flat
               <property name="checkable">
                <bool>true</bool>
               </property>
-              <property name="flat">
+              <property name="autoExclusive">
                <bool>true</bool>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextUnderIcon</enum>
               </property>
              </widget>
             </item>

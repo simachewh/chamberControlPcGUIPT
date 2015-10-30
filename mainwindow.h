@@ -77,6 +77,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Communication *communication;
+    OptionsWidget *optionsWidget;
 
     enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, OPTIONS_INDEX = 3};
 

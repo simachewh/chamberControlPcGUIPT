@@ -17,6 +17,9 @@ public:
 
 private:
     Ui::OptionsWidget *ui;
+
+public slots:
+    void on_sysButtonClicked();
 };
 
 #endif // OPTIONSWIDGET_H

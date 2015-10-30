@@ -388,11 +388,10 @@ void MainWindow::optionsTabInit()
     this->setWindowTitle("Climate Chamber - AUX Data");
 
     QButtonGroup *optionsButtonGroup = new QButtonGroup(this);
-    optionsButtonGroup->addButton(ui->sysInfoPushButton);
-    optionsButtonGroup->addButton(ui->sysParamPushButton);
-    optionsButtonGroup->addButton(ui->controlParamPushButton);
+    optionsButtonGroup->addButton(ui->sysInfoToolButton);
+    optionsButtonGroup->addButton(ui->sysParamToolButton);
+    optionsButtonGroup->addButton(ui->controlParamToolButton);
     optionsButtonGroup->setExclusive(true);
-
 
 }
 

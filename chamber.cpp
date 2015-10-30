@@ -41,7 +41,7 @@ double Chamber::getHumidity(){
 void Chamber::setDryTemprature(double value){
     if(getDryTemperature() != value){
         dryTemperature = value;
-        emit dryTemperatureChanged(QString::number(dryTemperature));
+        emit dryTemperatureChanged(QString("%1").arg(dryTemperature, 6, 'f', 2, '0'));
         emit dryTemperatureChanged(value);
     }
 }
@@ -49,7 +49,7 @@ void Chamber::setDryTemprature(double value){
 void Chamber::setWetTemprature(double value){
     if(getWetTemperature() != value){
         wetTemperature = value;
-        emit wetTemperatureChanged(QString::number(wetTemperature));
+        emit wetTemperatureChanged(QString("%1").arg(wetTemperature, 6, 'f', 2, '0'));
         emit wetTemperatureChanged(value);
     }
 }
@@ -57,7 +57,7 @@ void Chamber::setWetTemprature(double value){
 void Chamber::setHumidity(double value){
     if(getHumidity() != value){
         humidity = value;
-        emit humidityChanged(QString::number(humidity));
+        emit humidityChanged(QString("%1").arg(humidity, 4, 'f', 1, '0'));
         emit humidityChanged(value);
     }
 }
