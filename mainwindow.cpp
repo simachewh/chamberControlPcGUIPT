@@ -113,6 +113,7 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     stepModel->setProgramToShow(prgmToDisplay);
 
     ui->stepsTableView->setModel(stepModel);
+
     if(!ui->loadProgramButton->isEnabled()){
         ui->loadProgramButton->setEnabled(true);
     }
@@ -124,6 +125,14 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     }
     if(!ui->startButton->isEnabled()){
         ui->startButton->setEnabled(true);
+    }
+    if(!ui->addStepOnSelectedButton->isEnabled())
+    {
+        ui->addStepOnSelectedButton->setEnabled(true);
+    }
+    if(!ui->removeStepFromSelectedButton->isEnabled())
+    {
+        ui->removeStepFromSelectedButton->setEnabled(true);
     }
     qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
 }
@@ -417,6 +426,23 @@ void MainWindow::on_removeStepFromSelectedButton_clicked()
 
 void MainWindow::on_addStepOnSelectedButton_clicked()
 {
+      StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
+//    stepsModel->ads->setWindowTitle("from model");
+//    stepsModel->ads->setModal(true);
+//    stepsModel->ads->show();
+
+    AddStep *ads = new AddStep();
+    connect(ads, SIGNAL(stepFormSubmitted(QString,QString,QString,
+                                          QString,QString,QString,
+                                          QString,QString,QString)),
+            stepsModel, SLOT(on_addStepFormSubmitted(QString,QString,QString,
+                                                     QString,QString,QString,
+                                                     QString,QString,QString)));
+    QString pgmName(ui->programsListView->currentIndex().data().toString());
+    pgmName = pgmName.left(pgmName.indexOf('.'));
+    ads->setWindowTitle("Adding step to " + pgmName);
+    ads->setModal(true);
+    ads->show();
 
 }
 

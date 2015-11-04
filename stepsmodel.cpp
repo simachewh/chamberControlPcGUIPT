@@ -3,9 +3,15 @@
 StepsModel::StepsModel()
 {
     pgmToShow = new Program();
+    openStep = new Step();
+    ads = new AddStep();
+    connect(ads, SIGNAL(stepFormSubmitted(QString,QString,QString,
+                                          QString,QString,QString,
+                                          QString,QString,QString)),
+            this, SLOT(on_addStepFormSubmitted(QString,QString,QString,
+                                               QString,QString,QString,
+                                               QString,QString,QString)));
 }
-
-//! ********************** PUBLIC FUNCTIONS ******************** !//
 
 Program * StepsModel::getProgramToShow() const
 {
@@ -132,6 +138,54 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
         break;
     }
     return QVariant();
+}
+
+bool StepsModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    Q_UNUSED(row)
+    Q_UNUSED(count)
+    int sizeBefore = pgmToShow->getSteps().size();
+    DataBackup db;
+    beginInsertRows(parent, pgmToShow->getSteps().size(),
+                    pgmToShow->getSteps().size());
+    pgmToShow->addStep(openStep);
+    db.writeStepToFile(openStep, pgmToShow);
+    endInsertRows();
+    int sizeAfter = pgmToShow->getSteps().size();
+    qDebug() << "insert row ended " << openStep->getTemperature()
+             << " sizeBefore" << sizeBefore << " sizeAfter"
+             << sizeAfter;
+    if(sizeAfter > sizeBefore){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+bool StepsModel::removeRow(int row, const QModelIndex &parent)
+{
+    Q_UNUSED(row) Q_UNUSED(parent)
+    return false;
+}
+
+bool StepsModel::on_addStepFormSubmitted(QString temp, QString humid, QString hrs,
+                                         QString mins, QString wait, QString hr,
+                                         QString one, QString two, QString three)
+{
+    openStep->setTemperature(temp.toDouble());
+    openStep->setHumidity(humid.toDouble());
+    openStep->setHours(hrs.toDouble());
+    openStep->setMinutes(mins.toDouble());
+    openStep->setWaiting(wait.toInt());
+    openStep->setHR(hr.toInt());
+    openStep->setOne(one.toInt());
+    openStep->setTwo(two.toInt());
+    openStep->setThree(three.toInt());
+    openStep->setStepNumber(pgmToShow->getSteps().size() + 1);
+    qDebug() << "open step " << openStep->getTemperature();
+    insertRows(pgmToShow->getSteps().size(), 1, QModelIndex());
+
+    return true;
 }
 
 //! ********************** END OF REIMPLEMENTED FUNCTIONS ************* !//

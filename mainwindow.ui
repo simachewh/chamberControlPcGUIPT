@@ -88,7 +88,7 @@ QTabBar::tab:!selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="monitorTab">
         <attribute name="title">
@@ -841,6 +841,9 @@ background: white;
               <enum>Qt::Horizontal</enum>
              </property>
              <widget class="QPushButton" name="removeStepFromSelectedButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>-</string>
               </property>
@@ -860,6 +863,9 @@ background: white;
               </property>
              </widget>
              <widget class="QPushButton" name="addStepOnSelectedButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="text">
                <string>+</string>
               </property>

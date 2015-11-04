@@ -45,7 +45,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
    // setChamberConnected(false);
 
     pidController->controlCommands->setIdle(true);
-    connectionTimer->start(1000);
+//    connectionTimer->start(1000);
 }
 
 Communication::~Communication(){

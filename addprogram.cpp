@@ -137,12 +137,12 @@ void AddProgram::on_stepFormSubmited(QString temp, QString humid, QString hrs,
 bool AddProgram::addStep(Step *step)
 {
     bool isAdded = false;
-    DataBackup *dbkp = new DataBackup();
+    DataBackup *db = new DataBackup();
 
     QString prgmName = p->getProgramName();
     p->getSteps().insert(p->getSteps().size() + 1, step);
 
-    QString path = dbkp->fileLives(DataBackup::PRGM, prgmName);
+    QString path = db->fileLives(DataBackup::PRGM, prgmName);
     QFile prgmFile(path);
 
     if(path.isEmpty()){
@@ -151,21 +151,7 @@ bool AddProgram::addStep(Step *step)
     }
 
     p->addStep(step);
-    dbkp->writeStepToFile(step, p);
+    db->writeStepToFile(step, p);
 
     return isAdded;
 }
-
-//bool AddProgram::addStep(Program *prgm, Step *step)
-//{
-//    bool isAdded = false;
-
-//    return isAdded;
-//}
-
-//bool AddProgram::addStep(QString name, Step *step)
-//{
-//    bool isAded = false;
-
-//    return isAded;
-//}
