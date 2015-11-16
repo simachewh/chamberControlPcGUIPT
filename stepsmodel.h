@@ -7,7 +7,6 @@
 
 #include "step.h"
 #include "program.h"
-#include "addstep.h"
 #include "databackup.h"
 
 /**
@@ -21,10 +20,12 @@ private:
     Q_OBJECT
     Program *pgmToShow;
     Step *openStep;
+    enum HEADER_TYPE {NUM = 0, TEMPR = 1, HUM = 2,
+                     HRS = 3, MINS = 4, WAIT =5,
+                     HR = 6, ONE = 7, TWO = 8, THREE = 9};
 
 
 public:
-    AddStep *ads;
     /**
      * @brief StepsModel Constructor to create instance of this class.
      * Initializes the private member pgmToShow with a new empty Program
@@ -56,7 +57,7 @@ public:
 
     bool insertRows(int row, int count, const QModelIndex &parent);
 
-    bool removeRow(int row, const QModelIndex &parent);
+    bool removeRows(int row, int count, const QModelIndex &parent);
 
 public slots:
     bool on_addStepFormSubmitted(QString temp, QString humid, QString hrs,

@@ -5,9 +5,8 @@ Step::Step(QObject *parent) : QObject(parent)
 
 }
 
-//! ************* GETTERS AND SETTERS ******** !//
-
 int Step::getStepNumber() const{
+    qDebug() << "getStepNumber: step no " << stepNumber;
     return stepNumber;
 }
 

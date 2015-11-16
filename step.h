@@ -2,6 +2,7 @@
 #define STEP_H
 
 #include <QObject>
+#include <QDebug>
 
 class Step : public QObject
 {

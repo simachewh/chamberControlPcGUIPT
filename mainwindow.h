@@ -34,6 +34,7 @@ public:
     void helpTabInit();
     void monitorTabInit();
     void optionsTabInit();
+    void quickStartTabInit();
 private slots:
 
     void initStyle();
@@ -64,6 +65,8 @@ private slots:
 
     void on_connectionLost(bool disconnected);
 
+    void on_stepsTableView_clicked(const QModelIndex &index);
+
 public slots:
     void populateProgramsList();
 
@@ -79,7 +82,8 @@ private:
     Communication *communication;
     OptionsWidget *optionsWidget;
 
-    enum VIEW_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1, AUX_INDEX = 2, OPTIONS_INDEX = 3};
+    enum TAB_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1,
+                    AUX_INDEX = 2, OPTIONS_INDEX = 3, QUICK_START = 4};
 
 };
 

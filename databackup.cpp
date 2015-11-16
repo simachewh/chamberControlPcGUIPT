@@ -71,8 +71,7 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
     QFile prgmFile(path);
     if(prgmFile.open(QIODevice::Append)){
         QTextStream ts(&prgmFile);
-        ts << step->getStepNumber() << " : "
-           << QString("%1").arg(step->getTemperature(), 6, 'f', 2, '0') << ":"
+        ts << QString("%1").arg(step->getTemperature(), 6, 'f', 2, '0') << ":"
            << QString("%1").arg(step->getHumidity(), 4, 'f', 1, '0') << ":"
            << QString("%1").arg(step->getHours()) << ":"
            << QString("%1").arg(step->getMinutes()) << ":"
@@ -91,13 +90,13 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
 
 void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
 {
-    qDebug() << "loadTestProgram: Entered";
+    qDebug() << "DataBackup::loadTestProgram: Entered";
     QString path = fileLives(PRGM, pgmFileName);
     qDebug() << path;
 
     if(path.isEmpty())
     {
-        qDebug() << "loadTestProgram: " << "path is empty";
+        qDebug() << "DataBackup::loadTestProgram: " << "path is empty";
         return;
     }
 
@@ -106,12 +105,13 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
 
     if(!pgmFile.open(QIODevice::ReadOnly))
     {
-        qDebug() << "loadTestProgram: Program cant open";
+        qDebug() << "DataBackup::loadTestProgram: Program cant open";
         return;
     }
-    QMap<int, Step*> loadedSteps;
+    QMap<int, Step*> *loadedSteps = new QMap<int, Step*>;
     prgm->getSteps().clear();
     prgm->setProgramName(pgmFileName);
+    int stepNo = 0;
     while(!ts.atEnd())
     {
         QString line = ts.readLine();
@@ -126,28 +126,26 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
                 qDebug() << s ;
             }
             Step *s = new Step();
-            s->setStepNumber(stepParams.at(0).toInt());
-            s->setTemperature(stepParams.at(1).toDouble());
-            s->setHumidity(stepParams.at(2).toDouble());
-            s->setHours(stepParams.at(3).toInt());
-            s->setMinutes(stepParams.at(4).toInt());
-            s->setWaiting(stepParams.at(5).toInt());
-            s->setHR(stepParams.at(6).toInt());
-            s->setOne(stepParams.at(7).toInt());
-            s->setTwo(stepParams.at(8).toInt());
-            s->setThree(stepParams.at(9).toInt());
+            s->setStepNumber(stepNo);
+            s->setTemperature(stepParams.at(0).toDouble());
+            s->setHumidity(stepParams.at(1).toDouble());
+            s->setHours(stepParams.at(2).toInt());
+            s->setMinutes(stepParams.at(3).toInt());
+            s->setWaiting(stepParams.at(4).toInt());
+            s->setHR(stepParams.at(5).toInt());
+            s->setOne(stepParams.at(6).toInt());
+            s->setTwo(stepParams.at(7).toInt());
+            s->setThree(stepParams.at(8).toInt());
 
-            loadedSteps.insert(s->getStepNumber(), s);
-        }
-
-        qDebug() << "DataBackup::loadProgram: loadedSteps size" << loadedSteps.size();
+            loadedSteps->insert(s->getStepNumber(), s);
+            stepNo++;
+        }        
     }
-    prgm->setSteps(loadedSteps);
+    qDebug() << "DataBackup::loadProgram: loadedSteps size" << loadedSteps->size();
+    prgm->setSteps(*loadedSteps);
     prgm->setCurrentCycle(1);
     prgm->setCurrentStepNum(1);
 }
-
-//! ************************ END OF PUBLIC FUNCTIONS *************** !//
 
 QString DataBackup::fileLives(File_Type type, QString name)
 {

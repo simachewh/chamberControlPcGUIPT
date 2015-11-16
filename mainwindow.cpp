@@ -129,11 +129,7 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     if(!ui->addStepOnSelectedButton->isEnabled())
     {
         ui->addStepOnSelectedButton->setEnabled(true);
-    }
-    if(!ui->removeStepFromSelectedButton->isEnabled())
-    {
-        ui->removeStepFromSelectedButton->setEnabled(true);
-    }
+    }    
     qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
 }
 
@@ -404,6 +400,11 @@ void MainWindow::optionsTabInit()
 
 }
 
+void MainWindow::quickStartTabInit()
+{
+    QString none("try initializing quick start tab here");
+}
+
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
     if(index == OPTIONS_INDEX){
@@ -414,6 +415,8 @@ void MainWindow::on_tabWidget_currentChanged(int index)
         monitorTabInit();
     }else if(index == AUX_INDEX){
         optionsTabInit();
+    }else if(index == QUICK_START){
+        quickStartTabInit();
     }
 }
 
@@ -421,15 +424,16 @@ void MainWindow::on_removeStepFromSelectedButton_clicked()
 {
     QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
-
+    int selectedRow = ui->stepsTableView->selectionModel()->currentIndex().row();
+    qDebug() << "on_removeStepFromSelectedButton_clicked: selectedRow"
+             << selectedRow;
+    StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
+    stepsModel->removeRows(selectedRow, 1, QModelIndex());
 }
 
 void MainWindow::on_addStepOnSelectedButton_clicked()
 {
-      StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
-//    stepsModel->ads->setWindowTitle("from model");
-//    stepsModel->ads->setModal(true);
-//    stepsModel->ads->show();
+    StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
 
     AddStep *ads = new AddStep();
     connect(ads, SIGNAL(stepFormSubmitted(QString,QString,QString,
@@ -519,4 +523,13 @@ void MainWindow::on_connectionLost(bool disconnected)
 
         this->statusBar()->showMessage("Connection to chamber established", 2000);
     }
+}
+
+void MainWindow::on_stepsTableView_clicked(const QModelIndex &index)
+{
+    if(!ui->removeStepFromSelectedButton->isEnabled()){
+        ui->removeStepFromSelectedButton->setEnabled(true);
+    }
+    int selected = ui->stepsTableView->selectionModel()->currentIndex().row();
+    qDebug() << "on_stepsTableView_clicked: selected row: " << selected;
 }

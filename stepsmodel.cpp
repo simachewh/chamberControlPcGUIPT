@@ -4,13 +4,6 @@ StepsModel::StepsModel()
 {
     pgmToShow = new Program();
     openStep = new Step();
-    ads = new AddStep();
-    connect(ads, SIGNAL(stepFormSubmitted(QString,QString,QString,
-                                          QString,QString,QString,
-                                          QString,QString,QString)),
-            this, SLOT(on_addStepFormSubmitted(QString,QString,QString,
-                                               QString,QString,QString,
-                                               QString,QString,QString)));
 }
 
 Program * StepsModel::getProgramToShow() const
@@ -22,10 +15,6 @@ void StepsModel::setProgramToShow(Program *pgm)
 {
     pgmToShow = pgm;
 }
-
-//! ********************** END OF PUBLIC FUNCTIONS ************* !//
-
-//! ********************** REIMPLEMENTED FUNCTIONS ************* !//
 
 int StepsModel::rowCount(const QModelIndex &parent) const
 {
@@ -49,34 +38,34 @@ QVariant StepsModel::headerData(int section, Qt::Orientation orientation, int ro
     if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {
         switch (section) {
-        case 0:
-            return "NO.";
+        case NUM:
+            return "Num.";
             break;
-        case 1:
+        case TEMPR:
             return "Temp.°C";
             break;
-        case 2:
+        case HUM:
             return "HUM %RH";
             break;
-        case 3:
+        case HRS:
             return "Hrs.";
             break;
-        case 4:
+        case MINS:
             return "Mins.";
             break;
-        case 5:
+        case WAIT:
             return "WT";
             break;
-        case 6:
+        case HR:
             return "hr";
             break;
-        case 7:
+        case ONE:
             return "1";
             break;
-        case 8:
+        case TWO:
             return "2";
             break;
-        case 9:
+        case THREE:
             return "3";
             break;
         default:
@@ -97,11 +86,12 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
     {
         return QVariant();
     }
-    if(index.row() < 0 || index.row() > pgmToShow->getSteps().size())
+    if(index.row() < 0 || index.row() > pgmToShow->getSteps().size()
+            || !pgmToShow->getSteps().contains(index.row()))
     {
         return QVariant();
     }
-    Step *s = pgmToShow->getSteps().value(index.row() +1);
+    Step *s = pgmToShow->getSteps().value(index.row());
     switch (index.column()) {
     case 0:
         return s->getStepNumber();
@@ -137,18 +127,20 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
         return "View ERR";
         break;
     }
-    return QVariant();
+//    return QVariant();
 }
 
 bool StepsModel::insertRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(row)
     Q_UNUSED(count)
-    int sizeBefore = pgmToShow->getSteps().size();
+    int sizeBefore = pgmToShow->getNoOfSteps();
     DataBackup db;
-    beginInsertRows(parent, pgmToShow->getSteps().size(),
-                    pgmToShow->getSteps().size());
+    Step *s = openStep;
+    beginInsertRows(parent, 1, 1);
+
     pgmToShow->addStep(openStep);
+
     db.writeStepToFile(openStep, pgmToShow);
     endInsertRows();
     int sizeAfter = pgmToShow->getSteps().size();
@@ -162,16 +154,33 @@ bool StepsModel::insertRows(int row, int count, const QModelIndex &parent)
     }
 }
 
-bool StepsModel::removeRow(int row, const QModelIndex &parent)
+bool StepsModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-    Q_UNUSED(row) Q_UNUSED(parent)
-    return false;
+    Q_UNUSED(count)
+    qDebug() << "removeRows: before" << pgmToShow->getNoOfSteps();
+    int removed = 0;
+    beginRemoveRows(parent, row, row);
+
+    removed = pgmToShow->removeStep(row);
+
+    endRemoveRows();
+
+
+    if(removed == 1){
+        qDebug() << "removeRows: true" << pgmToShow->getNoOfSteps();
+        return true;
+    }else{
+        qDebug() << "removeRows: false" << pgmToShow->getNoOfSteps();
+        return false;
+    }
 }
+
 
 bool StepsModel::on_addStepFormSubmitted(QString temp, QString humid, QString hrs,
                                          QString mins, QString wait, QString hr,
                                          QString one, QString two, QString three)
 {
+    openStep = new Step();
     openStep->setTemperature(temp.toDouble());
     openStep->setHumidity(humid.toDouble());
     openStep->setHours(hrs.toDouble());
@@ -187,6 +196,3 @@ bool StepsModel::on_addStepFormSubmitted(QString temp, QString humid, QString hr
 
     return true;
 }
-
-//! ********************** END OF REIMPLEMENTED FUNCTIONS ************* !//
-

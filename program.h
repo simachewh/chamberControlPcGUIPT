@@ -90,6 +90,7 @@ public:
 
     int addStep(Step* s);
 
+    int removeStep(int key);
 private:
     QString programName;
     int point;
@@ -109,7 +110,7 @@ private:
      * the total number of steps.
      */
     int currentStepNum;
-    QMap<int, Step*> steps;
+    QMap<int, Step*> *steps;
     Q_DISABLE_COPY(Program)
 
 signals:
