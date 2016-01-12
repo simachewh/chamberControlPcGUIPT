@@ -32,7 +32,7 @@ QVariant StepsModel::headerData(int section, Qt::Orientation orientation, int ro
 {
     if(orientation == Qt::Vertical && role == Qt::DisplayRole)
     {
-        return section + 1;
+        return section;
     }
 
     if(orientation == Qt::Horizontal && role == Qt::DisplayRole)
@@ -78,6 +78,9 @@ QVariant StepsModel::headerData(int section, Qt::Orientation orientation, int ro
 
 QVariant StepsModel::data(const QModelIndex &index, int role) const
 {
+    int row = index.row();
+    int stepSize = pgmToShow->getSteps().size();
+    bool containsNot = !pgmToShow->getSteps().contains(row);
     if(!index.isValid())
     {
         return QVariant();
@@ -86,9 +89,12 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
     {
         return QVariant();
     }
-    if(index.row() < 0 || index.row() > pgmToShow->getSteps().size()
-            || !pgmToShow->getSteps().contains(index.row()))
+
+    if(row < 0 || row > pgmToShow->getSteps().size()
+            || !pgmToShow->getSteps().contains(row))
     {
+        //TODO: check if this is the reason blocking update of GUI
+        //on insert row
         return QVariant();
     }
     Step *s = pgmToShow->getSteps().value(index.row());
@@ -132,17 +138,19 @@ QVariant StepsModel::data(const QModelIndex &index, int role) const
 
 bool StepsModel::insertRows(int row, int count, const QModelIndex &parent)
 {
-    Q_UNUSED(row)
-    Q_UNUSED(count)
+    //Q_UNUSED(row)
+    //Q_UNUSED(count)
     int sizeBefore = pgmToShow->getNoOfSteps();
     DataBackup db;
-    Step *s = openStep;
-    beginInsertRows(parent, 1, 1);
+    beginInsertRows(parent, row, row);
 
     pgmToShow->addStep(openStep);
 
-    db.writeStepToFile(openStep, pgmToShow);
+    //db.writeStepToFile(openStep, pgmToShow);
     endInsertRows();
+    db.writeStepToFile(openStep, pgmToShow);
+    //TODO: GUI doesn't update inserted row, it loads from file when program
+    //is selected again. Probably data method returns empty row.
     int sizeAfter = pgmToShow->getSteps().size();
     qDebug() << "insert row ended " << openStep->getTemperature()
              << " sizeBefore" << sizeBefore << " sizeAfter"
@@ -190,7 +198,8 @@ bool StepsModel::on_addStepFormSubmitted(QString temp, QString humid, QString hr
     openStep->setOne(one.toInt());
     openStep->setTwo(two.toInt());
     openStep->setThree(three.toInt());
-    openStep->setStepNumber(pgmToShow->getSteps().size() + 1);
+    openStep->setStepNumber(pgmToShow->getSteps().size());
+    //pgmToShow->addStep(openStep);
     qDebug() << "open step " << openStep->getTemperature();
     insertRows(pgmToShow->getSteps().size(), 1, QModelIndex());
 

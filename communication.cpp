@@ -118,7 +118,7 @@ QByteArray Communication::readData(){
 
 
 void Communication::on_idelStateChanged(){
-    bool isIdel = pidController->controlCommands->getIsIdle();
+    bool isIdel = pidController->controlCommands->isIdle();
     if(isIdel){
         qDebug() << "state changed: " << isIdel;
 //        disconnect(pidController->chamberParams, SIGNAL(dryTemperatureChanged(int)),
@@ -151,7 +151,7 @@ if(chCommand == ControlCommands::A){
         pidController->chamberParams->setDryTemprature(temp);
         pidController->chamberParams->setHumidity(humid);
 
-        if(pidController->controlCommands->getIsIdle())
+        if(pidController->controlCommands->isIdle())
         {
             emit replyReady(chCommand);
         }else{

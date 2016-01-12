@@ -2,10 +2,6 @@
 #include "communication.h"
 #include <QDebug>
 
-bool ControlCommands::isIdle = false;
-
-
-
 ControlCommands::ControlCommands(QObject *parent) : QObject(parent)
 {
     stx = 0x02;
@@ -497,8 +493,8 @@ void ControlCommands::setHumidityPowerRate1(std::bitset<8> *value)
     bits[7] = (*value)[3];
 }
 
-bool ControlCommands::getIsIdle(){
-    return ControlCommands::isIdle;
+bool ControlCommands::isIdle(){
+    return ControlCommands::idle;
 }
 
 bool ControlCommands::getH1(){
@@ -691,8 +687,8 @@ int ControlCommands::getHumidityPower(){
 
 
 void ControlCommands::setIdle(bool idelState){
-    if(!(getIsIdle() == idelState)){
-        isIdle = idelState;
-        emit idleStateChanged();
+    if(!(isIdle() == idelState)){
+        idle = idelState;
+        emit idleStateChanged(idelState);
     }
 }

@@ -4,6 +4,7 @@
 
 #include <QMainWindow>
 #include <QFileSystemModel>
+#include <QSettings>
 
 #include "controlcommands.h"
 #include "communication.h"
@@ -14,6 +15,8 @@
 #include "loadprogram.h"
 #include "renamedialog.h"
 #include "optionswidget.h"
+#include "addpid.h"
+#include "pidlistmodel.h"
 
 
 namespace Ui {
@@ -31,10 +34,12 @@ public:
     void helpProgramInit();
     void monitorHelpInit();
     void programTabInit();
-    void helpTabInit();
     void monitorTabInit();
     void optionsTabInit();
     void quickStartTabInit();
+    void auxTabInit();
+signals:
+    void quickStepAboutToAdd();
 private slots:
 
     void initStyle();
@@ -67,6 +72,32 @@ private slots:
 
     void on_stepsTableView_clicked(const QModelIndex &index);
 
+    void on_quickStartButton_clicked(bool checked);
+
+    void on_idleStateChanged(bool state);
+
+    void on_quickStopButton_clicked();
+
+    void on_sysInfoToolButton_clicked(bool checked);
+
+    void on_sysParamToolButton_clicked(bool checked);
+
+    void on_controlParamToolButton_clicked(bool checked);
+
+    void on_quickAddStepButton_clicked();
+
+    void on_quickStepAboutToAdd();
+
+    void on_useButton_clicked();
+
+    void on_makeDefaultButton_clicked();
+
+    void on_plusTPButton_clicked();
+
+    void on_plusHPButton_clicked();
+
+    void on_pidTabWidget_currentChanged(int index);
+
 public slots:
     void populateProgramsList();
 
@@ -80,10 +111,16 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Communication *communication;
-    OptionsWidget *optionsWidget;
+    QSettings settings;
 
-    enum TAB_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1,
+    //Program *quickPgm; // removed for resons explained in the constructor
+    //check details at in the implementation file. (.cpp)
+
+    enum MAIN_TAB_INDEX {MONITOR_INDEX = 0, PROGRAM_INDEX = 1,
                     AUX_INDEX = 2, OPTIONS_INDEX = 3, QUICK_START = 4};
+    enum OPTIONS_PAGE_INDEX {SYS_INFO = 0, SYS_PARAM = 1, CONTROL_PARAM = 2};
+
+    enum Pid_Tab_Index {Temperature_Index = 0, Humidity_Index = 1};
 
 };
 

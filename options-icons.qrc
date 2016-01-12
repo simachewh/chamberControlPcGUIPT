@@ -5,4 +5,8 @@
         <file>images/technobothnia_logo.png</file>
         <file>images/control.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>images/Less.png</file>
+        <file>images/More.png</file>
+    </qresource>
 </RCC>

@@ -4,12 +4,14 @@
 #include <QObject>
 #include <QTimer>
 #include <QDebug>
+#include <QSettings>
 
 #include "chamber.h"
 #include "controlcommands.h"
 #include "program.h"
 #include "step.h"
 #include "databackup.h"
+#include "pid.h"
 
 /**
  * @brief The Controller class is where control of a test program
@@ -21,8 +23,6 @@ class Controller : public QObject
     Q_OBJECT
 
 private:
-
-    enum {MAX_OUT = 255, MIN_OUT = 0};
 
     /**
      * @brief currentStep Representaion of the current step
@@ -42,87 +42,9 @@ private:
      */
     Step *nextStep;
 
-    /**
-     * @brief previousTempError The previous error of temperature.
-     */
-    double previousTempError;
+    PID *temperaturePID;
 
-    /**
-     * @brief tempError The error between the set and measured values
-     * of temperature
-     */
-    double tempError;
-
-    /**
-     * @brief previousHumidError The previous error of Humidity.
-     */
-    double previousHumidError;
-
-    /**
-     * @brief humidError The error between the set and measured values
-     * of humidity.
-     */
-    double humidError;
-
-    /**
-     * @brief temperatureSetValue Temperature set value of current
-     * step.
-     */
-    double temperatureSetValue;
-
-    /**
-     * @brief HumiditySetValue Humidity set value of current step.
-     */
-    double HumiditySetValue;
-
-    /**
-     * @brief measuredTemp Temperature measured value;
-     */
-    double measuredTemp;
-
-    /**
-     * @brief measuredHumid Humidity measured value.
-     */
-    double measuredHumid;
-
-    /**
-     * @brief kp The proportional gain.
-     */
-    double kpTemp;
-
-    /**
-     * @brief ki The integral gain.
-     */
-    double kiTemp;
-
-    /**
-     * @brief kd The derivative gain.
-     */
-    double kdTemp;
-
-    double integralTemp;
-
-    double proportionalTemp;
-
-    double derivativeTemp;
-
-    double dtTemp;
-
-    double kpHumd;
-
-    double kiHumid;
-
-    double kdHumid;
-
-    double integralHumid;
-
-    double proportionalHumid;
-
-    double derivativeHumid;
-
-    double dtHumid;
-
-
+    PID *humidityPID;
 
 public:
 
@@ -144,10 +66,6 @@ public:
     explicit Controller(QObject *parent = 0);
     ~Controller();
 
-    int pidTempControl();
-
-    int pidHumidControl();
-
     void controlTestRun();
 
     void setUpStart();
@@ -164,90 +82,15 @@ public:
     Step *getNextStep() const;
     void setNextStep(Step *value);
 
-    double getPreviousTempError() const;
-    void setPreviousTempError(double value);
+    Program *getTestPgm() const;
+    void setTestPgm(Program *value);
 
-    double getTempError() const;
-    void setTempError(double value);
+    void startQuickTest(Program *pgm);
+    PID *getTemperaturePID() const;
+    void setTemperaturePID(PID *value);
 
-    double getPreviousHumidError() const;
-    void setPreviousHumidError(double value);
-
-    double getHumidError() const;
-    void setHumidError(double value);
-
-    double getTemperatureSetValue() const;
-    void setTemperatureSetValue(double value);
-
-    double getHumiditySetValue() const;
-    void setHumiditySetValue(double value);
-
-    double getMeasuredTemp() const;
-
-    double getMeasuredHumid() const;
-
-    double getKp() const;
-    void setKp(double value);
-
-    double getKi() const;
-    void setKi(double value);
-
-    double getKd() const;
-    void setKd(double value);
-
-    double getIntegral() const;
-    void setIntegral(double value);
-
-    double getProportional() const;
-    void setProportional(double value);
-
-    double getDerivative() const;
-    void setDerivative(double value);
-
-    double getDt() const;
-    void setDt(double value);
-
-    double getKpTemp() const;
-    void setKpTemp(double value);
-
-    double getKiTemp() const;
-    void setKiTemp(double value);
-
-    double getKdTemp() const;
-    void setKdTemp(double value);
-
-    double getIntegralTemp() const;
-    void setIntegralTemp(double value);
-
-    double getProportionalTemp() const;
-    void setProportionalTemp(double value);
-
-    double getDerivativeTemp() const;
-    void setDerivativeTemp(double value);
-
-    double getDtTemp() const;
-    void setDtTemp(double value);
-
-    double getKpHumd() const;
-    void setKpHumd(double value);
-
-    double getKiHumid() const;
-    void setKiHumid(double value);
-
-    double getKdHumid() const;
-    void setKdHumid(double value);
-
-    double getIntegralHumid() const;
-    void setIntegralHumid(double value);
-
-    double getProportionalHumid() const;
-    void setProportionalHumid(double value);
-
-    double getDerivativeHumid() const;
-    void setDerivativeHumid(double value);
-
-    double getDtHumid() const;
-    void setDtHumid(double value);
+    PID *getHumidityPID() const;
+    void setHumidityPID(PID *value);
 
 signals:
     void stepsFinished(int totalStepsDone);
@@ -257,10 +100,6 @@ signals:
 public slots:
 
     void on_TemperatureRealChanged(double value);
-
-    void setMeasuredTemp(double value);
-
-    void setMeasuredHumid(double value);
 
     void changeStep();
 

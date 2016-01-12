@@ -6,9 +6,20 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    QCoreApplication::setOrganizationName("technobothnia");
+    QCoreApplication::setOrganizationDomain("simachew.com");
+    QCoreApplication::setApplicationName("climate_chamber_controller");
+    ui->setupUi(this);    
     communication = new Communication();
+
+    //no need to reserve memory for a quick program, it can be collected
+    //from the quick steps view table's model.
+    //quickPgm = new Program(parent);
     initStyle();
+
+    /// Internal connections ///
+    connect(this, SIGNAL(quickStepAboutToAdd()),
+            this, SLOT(on_quickStepAboutToAdd()));
 
     //!communication object signals connection to this
     connect(communication, SIGNAL(connectionLost(bool)),
@@ -35,6 +46,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->pidController->controlCommands,
             SIGNAL(humidityPowerChanged(int)),
             this, SLOT(on_humidPowerChange(int)));
+
+    connect(communication->pidController->controlCommands, SIGNAL(idleStateChanged(bool)),
+            this, SLOT(on_idleStateChanged(bool)));
 
     //! program connections to gui !//
     connect(communication->pidController->testPgm,
@@ -77,22 +91,6 @@ void MainWindow::populateProgramsList(){
     ui->programsListView->setCurrentIndex(programsListModel->index(0,0));
 }
 
-void MainWindow::initStyle(){
-    ui->tabWidget->setCurrentIndex(MONITOR_INDEX);
-    ui->loadProgramButton->setEnabled(false);
-    ui->renameProgramButton->setEnabled(false);
-    ui->deleteProgramButton->setEnabled(false);
-    ui->startButton->setEnabled(false);
-    ui->stopButton->setEnabled(false);
-
-    ui->programStepsSpliter->setStretchFactor(0, 1);
-    ui->programStepsSpliter->setStretchFactor(1, 3);
-
-    ui->stepsTableView->setAlternatingRowColors(true);
-    ui->stepsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-}
-
 void MainWindow::on_newProgramButton_clicked()
 {
     AddProgram *ap = new AddProgram();
@@ -130,7 +128,7 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
     {
         ui->addStepOnSelectedButton->setEnabled(true);
     }    
-    qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
+//    qDebug() << "on_programsListView_clicked: Row" << index.row() << index.column();
 }
 
 void MainWindow::on_loadProgramButton_clicked()
@@ -368,6 +366,46 @@ void MainWindow::on_humidPowerChange(int value)
     ui->h2ProgressBar->update();
 }
 
+void MainWindow::initStyle(){
+    ui->tabWidget->setCurrentIndex(MONITOR_INDEX);
+    ui->loadProgramButton->setEnabled(false);
+    ui->renameProgramButton->setEnabled(false);
+    ui->deleteProgramButton->setEnabled(false);
+    ui->startButton->setEnabled(false);
+    ui->stopButton->setEnabled(false);
+
+    ui->programStepsSpliter->setStretchFactor(0, 1);
+    ui->programStepsSpliter->setStretchFactor(1, 3);
+
+    ui->stepsTableView->setAlternatingRowColors(true);
+    ui->stepsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    //! options tab !//
+    QButtonGroup *optionsButtonGroup = new QButtonGroup(this);
+    optionsButtonGroup->addButton(ui->sysInfoToolButton);
+    optionsButtonGroup->addButton(ui->sysParamToolButton);
+    optionsButtonGroup->addButton(ui->controlParamToolButton);
+    optionsButtonGroup->setExclusive(true);
+    //! options tab - system params
+    ui->maxHighLineEdit->setValidator(new QIntValidator(25, 150, this));
+    ui->maxLowLineEdit->setValidator(new QIntValidator(-10, -40, this));
+    ui->pointLineEdit->setValidator(new QIntValidator(20, 40));
+    //! options tab - pid params !//
+
+
+    //! quick start tab !//
+    ui->quickStartTableView->setAlternatingRowColors(true);
+    ui->quickStartTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->quickStartTableView->setModel(new StepsModel());
+    QRegExp str("[a-zA-Z]+");
+    QValidator *strValidator = new QRegExpValidator(str, this);
+    ui->nameLineEdit->setValidator(strValidator);
+    ui->nameLineEdit->setPlaceholderText("untitled");
+    ui->cycleLineEdit->setValidator(new QIntValidator(1, 50, this));
+    ui->cycleLineEdit->setPlaceholderText("1");
+    ui->quickStartButton->setEnabled(false);
+    ui->quickStopButton->setEnabled(false);
+}
 void MainWindow::programTabInit()
 {
     this->setWindowTitle("Climate Chamber - Program");
@@ -378,11 +416,6 @@ void MainWindow::programTabInit()
     populateProgramsList();
 }
 
-void MainWindow::helpTabInit()
-{
-    this->setWindowTitle("Climate Chamber - Help");
-}
-
 void MainWindow::monitorTabInit()
 {
     this->setWindowTitle("Climate Chamber - Monitor");
@@ -390,33 +423,39 @@ void MainWindow::monitorTabInit()
 
 void MainWindow::optionsTabInit()
 {
-    this->setWindowTitle("Climate Chamber - AUX Data");
-
-    QButtonGroup *optionsButtonGroup = new QButtonGroup(this);
-    optionsButtonGroup->addButton(ui->sysInfoToolButton);
-    optionsButtonGroup->addButton(ui->sysParamToolButton);
-    optionsButtonGroup->addButton(ui->controlParamToolButton);
-    optionsButtonGroup->setExclusive(true);
-
+    this->setWindowTitle("Climate Chamber - Options");
+    ui->sysInfoToolButton->setChecked(true);
+    ui->optionsStackedWidget->setCurrentIndex(SYS_INFO);
 }
 
 void MainWindow::quickStartTabInit()
 {
-    QString none("try initializing quick start tab here");
+    this->setWindowTitle("Climate Chamber - Quick Start");
+//    quickPgm->setProgramName("untitled");
+//    quickPgm->setCycle(1);
+//    StepsModel *stepsModel = new StepsModel();
+    //stepsModel->setProgramToShow(quickPgm);
+//    stepsModel->setProgramToShow(new Program());
+//    ui->quickStartTableView->setModel(stepsModel);
+}
+
+void MainWindow::auxTabInit()
+{
+    this->setWindowTitle("Climate Chamber - AUX Data");
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)
 {
-    if(index == OPTIONS_INDEX){
-        helpTabInit();
+    if(index == MONITOR_INDEX){
+        monitorTabInit();
     }else if(index == PROGRAM_INDEX){
         programTabInit();
-    }else if(index == MONITOR_INDEX){
-        monitorTabInit();
-    }else if(index == AUX_INDEX){
+    }else if(index == OPTIONS_INDEX){
         optionsTabInit();
     }else if(index == QUICK_START){
         quickStartTabInit();
+    }else if(index == AUX_INDEX){
+        auxTabInit();
     }
 }
 
@@ -493,13 +532,18 @@ void MainWindow::on_testFinished()
 
 void MainWindow::on_stopButton_clicked()
 {
-    communication->pidController->controlCommands->setIdle(false);
+    communication->pidController->controlCommands->setIdle(true);
     communication->pidController->testPgm = new Program();
     ui->stopButton->setEnabled(false);
 }
 
 void MainWindow::on_startButton_clicked()
 {
+    if(!communication->pidController->controlCommands->isIdle()){
+        QMessageBox::information(this, "Info","A Test Program is already running. Stop "
+                                             "the Program first");
+        return;
+    }
     QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
     QMessageBox::StandardButton reply =
@@ -511,6 +555,8 @@ void MainWindow::on_startButton_clicked()
     }else{
         communication->pidController->startTest(pgmName);
         ui->stopButton->setEnabled(true);
+        ui->startButton->setEnabled(false);
+        ui->quickStartButton->setEnabled(false);
     }
 }
 
@@ -530,6 +576,197 @@ void MainWindow::on_stepsTableView_clicked(const QModelIndex &index)
     if(!ui->removeStepFromSelectedButton->isEnabled()){
         ui->removeStepFromSelectedButton->setEnabled(true);
     }
-    int selected = ui->stepsTableView->selectionModel()->currentIndex().row();
+    int selected = index.row();
+    //int selected = ui->stepsTableView->selectionModel()->currentIndex().row();
     qDebug() << "on_stepsTableView_clicked: selected row: " << selected;
+}
+
+void MainWindow::on_quickStartButton_clicked(bool checked)
+{
+    Q_UNUSED(checked)
+    if(!communication->pidController->controlCommands->isIdle()){
+        QMessageBox::information(this, "Info","A Test Program is already running. Stop "
+                                             "the Program first");
+        return;
+    }
+    QString pgmName = ui->nameLineEdit->text();
+    QString cycleStr = ui->cycleLineEdit->text();
+    int cycle = 1;
+    QMessageBox::StandardButton reply =
+            QMessageBox::question(this, "Confirm", "Start runing quick test "
+                                  + pgmName + "?", QMessageBox::Yes | QMessageBox::No,
+                                  QMessageBox::No);
+    if(reply == QMessageBox::No){
+        return;
+    }else{
+        if(pgmName.isEmpty()){
+            pgmName = "untitled";
+        }
+        if(!cycleStr.isEmpty()){
+            cycle = cycleStr.toInt();
+        }
+//        Program *pgm = new Program();
+        Program *pgm = ((StepsModel*)ui->quickStartTableView->model())
+                ->getProgramToShow();
+        //CONSL:
+        qDebug() << "###### About to run pgm with " << pgm->getNoOfSteps()
+                 << " steps #####";
+        pgm->setProgramName(pgmName);
+        pgm->setCycle(cycle);
+
+        communication->pidController->startQuickTest(pgm);
+    }
+
+}
+
+void MainWindow::on_quickStopButton_clicked()
+{
+    //TODO: implement on quick stop here
+}
+
+void MainWindow::on_idleStateChanged(bool state)
+{
+    ui->startButton->setEnabled(state);
+    ui->quickStartButton->setEnabled(state);
+    ui->loadProgramButton->setEnabled(state);
+    ui->newProgramButton->setEnabled(state);
+    ui->renameProgramButton->setEnabled(state);
+    ui->deleteProgramButton->setEnabled(state);
+
+    ui->stopButton->setEnabled(!state);
+    ui->quickStopButton->setEnabled(!state);
+}
+
+void MainWindow::on_sysInfoToolButton_clicked(bool checked)
+{
+    ui->optionsStackedWidget->setCurrentIndex(SYS_INFO);
+}
+
+void MainWindow::on_sysParamToolButton_clicked(bool checked)
+{
+    ui->optionsStackedWidget->setCurrentIndex(SYS_PARAM);
+}
+
+void MainWindow::on_controlParamToolButton_clicked(bool checked)
+{
+    ui->optionsStackedWidget->setCurrentIndex(CONTROL_PARAM);
+    ui->tempPIDListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tempPIDListView->setSelectionMode(QAbstractItemView::SingleSelection);
+    DataBackup db;
+    PidListModel *tempPidModel = new PidListModel();
+    tempPidModel->setPidList(db.loadPIDList(0));
+    ui->tempPIDListView->setModel(tempPidModel);
+
+    PidListModel *humidPidModel = new PidListModel();
+    humidPidModel->setPidList(db.loadPIDList(1));
+    ui->humidPIDListView->setModel(humidPidModel);
+
+    if(communication->pidController->getTemperaturePID()->getKp() == 0){
+        QMessageBox::information(this, "Info", "PID params default has not been set yet."
+                                               "Remember to set defaults before runing tests",
+                                 QMessageBox::Ok);
+    }
+}
+
+void MainWindow::on_quickAddStepButton_clicked()
+{
+    AddStep *ads = new AddStep();
+    StepsModel *stepsModel = (StepsModel*)ui->quickStartTableView->model();
+    Program * pgm = stepsModel->getProgramToShow();
+    connect(ads, SIGNAL(stepFormSubmitted(QString,QString,QString,
+                                          QString,QString,QString,
+                                          QString,QString,QString)),
+            stepsModel, SLOT(on_addStepFormSubmitted(QString,QString,QString,
+                                                     QString,QString,QString,
+                                                     QString,QString,QString)));
+
+    ads->setWindowTitle("Adding step to " + pgm->getProgramName());
+    ads->setModal(true);
+    ads->exec();
+    emit quickStepAboutToAdd();
+}
+
+void MainWindow::on_quickStepAboutToAdd()
+{
+    int size = ((StepsModel*)ui->quickStartTableView->model())->
+            getProgramToShow()->getNoOfSteps();
+//    int size = quickPgm->getNoOfSteps();
+    //CONSL: on_quickStepAboutToAdd
+    qDebug () << "###### " << size << " #####";
+    if(size > 0){
+        ui->quickStartButton->setEnabled(true);
+    }
+}
+
+void MainWindow::on_useButton_clicked()
+{
+    settings;
+    //TODO: load the entered PID values for use in this context.
+//    if(ui->pTempDoubleSpinBox->text().toDouble() == 0 ||
+//            ui->iTempDoubleSpinBox->text().toDouble() == 0 ||
+//            ui->dTempDoubleSpinBox->text().toDouble() == 0 ||
+//            ui->pHumidDoubleSpinBox->text().toDouble() == 0 ||
+//            ui->iHumidDoubleSpinBox->text().toDouble() == 0 ||
+//            ui->dHumidDoubleSpinBox->text().toDouble() == 0){
+//        QMessageBox::warning(this, "Empty Field", "Fields can not be empty or zero",
+//                            QMessageBox::Ok);
+//        return;
+//    }
+//    settings.setValue("pid/ptemp", ui->pTempDoubleSpinBox->text());
+//    settings.setValue("pid/itemp", ui->iTempDoubleSpinBox->text());
+//    settings.setValue("pid/dtemp", ui->dTempDoubleSpinBox->text());
+//    settings.setValue("pid/phumid", ui->pHumidDoubleSpinBox->text());
+//    settings.setValue("pid/ihumid", ui->iHumidDoubleSpinBox->text());
+//    settings.setValue("pid/dhumid", ui->dHumidDoubleSpinBox->text());
+    qDebug() << "" << settings.value("pid/ptemp").toString();
+
+}
+
+void MainWindow::on_makeDefaultButton_clicked()
+{
+    QSettings settings;
+    //TODO: save the PID values entered, to persistance.
+    int index = ui->pidTabWidget->currentIndex();
+    if(index == Temperature_Index){
+        ui->tempPIDListView->currentIndex().data().toString();
+        //TODO: Call method to save default temp pid setting based on this data
+    }else if(index == Humidity_Index){
+        ui->humidPIDListView->currentIndex().data().toString();
+        //TODO: Call method to save default humid pid setting based on this data
+    }
+}
+
+void MainWindow::on_plusTPButton_clicked()
+{
+    AddPid addPid;
+    addPid.setModal(true);
+    addPid.exec();
+}
+
+void MainWindow::on_plusHPButton_clicked()
+{
+    AddPid addPid;
+    addPid.setModal(true);
+    addPid.exec();
+}
+
+void MainWindow::on_pidTabWidget_currentChanged(int index)
+{
+    switch (index) {
+    case Temperature_Index:
+    {
+        DataBackup db;
+//        QList<PID> pidList = db.loadPIDList(1);
+        PidListModel *tempPidModel = new PidListModel();
+        tempPidModel->setPidList(db.loadPIDList(0));
+        ui->tempPIDListView->setModel(tempPidModel);
+        ui->tempPIDListView->repaint();
+    }
+        break;
+    case Humidity_Index:
+
+        break;
+    default:
+        break;
+    }
 }

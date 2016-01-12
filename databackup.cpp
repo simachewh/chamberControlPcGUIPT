@@ -1,9 +1,15 @@
 #include "databackup.h"
 
 const QString DataBackup::PROGRAMS_DIR_NAME = "programs";
+const QString DataBackup::PRGM_FILE_EXT = ".PGM";
+const QString DataBackup::PID_DIR_NAME = "pids";
+const QString DataBackup::TXT_FILE_EXT = ".txt";
+
+
 const QString DataBackup::PROGRAMS_DIR_PATH = QDir::current().path()
         + QDir::separator() + DataBackup::PROGRAMS_DIR_NAME;
-const QString DataBackup::PRGM_FILE_EXT = ".PGM";
+const QString DataBackup::PID_DIR_PATH = QDir::current().path()
+        + QDir::separator() + DataBackup::PROGRAMS_DIR_NAME;
 
 DataBackup::DataBackup(QObject *parent) : QObject(parent)
 {
@@ -163,6 +169,9 @@ QString DataBackup::fileLives(File_Type type, QString name)
     case SYS_WARN:
         path = "";
         break;
+    case PID_DATA:
+        path = PID_DIR_PATH + QDir::separator()
+                + name + TXT_FILE_EXT;
     default:
         break;
     }
@@ -209,6 +218,36 @@ bool DataBackup::removeProgram(QString name)
     return removed;
 }
 
+void DataBackup::insertPID(QDataStream &stream, PID *pid)
+{
+    QMap<quint16, PID*> pidList;
+    //stream >> pidList;
+    pidList.insert(pidList.size(), pid);
+    stream << pidList;
+}
+
+QList<PID> DataBackup::loadPIDList(int choice)
+{
+    QString name = "temperature";
+    if(choice == 1){
+        name = "humidity";
+    }
+    QList<PID> pidList;
+    QDir appDir = QDir::current();
+    checkDir(PID_DIR_NAME);
+    appDir.cd(PID_DIR_NAME);
+    QString path = appDir.path() + QDir::separator()
+            + name + TXT_FILE_EXT;
+    QFile pidFile(path);
+    pidFile.open(QIODevice::ReadWrite);
+    QDataStream stream(&pidFile);
+    if(pidFile.size() > 0){
+        stream >> pidList;
+    }
+    pidFile.close();
+    return pidList;
+}
+
 
 bool DataBackup::createDir(QString dirName){
     bool dirCreated;
@@ -218,3 +257,43 @@ bool DataBackup::createDir(QString dirName){
     }
     return dirCreated;
 }
+
+void DataBackup::on_pidFormSubmited(double p, double i, double d, int choice)
+{
+    QString name = "temperature";
+    if(choice == 1){
+        name = "humidity";
+    }
+
+    PID pid;
+    pid.setKp(p);
+    pid.setKi(i);
+    pid.setKd(d);
+
+    QDir appDir = QDir::current();
+    checkDir(PID_DIR_NAME);
+    appDir.cd(PID_DIR_NAME);
+    QString path = appDir.path() + QDir::separator()
+            + name + TXT_FILE_EXT;
+    QFile pidFile(path);
+    pidFile.open(QIODevice::ReadWrite);
+    QDataStream stream(&pidFile);
+
+    QList<PID> pidList;
+    if(pidFile.size() > 0){
+        stream >> pidList;
+    }
+    pidList.insert(pidList.size(), pid);
+    stream.device()->reset();
+    stream << pidList;
+    foreach (PID var, pidList) {
+        qDebug() << "AFTER: "<< var.getKp();
+    }
+
+    qDebug() << "Pid map size: " << pidList.size() << " File Size: "<< pidFile.size();
+
+    pidList.clear();
+    pidFile.close();
+}
+
+

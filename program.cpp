@@ -153,7 +153,7 @@ int Program::removeStep(int key){
 }
 
 int Program::addStep(Step *s){
-    int insertIndex = steps->size() + 1;
+    int insertIndex = steps->size();
     steps->insert(insertIndex, s);
     int stepsSize = steps->size();
     if(insertIndex == stepsSize){

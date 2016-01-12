@@ -56,7 +56,7 @@ private:
     /**
      * @brief isIdel holds value true when there is no test program runing.
      */
-    static bool isIdle;
+    bool idle;
 
 public:
 
@@ -258,7 +258,7 @@ public:
     std::bitset<8> toBitArray(int value);
 
 
-    bool getIsIdle();
+    bool isIdle();
 
     bool getH1();
 
@@ -350,7 +350,7 @@ public:
 
     void appendChecksum(QByteArray *value);
 signals:
-    void idleStateChanged();
+    void idleStateChanged(bool);
     void pcCommandChanged(ControlCommands::PC_COMMAND PC_COMMAND);
     void chCommandChanged(ControlCommands::CH_COMMAND CH_COMMAND);
 

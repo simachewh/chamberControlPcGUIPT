@@ -12,14 +12,16 @@
 
 #include "program.h"
 #include "step.h"
+#include "pid.h"
 
 class DataBackup : public QObject
 {
     Q_OBJECT
     Q_ENUMS(File_Type)
 public:
-    enum File_Type {PRGM, TST_DATA, SYS_WARN, SYS_BOOT};
+    enum File_Type {PRGM, TST_DATA, SYS_WARN, SYS_BOOT, PID_DATA};
     static const QString PROGRAMS_DIR_PATH;
+    static const QString PID_DIR_PATH;
 
     /**
      * @brief DataBackup constructor.
@@ -103,9 +105,19 @@ public:
      */
     bool removeProgram(QString name);
 
+    void insertPID(QDataStream &stream, PID *pid);
+
+    QList<PID> loadPIDList(int choice);
 private:
     static const QString PROGRAMS_DIR_NAME;
+    static const QString PID_DIR_NAME;
     static const QString PRGM_FILE_EXT;
+    static const QString TXT_FILE_EXT;
+
+//! TODO: A possible aproach to saving system wide setting
+//! using a struct of setting and perssistin it to a file using the QDataStream
+//! NOTE: A more convinent and better approch would be to use the QSetting frame
+//! work for a reliable persistance.
 
 signals:
     /**
@@ -124,6 +136,8 @@ public slots:
      * @return
      */
     bool createDir(QString dirName);
+
+    void on_pidFormSubmited(double p, double i, double d, int choice);
 };
 
 #endif // DATABACKUP_H

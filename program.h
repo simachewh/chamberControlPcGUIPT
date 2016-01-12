@@ -110,7 +110,10 @@ private:
      * the total number of steps.
      */
     int currentStepNum;
-    QMap<int, Step*> *steps;
+    /**
+     * @brief steps a property to hold the steps in this program.
+     */
+    QMap<int, Step*> *steps; //NOTE: consider changing this to QList, might be more efficeint
     Q_DISABLE_COPY(Program)
 
 signals:
