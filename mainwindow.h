@@ -92,11 +92,11 @@ private slots:
 
     void on_makeDefaultButton_clicked();
 
-    void on_plusTPButton_clicked();
-
     void on_plusHPButton_clicked();
 
     void on_pidTabWidget_currentChanged(int index);
+
+    void on_minusHPButton_clicked();
 
 public slots:
     void populateProgramsList();

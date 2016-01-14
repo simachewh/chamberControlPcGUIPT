@@ -244,8 +244,30 @@ QList<PID> DataBackup::loadPIDList(int choice)
     if(pidFile.size() > 0){
         stream >> pidList;
     }
+    foreach (PID pid, pidList) {
+        qDebug() << "DataBackup::loadPIDList: Default" << pid.getChoosen() << " : " << pid.toString();
+    }
     pidFile.close();
     return pidList;
+}
+
+void DataBackup::replacePIDList(QList<PID> pidList, int choice)
+{
+    QString name = "temperature";
+    if(choice == 1){
+        name = "humidity";
+    }
+    QDir appDir = QDir::current();
+    checkDir(PID_DIR_NAME);
+    appDir.cd(PID_DIR_NAME);
+    QString path = appDir.path() + QDir::separator()
+            + name + TXT_FILE_EXT;
+    QFile pidFile(path);
+    pidFile.open(QIODevice::ReadWrite);
+    QDataStream stream(&pidFile);
+    stream.device()->reset();
+    stream << pidList;
+    pidFile.close();
 }
 
 

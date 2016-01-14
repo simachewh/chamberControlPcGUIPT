@@ -102,14 +102,26 @@ void PID::setMeasuredValue(double value)
 {
     measuredValue = value;
 }
+
+
+bool PID::getChoosen() const
+{
+    return choosen;
+}
+
+void PID::setChoosen(bool value)
+{
+    choosen = value;
+}
 PID::PID(QObject *parent) : QObject(parent)
 {
     proportional = integral = derivative = 0;
     error = previousError = 0;
+    choosen = 0;
     dt = 1;
-    ki = 1;
-    kd = 1;
-    kp = 1;
+    ki = 0;//TODO: Check how this affects the control
+    kd = 0;
+    kp = 0;
 }
 
 PID::PID(const PID &other)
@@ -117,6 +129,7 @@ PID::PID(const PID &other)
     kp = other.getKp();
     ki = other.getKi();
     kd = other.getKd();
+    choosen = other.getChoosen();
 }
 
 PID &PID::operator=(const PID &other)
@@ -124,6 +137,7 @@ PID &PID::operator=(const PID &other)
     kp = other.getKp();
     ki = other.getKi();
     kd = other.getKd();
+    choosen = other.getChoosen();
 }
 
 int PID::control()
@@ -164,7 +178,7 @@ void PID::setPreviousError(double value)
 
 QDataStream &operator <<(QDataStream &out, const PID &pid)
 {
-    out << pid.getKp() << pid.getKi() << pid.getKd();
+    out << pid.getKp() << pid.getKi() << pid.getKd() << pid.getChoosen();
     return out;
 }
 
@@ -174,11 +188,14 @@ QDataStream &operator >>(QDataStream &in, PID &pid)
     double kp;
     double ki;
     double kd;
+    qint8 choosen;
     in >> kp;
     in >> ki;
     in >> kd;
+    in >> choosen;
     pid.setKp(kp);
     pid.setKi(ki);
     pid.setKd(kd);
+    pid.setChoosen(choosen);
     return in;
 }

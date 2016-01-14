@@ -108,6 +108,8 @@ public:
     void insertPID(QDataStream &stream, PID *pid);
 
     QList<PID> loadPIDList(int choice);
+
+    void replacePIDList(QList<PID> pidList, int choice);
 private:
     static const QString PROGRAMS_DIR_NAME;
     static const QString PID_DIR_NAME;

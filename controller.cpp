@@ -1,5 +1,11 @@
 #include "controller.h"
 
+const QString Controller::Temp_P = "ptemp";
+const QString Controller::Temp_I = "itemp";
+const QString Controller::Temp_D = "dtemp";
+const QString Controller::Humid_P = "phumid";
+const QString Controller::Humid_I = "ihumid";
+const QString Controller::Humid_D = "dhumid";
 
 Program *Controller::getTestPgm() const
 {
@@ -54,6 +60,9 @@ Controller::Controller(QObject *parent) : QObject(parent)
     humidityPID->setDt(3.1);
     //FIXME:load PID params from setting instead.
     QSettings settings;
+    //CONSL:
+    qDebug() <<"CHecking settins file" << settings.fileName();
+    qDebug() <<"CHecking settins value" <<settings.value("ptemp", "No value").toDouble();
     temperaturePID->setKp(settings.value("ptemp", 0).toDouble());
     temperaturePID->setKi(settings.value("itemp", 0).toDouble());
     temperaturePID->setKd(settings.value("dtemp", 0).toDouble());
@@ -199,6 +208,36 @@ void Controller::startTest(QString programName)
     controlCommands->setIdle(false);
     setUpStart();
     controlTestRun();
+}
+
+void Controller::saveTempDefault(QString data)
+{
+    QStringList list = data.split(" ");
+    QSettings setting;
+    setting.setValue(Temp_P, list[0].trimmed());
+    setting.setValue(Temp_I, list[1].trimmed());
+    setting.setValue(Temp_D, list[2].trimmed());
+}
+
+void Controller::saveHumidDefault(QString data)
+{
+    QStringList list = data.split(" ");
+    QSettings setting;
+    setting.setValue(Humid_P, list[0].trimmed());
+    setting.setValue(Humid_I, list[1].trimmed());
+    setting.setValue(Humid_D    , list[2].trimmed());
+}
+
+bool Controller::isDefaultSet()
+{
+    QSettings setting;
+    bool ret = setting.value(Temp_P, 0.00).toDouble() != 0.00
+            && setting.value(Temp_I, 0.00).toDouble() != 0.00
+            && setting.value(Temp_D, 0.00).toDouble() != 0.00
+            && setting.value(Humid_P, 0.00).toDouble() != 0.00
+            && setting.value(Humid_I, 0.00).toDouble() != 0.00
+            && setting.value(Humid_D, 0.00).toDouble() != 0.00;
+    return ret;
 }
 
 void Controller::startQuickTest(Program *pgm)

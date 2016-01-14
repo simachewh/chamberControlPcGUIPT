@@ -1208,7 +1208,11 @@ border : none;
                      <item row="0" column="0">
                       <layout class="QGridLayout" name="gridLayout_14">
                        <item row="1" column="0">
-                        <widget class="QListView" name="tempPIDListView"/>
+                        <widget class="QListView" name="tempPIDListView">
+                         <property name="selectionBehavior">
+                          <enum>QAbstractItemView::SelectItems</enum>
+                         </property>
+                        </widget>
                        </item>
                       </layout>
                      </item>

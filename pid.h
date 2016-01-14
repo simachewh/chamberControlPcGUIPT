@@ -7,9 +7,13 @@
 class PID : public QObject
 {
     Q_OBJECT
+//TODO: NO reason to subclass QObject so far.
+//NOTE: Maybe a bool value(true for default) then can change the background
+    //color of the default PID in the view
 
 private:
     enum {MAX_OUT = 255, MIN_OUT = 0};
+    bool choosen;
     double error;
     double previousError;
 
@@ -66,6 +70,9 @@ public:
     double getSetValue() const;    
 
     double getMeasuredValue() const;
+
+    bool getChoosen() const;
+    void setChoosen(bool value);
 
 signals:
 

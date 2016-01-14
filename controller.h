@@ -48,6 +48,13 @@ private:
 
 public:
 
+    static const QString Temp_P;
+    static const QString Temp_I;
+    static const QString Temp_D;
+    static const QString Humid_P;
+    static const QString Humid_I;
+    static const QString Humid_D;
+
     /**
      * @brief testPgm Represents the program runing in the
      * system. This is the program that is being controlled
@@ -71,6 +78,12 @@ public:
     void setUpStart();
 
     void startTest(QString programName);
+
+    void saveTempDefault(QString data);
+
+    void saveHumidDefault(QString data);
+
+    bool isDefaultSet();
 
 
     Step *getCurrentStep() const;

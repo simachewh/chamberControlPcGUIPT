@@ -10,7 +10,7 @@ AddPid::AddPid(QWidget *parent) :
     ui->setupUi(this);
     connect(this, SIGNAL(formSubmited(double,double,double,int)),
             &db, SLOT(on_pidFormSubmited(double, double, double, int)));
-    choice = 1;
+    choice = 0;
 }
 
 AddPid::~AddPid()
@@ -33,13 +33,13 @@ void AddPid::on_buttonBox_accepted()
 void AddPid::on_tempRadioButton_clicked(bool checked)
 {
     if(checked){
-        choice = 1;
+        choice = 0;
     }
 }
 
 void AddPid::on_humidRadioButton_clicked(bool checked)
 {
     if(checked){
-        choice = 0;
+        choice = 1;
     }
 }

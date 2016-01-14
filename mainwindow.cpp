@@ -464,6 +464,7 @@ void MainWindow::on_removeStepFromSelectedButton_clicked()
     QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
     int selectedRow = ui->stepsTableView->selectionModel()->currentIndex().row();
+    //CONSL:
     qDebug() << "on_removeStepFromSelectedButton_clicked: selectedRow"
              << selectedRow;
     StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
@@ -652,16 +653,20 @@ void MainWindow::on_controlParamToolButton_clicked(bool checked)
     ui->optionsStackedWidget->setCurrentIndex(CONTROL_PARAM);
     ui->tempPIDListView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tempPIDListView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tempPIDListView->setAlternatingRowColors(true);
     DataBackup db;
     PidListModel *tempPidModel = new PidListModel();
     tempPidModel->setPidList(db.loadPIDList(0));
     ui->tempPIDListView->setModel(tempPidModel);
 
+    ui->humidPIDListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->humidPIDListView->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->humidPIDListView->setAlternatingRowColors(true);
     PidListModel *humidPidModel = new PidListModel();
     humidPidModel->setPidList(db.loadPIDList(1));
     ui->humidPIDListView->setModel(humidPidModel);
 
-    if(communication->pidController->getTemperaturePID()->getKp() == 0){
+    if(!communication->pidController->isDefaultSet()){
         QMessageBox::information(this, "Info", "PID params default has not been set yet."
                                                "Remember to set defaults before runing tests",
                                  QMessageBox::Ok);
@@ -702,45 +707,36 @@ void MainWindow::on_useButton_clicked()
 {
     settings;
     //TODO: load the entered PID values for use in this context.
-//    if(ui->pTempDoubleSpinBox->text().toDouble() == 0 ||
-//            ui->iTempDoubleSpinBox->text().toDouble() == 0 ||
-//            ui->dTempDoubleSpinBox->text().toDouble() == 0 ||
-//            ui->pHumidDoubleSpinBox->text().toDouble() == 0 ||
-//            ui->iHumidDoubleSpinBox->text().toDouble() == 0 ||
-//            ui->dHumidDoubleSpinBox->text().toDouble() == 0){
-//        QMessageBox::warning(this, "Empty Field", "Fields can not be empty or zero",
-//                            QMessageBox::Ok);
-//        return;
-//    }
-//    settings.setValue("pid/ptemp", ui->pTempDoubleSpinBox->text());
-//    settings.setValue("pid/itemp", ui->iTempDoubleSpinBox->text());
-//    settings.setValue("pid/dtemp", ui->dTempDoubleSpinBox->text());
-//    settings.setValue("pid/phumid", ui->pHumidDoubleSpinBox->text());
-//    settings.setValue("pid/ihumid", ui->iHumidDoubleSpinBox->text());
-//    settings.setValue("pid/dhumid", ui->dHumidDoubleSpinBox->text());
     qDebug() << "" << settings.value("pid/ptemp").toString();
 
 }
 
 void MainWindow::on_makeDefaultButton_clicked()
 {
-    QSettings settings;
-    //TODO: save the PID values entered, to persistance.
     int index = ui->pidTabWidget->currentIndex();
     if(index == Temperature_Index){
-        ui->tempPIDListView->currentIndex().data().toString();
-        //TODO: Call method to save default temp pid setting based on this data
+        QString data = ui->tempPIDListView->currentIndex().data().toString();
+        communication->pidController->saveTempDefault(data);
+        int row = ui->tempPIDListView->selectionModel()->currentIndex().row();
+        PidListModel *model = (PidListModel*)ui->tempPIDListView->model();
+        model->chooseDefault(row);
+        foreach (PID pid, model->getPidList()) {
+            qDebug() << "on_makeDefaultButton_clicked:"
+                     << pid.toString() << pid.getChoosen();
+        }
+        DataBackup db;
+        db.replacePIDList(model->getPidList(), Temperature_Index);
+        ui->tempPIDListView->repaint();
     }else if(index == Humidity_Index){
-        ui->humidPIDListView->currentIndex().data().toString();
-        //TODO: Call method to save default humid pid setting based on this data
+        QString data = ui->humidPIDListView->currentIndex().data().toString();
+        communication->pidController->saveHumidDefault(data);
+        int row = ui->humidPIDListView->selectionModel()->currentIndex().row();
+        PidListModel *model = (PidListModel*)ui->humidPIDListView->model();
+        model->chooseDefault(row);
+        DataBackup db;
+        db.replacePIDList(model->getPidList(), Humidity_Index);
+        ui->humidPIDListView->repaint();
     }
-}
-
-void MainWindow::on_plusTPButton_clicked()
-{
-    AddPid addPid;
-    addPid.setModal(true);
-    addPid.exec();
 }
 
 void MainWindow::on_plusHPButton_clicked()
@@ -758,15 +754,47 @@ void MainWindow::on_pidTabWidget_currentChanged(int index)
         DataBackup db;
 //        QList<PID> pidList = db.loadPIDList(1);
         PidListModel *tempPidModel = new PidListModel();
-        tempPidModel->setPidList(db.loadPIDList(0));
+        tempPidModel->setPidList(db.loadPIDList(Temperature_Index));
         ui->tempPIDListView->setModel(tempPidModel);
         ui->tempPIDListView->repaint();
     }
         break;
     case Humidity_Index:
-
+    {
+        DataBackup db;
+        PidListModel *humidPidModel = new PidListModel();
+        humidPidModel->setPidList(db.loadPIDList(Humidity_Index));
+        ui->humidPIDListView->setModel(humidPidModel);
+        ui->humidPIDListView->repaint();
+    }
         break;
     default:
         break;
     }
+}
+
+void MainWindow::on_minusHPButton_clicked()
+{
+
+    //TODO: if none is selected return
+    int choice = ui->pidTabWidget->currentIndex();
+    if(choice == Temperature_Index){
+        int row = ui->tempPIDListView->selectionModel()->currentIndex().row();
+        PidListModel *pidModel = (PidListModel*)ui->tempPIDListView->model();
+        //TODO: if selected is default take care of it
+//        QMessageBox::StandardButton reply;
+//        if(pidModel->getPidList().at(row).getChoosen()){
+//            reply = QMessageBox::question(this, "Warning", "This is the default PID."
+//                                                           "If you choose to remove, please select default again."
+//                                                           "Are you sure you want to remove?"
+//                                          , QMessageBox::Yes | QMessageBox::No,
+//                                          QMessageBox::No);
+//        }
+        pidModel->removeRow(row, QModelIndex());
+        DataBackup db;
+        db.replacePIDList(pidModel->getPidList(), Temperature_Index);
+    }else if(choice == Humidity_Index){
+
+    }
+
 }
