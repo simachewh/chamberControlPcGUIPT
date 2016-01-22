@@ -3,11 +3,17 @@
 Program::Program(QObject *parent) : QObject(parent)
 {
     currentCycle = 0;
-    currentStepNum = 0;
+    currentStepNum = -1; //NOTE: minus one because when steps change we need
+    //setCurrentStepNum(val) to emit program param changed;
     steps = new QMap<int, Step*>;
 
     connect(this, SIGNAL(stepsChanged()),
             this, SLOT(on_stepsChanged()));
+}
+
+Program::~Program()
+{
+    delete steps;
 }
 
 Step *Program::getCurrentStep()
@@ -32,14 +38,14 @@ bool Program::goToNextStep()
              << "no of steps " << noOfSteps
              << "curr step " << currentStepNum;
     ///if step and cycle are the last ones
-    if(currentCycle == cycle && currentStepNum == noOfSteps){
+    if(currentCycle == cycle && currentStepNum == noOfSteps - 1){
         qDebug() << "Finnnnished";
         return false;
     }
     ///if cycle is not the last one but step is the last for this cycle
-    if(currentStepNum == noOfSteps){
+    if(currentStepNum == noOfSteps - 1){
         qDebug() << "Nextttt cyc";
-        setCurrentStepNum(1);
+        setCurrentStepNum(0);
         setCurrentCycle(currentCycle + 1);
         return true;
     }

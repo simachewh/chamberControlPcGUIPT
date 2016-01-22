@@ -2,7 +2,12 @@
 
 PidListModel::PidListModel()
 {
-//    pidList = new QList<PID>;
+    openPid = new PID();
+}
+
+PidListModel::~PidListModel()
+{
+    delete openPid;
 }
 
 int PidListModel::rowCount(const QModelIndex &parent) const
@@ -49,6 +54,13 @@ bool PidListModel::removeRow(int row, const QModelIndex &parent)
     }
 }
 
+bool PidListModel::insertRow(int row, const QModelIndex &parent)
+{
+    beginInsertRows(parent, row, row + 1);
+    pidList.insert(pidList.size(), *openPid);
+    endInsertRows();
+}
+
 void PidListModel::chooseDefault(int index)
 {
     //CONSL:
@@ -69,4 +81,24 @@ QList<PID> PidListModel::getPidList()
 void PidListModel::setPidList(QList<PID> value)
 {
     pidList = value;
+}
+
+void PidListModel::on_pidFormSubmited(double p, double i, double d, int choice)
+{
+    QString name = "temperature";
+    if(choice == 1){
+        name = "humidity";
+    }
+
+    PID pid;
+    pid.setKp(p);
+    pid.setKi(i);
+    pid.setKd(d);
+    qDebug() << "PidListModel::on_pidFormSubmited"
+             << pid.getKp();
+    openPid = &pid;
+    insertRow(pidList.size(), QModelIndex());
+    DataBackup db;
+    db.on_pidFormSubmited(p, i, d, choice);
+
 }

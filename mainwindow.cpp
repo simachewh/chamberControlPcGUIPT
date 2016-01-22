@@ -12,9 +12,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);    
     communication = new Communication();
 
-    //no need to reserve memory for a quick program, it can be collected
-    //from the quick steps view table's model.
-    //quickPgm = new Program(parent);
     initStyle();
 
     /// Internal connections ///
@@ -340,13 +337,9 @@ void MainWindow::on_testProgramParamChanged(int value, Program::PGM_PARAM param)
                                 arg(value).
                                 arg(communication->pidController->testPgm->getNoOfSteps()));
          double humSet = communication->pidController
-                 ->testPgm->getSteps().value(communication->pidController
-                                             ->testPgm->getCurrentStepNum())
-                 ->getHumidity();
+                 ->testPgm->getCurrentStep()->getHumidity();
          double tempset = communication->pidController
-                 ->testPgm->getSteps().value(communication->pidController
-                                             ->testPgm->getCurrentStepNum())
-                 ->getTemperature();
+                 ->testPgm->getCurrentStep()->getTemperature();
          ui->humidSetValueLabel->setText(QString("%1").arg(humSet));
          ui->tempSetValueLabel->setText(QString("%1").arg(tempset));
     }
@@ -526,6 +519,11 @@ void MainWindow::on_deleteProgramButton_clicked()
 
 void MainWindow::on_testFinished()
 {
+    communication->pidController->controlCommands->resetAll();
+    ui->tempSetValueLabel->setText("00.00");
+    ui->humidSetValueLabel->setText("00.00");
+    ui->stepsLabel->setText("Step:");
+    ui->cycleLabel->setText("Cycle:");
     QMessageBox::information(this, "Information", "Runing Test Program has Finished",
                              QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -533,9 +531,21 @@ void MainWindow::on_testFinished()
 
 void MainWindow::on_stopButton_clicked()
 {
-    communication->pidController->controlCommands->setIdle(true);
-    communication->pidController->testPgm = new Program();
-    ui->stopButton->setEnabled(false);
+    QMessageBox::StandardButton reply =
+            QMessageBox::information(this, "Comfirm", "Stop running the program" +
+                             communication->pidController->testPgm->getProgramName() +
+                             "?", QMessageBox::Yes, QMessageBox::No);
+    if(reply == QMessageBox::No){
+        return;
+    }else if(reply == QMessageBox::Yes){
+        communication->pidController->controlCommands->setIdle(true);
+        //NOTE: for some reson this next line causes the app to crash.
+        //it is possible to comment it out, but if used can save some memory
+    //    communication->pidController->testPgm = new Program();
+        ui->stopButton->setEnabled(false);
+        communication->pidController->timer->stop();
+        on_testFinished();
+    }
 }
 
 void MainWindow::on_startButton_clicked()
@@ -554,6 +564,7 @@ void MainWindow::on_startButton_clicked()
     if(reply == QMessageBox::No){
         return;
     }else{
+        qDebug() << "Entering test";
         communication->pidController->startTest(pgmName);
         ui->stopButton->setEnabled(true);
         ui->startButton->setEnabled(false);
@@ -563,8 +574,8 @@ void MainWindow::on_startButton_clicked()
 
 void MainWindow::on_connectionLost(bool disconnected)
 {
-    if(disconnected){       
-         this->statusBar()->
+    if(disconnected){
+        this->statusBar()->
                 showMessage("Connection to chamber is lost!", 1000);
     }else{
 
@@ -588,6 +599,8 @@ void MainWindow::on_quickStartButton_clicked(bool checked)
     if(!communication->pidController->controlCommands->isIdle()){
         QMessageBox::information(this, "Info","A Test Program is already running. Stop "
                                              "the Program first");
+        //TODO: emit test inturupted and handel it here. Like what to save on the
+        //the report
         return;
     }
     QString pgmName = ui->nameLineEdit->text();
@@ -646,11 +659,16 @@ void MainWindow::on_sysInfoToolButton_clicked(bool checked)
 void MainWindow::on_sysParamToolButton_clicked(bool checked)
 {
     ui->optionsStackedWidget->setCurrentIndex(SYS_PARAM);
+    QSettings setting;
+    ui->pointLineEdit->setText(setting.value("point", 25).toString());
+    ui->maxHighLineEdit->setText(setting.value("max", 140).toString());
+    ui->maxLowLineEdit->setText(setting.value("min", -40).toString());
 }
 
 void MainWindow::on_controlParamToolButton_clicked(bool checked)
 {
     ui->optionsStackedWidget->setCurrentIndex(CONTROL_PARAM);
+    ui->minusHPButton->setEnabled(false);
     ui->tempPIDListView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tempPIDListView->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tempPIDListView->setAlternatingRowColors(true);
@@ -671,6 +689,8 @@ void MainWindow::on_controlParamToolButton_clicked(bool checked)
                                                "Remember to set defaults before runing tests",
                                  QMessageBox::Ok);
     }
+    populateHumidPID();
+    populateTempPID();
 }
 
 void MainWindow::on_quickAddStepButton_clicked()
@@ -703,13 +723,6 @@ void MainWindow::on_quickStepAboutToAdd()
     }
 }
 
-void MainWindow::on_useButton_clicked()
-{
-    settings;
-    //TODO: load the entered PID values for use in this context.
-    qDebug() << "" << settings.value("pid/ptemp").toString();
-
-}
 
 void MainWindow::on_makeDefaultButton_clicked()
 {
@@ -741,9 +754,38 @@ void MainWindow::on_makeDefaultButton_clicked()
 
 void MainWindow::on_plusHPButton_clicked()
 {
+    int choice;
+
+    PidListModel *model;
+    if(choice == Temperature_Index){
+        model = (PidListModel*)ui->tempPIDListView->model();
+    }else if(choice == Humidity_Index){
+        model = (PidListModel*)ui->humidPIDListView->model();
+    }
+
     AddPid addPid;
+    connect(&addPid, SIGNAL(formSubmited(double,double,double,int)),
+            this, SLOT(on_newPIDAdded(double,double,double,int)));
     addPid.setModal(true);
     addPid.exec();
+}
+
+void MainWindow::populateTempPID()
+{
+    DataBackup db;
+    PidListModel *tempPidModel = new PidListModel();
+    tempPidModel->setPidList(db.loadPIDList(Temperature_Index));
+    ui->tempPIDListView->setModel(tempPidModel);
+    ui->tempPIDListView->repaint();
+}
+
+void MainWindow::populateHumidPID()
+{
+    DataBackup db;
+    PidListModel *humidPidModel = new PidListModel();
+    humidPidModel->setPidList(db.loadPIDList(Humidity_Index));
+    ui->humidPIDListView->setModel(humidPidModel);
+    ui->humidPIDListView->repaint();
 }
 
 void MainWindow::on_pidTabWidget_currentChanged(int index)
@@ -751,21 +793,12 @@ void MainWindow::on_pidTabWidget_currentChanged(int index)
     switch (index) {
     case Temperature_Index:
     {
-        DataBackup db;
-//        QList<PID> pidList = db.loadPIDList(1);
-        PidListModel *tempPidModel = new PidListModel();
-        tempPidModel->setPidList(db.loadPIDList(Temperature_Index));
-        ui->tempPIDListView->setModel(tempPidModel);
-        ui->tempPIDListView->repaint();
+//        populateTempPID();
     }
         break;
     case Humidity_Index:
     {
-        DataBackup db;
-        PidListModel *humidPidModel = new PidListModel();
-        humidPidModel->setPidList(db.loadPIDList(Humidity_Index));
-        ui->humidPIDListView->setModel(humidPidModel);
-        ui->humidPIDListView->repaint();
+//        populateHumidPID();
     }
         break;
     default:
@@ -775,26 +808,82 @@ void MainWindow::on_pidTabWidget_currentChanged(int index)
 
 void MainWindow::on_minusHPButton_clicked()
 {
-
     //TODO: if none is selected return
     int choice = ui->pidTabWidget->currentIndex();
+    PidListModel *pidModel;
+    int row;
     if(choice == Temperature_Index){
-        int row = ui->tempPIDListView->selectionModel()->currentIndex().row();
-        PidListModel *pidModel = (PidListModel*)ui->tempPIDListView->model();
+        row = ui->tempPIDListView->selectionModel()->currentIndex().row();
+        pidModel = (PidListModel*)ui->tempPIDListView->model();
+    }else if(choice == Humidity_Index){
+        row = ui->humidPIDListView->selectionModel()->currentIndex().row();
+        pidModel = (PidListModel*)ui->humidPIDListView->model();
+    }
         //TODO: if selected is default take care of it
-//        QMessageBox::StandardButton reply;
-//        if(pidModel->getPidList().at(row).getChoosen()){
-//            reply = QMessageBox::question(this, "Warning", "This is the default PID."
-//                                                           "If you choose to remove, please select default again."
-//                                                           "Are you sure you want to remove?"
-//                                          , QMessageBox::Yes | QMessageBox::No,
-//                                          QMessageBox::No);
-//        }
+        QMessageBox::StandardButton reply;
+        if(pidModel->getPidList().at(row).getChoosen()){
+            reply = QMessageBox::question(this, "Warning",
+                                          "This is the default PID.\n"
+                                          "If you choose to remove it, please choose the "
+                                          "default latter.\n"
+                                          "Are you sure you want to remove it?"
+                                          , QMessageBox::Yes | QMessageBox::No,
+                                          QMessageBox::No);
+            if(reply == QMessageBox::No){
+                return;
+            }else if(reply == QMessageBox::Yes){
+                //TODO: remove the setting here
+                communication->pidController->
+                        removePIDDefaults(choice);
+            }
+        }
         pidModel->removeRow(row, QModelIndex());
         DataBackup db;
         db.replacePIDList(pidModel->getPidList(), Temperature_Index);
+}
+
+void MainWindow::on_tempPIDListView_clicked(const QModelIndex &index)
+{
+    Q_UNUSED(index)
+    ui->minusHPButton->setEnabled(true);
+    ui->makeDefaultButton->setEnabled(true);
+}
+
+void MainWindow::on_newPIDAdded(double p, double i, double d, int choice)
+{
+    PID pid;
+    pid.setKd(d);
+    pid.setKi(i);
+    pid.setKp(p);
+    pid.setChoosen(false);
+    PidListModel *model;
+    if(choice == Temperature_Index){
+        model = (PidListModel*)ui->tempPIDListView->model();
     }else if(choice == Humidity_Index){
-
+        model = (PidListModel*)ui->humidPIDListView->model();
     }
+    model->on_pidFormSubmited(p, i, d, choice);
+}
 
+void MainWindow::on_pointLineEdit_textEdited(const QString &arg1)
+{
+    ui->sysParamChangesButto->setEnabled(true);
+}
+
+void MainWindow::on_maxLowLineEdit_textEdited(const QString &arg1)
+{
+    ui->sysParamChangesButto->setEnabled(true);
+}
+
+void MainWindow::on_maxHighLineEdit_textEdited(const QString &arg1)
+{
+    ui->sysParamChangesButto->setEnabled(true);
+}
+
+void MainWindow::on_sysParamChangesButto_clicked()
+{
+    QSettings setting;
+    setting.setValue("point", ui->pointLineEdit->text());
+    setting.setValue("max", ui->maxHighLineEdit->text());
+    setting.setValue("min", ui->maxLowLineEdit->text());
 }

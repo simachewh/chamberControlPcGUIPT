@@ -38,6 +38,8 @@ public:
     void optionsTabInit();
     void quickStartTabInit();
     void auxTabInit();
+    void populateTempPID();
+    void populateHumidPID();
 signals:
     void quickStepAboutToAdd();
 private slots:
@@ -88,8 +90,6 @@ private slots:
 
     void on_quickStepAboutToAdd();
 
-    void on_useButton_clicked();
-
     void on_makeDefaultButton_clicked();
 
     void on_plusHPButton_clicked();
@@ -97,6 +97,18 @@ private slots:
     void on_pidTabWidget_currentChanged(int index);
 
     void on_minusHPButton_clicked();
+
+    void on_tempPIDListView_clicked(const QModelIndex &index);
+
+    void on_newPIDAdded(double p, double i, double d, int choice);
+
+    void on_pointLineEdit_textEdited(const QString &arg1);
+
+    void on_maxLowLineEdit_textEdited(const QString &arg1);
+
+    void on_maxHighLineEdit_textEdited(const QString &arg1);
+
+    void on_sysParamChangesButto_clicked();
 
 public slots:
     void populateProgramsList();

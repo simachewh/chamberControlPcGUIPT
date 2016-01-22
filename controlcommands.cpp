@@ -122,8 +122,6 @@ QByteArray ControlCommands::fullCommand(PC_COMMAND ctype)
         break;
     case O:
     {
-//        *htBlock = convertToBytes(*commandBlock1);
-//        *plBlock = convertToBytes(*commandBlock2);
         QString twelveZeros(12, zero);
         assembledCommand.append(capO);
         qDebug() << "capO " << capO;

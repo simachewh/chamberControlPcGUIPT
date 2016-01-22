@@ -113,15 +113,32 @@ void PID::setChoosen(bool value)
 {
     choosen = value;
 }
+
+int PID::getOutput() const
+{
+    return output;
+}
+
+void PID::setOutput(int value)
+{
+    if(value == output){
+        return;
+    }
+    output = value;
+    emit outputChanged(value);
+}
 PID::PID(QObject *parent) : QObject(parent)
 {
     proportional = integral = derivative = 0;
     error = previousError = 0;
     choosen = 0;
+    output = 0;
     dt = 1;
     ki = 0;//TODO: Check how this affects the control
     kd = 0;
     kp = 0;
+    setValue = 0;
+    measuredValue = 0;
 }
 
 PID::PID(const PID &other)
@@ -143,13 +160,29 @@ PID &PID::operator=(const PID &other)
 int PID::control()
 {
     error = setValue - measuredValue;
+    //NOTE: this is so if the this method is called before
+    //set values are properly set, which is very likely to happen,
+    //it protects the proportional, integral and derivatives from
+    //obtaining larg values.
+    if(error > 190 || error < -190){
+        output = 0;
+        return 0;
+    }
+    qDebug() << "PID::control -> error: " << error
+             << setValue << " <- set : mewasured ->"
+             <<measuredValue;
     integral = integral + (error * dt);
     derivative = (error - previousError) / dt;
     proportional = kp * error;
 
-    int output = proportional + (ki * integral) + (kd * derivative);
+    output = proportional + (ki * integral) + (kd * derivative);
     previousError = error;
-
+    qDebug() << "PID::control : \n"
+             << "\nError: " << error
+             << "\nintegral: " << integral
+             << "\nderivative: " << derivative
+             << "\nproportional: " << proportional
+             << "\noutput before correction->" << output;
     if(output < MIN_OUT){
         output = MIN_OUT;
     }else if(output > MAX_OUT){

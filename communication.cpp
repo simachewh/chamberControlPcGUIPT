@@ -45,7 +45,7 @@ Communication::Communication(QObject *parent) : QObject(parent)
    // setChamberConnected(false);
 
     pidController->controlCommands->setIdle(true);
-//    connectionTimer->start(1000);
+    connectionTimer->start(1000);
 }
 
 Communication::~Communication(){
@@ -138,38 +138,40 @@ void Communication::on_idelStateChanged(){
 void Communication::on_newDataArived(QByteArray newDataArived,
                                      ControlCommands::CH_COMMAND chCommand)
 {
+    if(chCommand == ControlCommands::A){
+            QStringList list;
+            double temp, humid;
+            QString str(newDataArived);
+            list = str.split(" ");
 
-if(chCommand == ControlCommands::A){
-        QStringList list;
-        double temp, humid;
-        QString str(newDataArived);
-        list = str.split(" ");
+            temp = list[0].mid(4,9).toDouble();
+            humid = list[2].left(4).toDouble();
 
-        temp = list[0].mid(4,9).toDouble();
-        humid = list[2].left(4).toDouble();
+            pidController->chamberParams->setDryTemprature(temp);
+            pidController->chamberParams->setHumidity(humid);
 
-        pidController->chamberParams->setDryTemprature(temp);
-        pidController->chamberParams->setHumidity(humid);
-
-        if(pidController->controlCommands->isIdle())
-        {
-            emit replyReady(chCommand);
-        }else{
-            emit requestControl();
+            if(pidController->controlCommands->isIdle())
+            {
+                emit replyReady(chCommand);
+            }else{
+                emit requestControl();
+            }
+    }else if(chCommand == ControlCommands::B){
+        if(!isChamberConnected() && getStateCounter() > 2){
+            setStateCounter(0);
         }
-}else if(chCommand == ControlCommands::B){
-    if(!isChamberConnected() && getStateCounter() > 2){
-        setStateCounter(0);
+        setStateCounter(1);
+        setChamberConnected(true);
+        emit replyReady(chCommand);
+    }else if(chCommand == ControlCommands::A){
+        emit replyReady(chCommand);
+    }else if(chCommand == ControlCommands::I){
+        setChamberConnected(false);
+        emit replyReady(chCommand);
+        return;
+    }else if (chCommand == ControlCommands::ACK) {
+//        emit replyReady(chCommand);
     }
-    setStateCounter(1);
-    setChamberConnected(true);
-    emit replyReady(chCommand);
-}else if(chCommand == ControlCommands::A){
-    emit replyReady(chCommand);
-}else if(chCommand == ControlCommands::I){
-    setChamberConnected(false);
-    return;
-}
 }
 
 void Communication::on_chamberConnectionChanged(bool value)

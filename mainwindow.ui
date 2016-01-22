@@ -88,7 +88,7 @@ QTabBar::tab:!selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="monitorTab">
         <attribute name="title">
@@ -653,10 +653,16 @@ background: white;
             <item row="2" column="1">
              <widget class="QLabel" name="tempSetValueLabel">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <family>Sans Serif</family>
+                <pointsize>24</pointsize>
+               </font>
               </property>
               <property name="text">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;00.00&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -673,7 +679,7 @@ background: white;
             <item row="2" column="0">
              <widget class="QLabel" name="label">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -698,10 +704,10 @@ background: white;
               </property>
               <property name="font">
                <font>
-                <family>Serif</family>
+                <family>Sans Serif</family>
                 <pointsize>24</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
+                <weight>50</weight>
+                <bold>false</bold>
                </font>
               </property>
               <property name="text">
@@ -712,7 +718,7 @@ background: white;
             <item row="2" column="5">
              <widget class="QLabel" name="label_2">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -1049,7 +1055,7 @@ border : none;
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="systemInfoPage">
               <widget class="QLabel" name="label_6">
@@ -1109,6 +1115,22 @@ border : none;
                 </item>
                </layout>
               </widget>
+              <widget class="QPushButton" name="sysParamChangesButto">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="geometry">
+                <rect>
+                 <x>10</x>
+                 <y>180</y>
+                 <width>101</width>
+                 <height>27</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Save Changes</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QWidget" name="controlParamsPage">
               <layout class="QGridLayout" name="gridLayout_18">
@@ -1120,23 +1142,25 @@ border : none;
                     <enum>QLayout::SetMinimumSize</enum>
                    </property>
                    <item>
-                    <widget class="QPushButton" name="useButton">
-                     <property name="text">
-                      <string>Use now</string>
+                    <spacer name="verticalSpacer_6">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
                      </property>
-                    </widget>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                    <item>
                     <widget class="QPushButton" name="makeDefaultButton">
                      <property name="text">
                       <string>Make Default</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="pushButton">
-                     <property name="text">
-                      <string>PushButton</string>
                      </property>
                     </widget>
                    </item>

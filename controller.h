@@ -83,17 +83,16 @@ public:
 
     void saveHumidDefault(QString data);
 
+    void removePIDDefaults(int choice);
+
     bool isDefaultSet();
 
 
     Step *getCurrentStep() const;
-    void setCurrentStep(Step *value);
 
     Step *getPreviousStep() const;
-    void setPreviousStep(Step *value);
 
     Step *getNextStep() const;
-    void setNextStep(Step *value);
 
     Program *getTestPgm() const;
     void setTestPgm(Program *value);
@@ -109,8 +108,16 @@ signals:
     void stepsFinished(int totalStepsDone);
     void stepsDone(bool);
     void controlready(ControlCommands::CH_COMMAND);
+    void currentStepChanged();
+    void nextStepChanged();
+    void previousStepChanged();
 
 public slots:
+    void setNextStep(Step *value);
+
+    void setPreviousStep(Step *value);
+
+    void setCurrentStep(Step *value);
 
     void on_TemperatureRealChanged(double value);
 
@@ -123,6 +130,8 @@ public slots:
     void runDeviceControll();
 
     void on_stepsDone(bool);
+
+    void on_stepsChanged();
 };
 
 #endif // CONTROLLER_H

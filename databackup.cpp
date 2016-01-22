@@ -149,8 +149,8 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
     }
     qDebug() << "DataBackup::loadProgram: loadedSteps size" << loadedSteps->size();
     prgm->setSteps(*loadedSteps);
-    prgm->setCurrentCycle(1);
-    prgm->setCurrentStepNum(1);
+//    prgm->setCurrentCycle(1);//TODO: check why this is being set to one
+//    prgm->setCurrentStepNum(0);
 }
 
 QString DataBackup::fileLives(File_Type type, QString name)

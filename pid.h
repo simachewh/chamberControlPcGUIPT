@@ -27,6 +27,8 @@ private:
 
     double dt;
 
+    int output;
+
     double setValue;
     double measuredValue;
 
@@ -35,8 +37,6 @@ public:
          PID(const PID &other);
 
          PID &operator=(const PID &other);
-
-    int control();
 
     QString toString() const;
 
@@ -74,12 +74,20 @@ public:
     bool getChoosen() const;
     void setChoosen(bool value);
 
+    int getOutput() const;
+
+
 signals:
+    void outputChanged(int);
 
 public slots:
     void setMeasuredValue(double value);
 
     void setSetValue(double value);
+
+    void setOutput(int value);
+
+    int control();
 
 };
 

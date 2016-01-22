@@ -14,6 +14,7 @@ class Program : public QObject
     //Q_PROPERTY(int point READ getPoint WRITE setPoint NOTIFY pointChanged)
 public:
     explicit Program(QObject *parent = 0);
+    ~Program();
 
     enum PGM_PARAM {Cycl, Curr_cycl, Stp, Curr_stp};
 
@@ -106,8 +107,8 @@ private:
 
     /**
      * @brief currentStepNum Represents the step number that
-     * is being excuted now. Step numbers span from one to
-     * the total number of steps.
+     * is being excuted now. Step numbers span from zero to
+     * the total number of steps minus one.
      */
     int currentStepNum;
     /**
