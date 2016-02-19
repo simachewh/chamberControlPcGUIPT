@@ -93,6 +93,8 @@ public:
 
 
 
+    bool getChamberConnected() const;
+
 signals:
     void newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND);
     void replyReady(ControlCommands::CH_COMMAND);
@@ -121,7 +123,10 @@ public slots:
     void reply(ControlCommands::CH_COMMAND chCommand);
 
     /**
-     * @brief on_connectionTimerOut this slot is convinently made to be connected
+     * @brief on_connectionTimerOut Starts communication by sending
+     * BR command to the control box and tracks the connection status
+     * of this application to the control box.
+     * this slot is convinently made to be connected
      * with the connectionTimer->timeout() signal.
      */
     void on_connectionTimerOut();

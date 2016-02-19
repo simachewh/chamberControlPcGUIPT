@@ -1,6 +1,7 @@
 #ifndef DATABACKUP_H
 #define DATABACKUP_H
 
+#include <QDate>
 #include <QObject>
 #include <QFile>
 #include <QDir>
@@ -22,6 +23,7 @@ public:
     enum File_Type {PRGM, TST_DATA, SYS_WARN, SYS_BOOT, PID_DATA};
     static const QString PROGRAMS_DIR_PATH;
     static const QString PID_DIR_PATH;
+    static const QString TST_DIR_PATH;
 
     /**
      * @brief DataBackup constructor.
@@ -107,7 +109,20 @@ public:
 
     void insertPID(QDataStream &stream, PID *pid);
 
+    /**
+     * @brief loadPIDList Loads the list of PIDs from the file given by choice.
+     * If choice is 0 Temperature PID list is loaded and if choice is 1 Humidity
+     * PID list is loaded.
+     * @param choice
+     * @return if choice is 0 a QList of Temperature PIDs, if choice is 1 a QList
+     * of Humidity PIDs.
+     */
     QList<PID> loadPIDList(int choice);
+
+    bool appendPlot(QString prgmName, double temp, double humid, int elapsedMinutes);
+
+    void loadPlot(QString name, QVector<double> *temp, QVector<double> *humid,
+                  QVector<double> *time);
 
     void replacePIDList(QList<PID> pidList, int choice);
 private:
@@ -115,6 +130,7 @@ private:
     static const QString PID_DIR_NAME;
     static const QString PRGM_FILE_EXT;
     static const QString TXT_FILE_EXT;
+    static const QString TST_DIR_NAME;
 
 //! TODO: A possible aproach to saving system wide setting
 //! using a struct of setting and perssistin it to a file using the QDataStream
@@ -138,6 +154,16 @@ public slots:
      * @return
      */
     bool createDir(QString dirName);
+
+    /**
+     * @brief on_testStarted Creates the file to write the plot data on.
+     * the file name is created by appending the name of the program that is
+     * running, the date it is running on and a string "-pl".
+     * @param prgmName
+     */
+    void on_testStarted(QString prgmName);
+
+    void on_testFinished(QString prgmName);
 
     void on_pidFormSubmited(double p, double i, double d, int choice);
 };

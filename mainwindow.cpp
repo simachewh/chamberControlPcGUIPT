@@ -62,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(communication->pidController, SIGNAL(stepsDone(bool)),
             this->ui->stopButton, SLOT(setDisabled(bool)));
 
+    connect(this, SIGNAL(testStoped(bool)),
+            communication->pidController, SLOT(on_stepsDone(bool)));
+
 }
 
 MainWindow::~MainWindow()
@@ -80,12 +83,30 @@ void MainWindow::populateProgramsList(){
     ui->programsListView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->programsListView->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    ui->programsListView->setRootIndex(programsListModel->index(DataBackup::PROGRAMS_DIR_PATH));
+    ui->programsListView->setRootIndex(programsListModel
+                                       ->index(DataBackup::PROGRAMS_DIR_PATH));
     programsListModel->setRootPath(DataBackup::PROGRAMS_DIR_PATH);
 
     //trying to select the first item by default, not working correctly
     //ui->programsListView->setSelection(new QItemSelectionModel(programsListModel));
     ui->programsListView->setCurrentIndex(programsListModel->index(0,0));
+}
+
+void MainWindow::populatePlotList()
+{
+    QFileSystemModel *plotListModel = new QFileSystemModel();
+    plotListModel->setFilter(QDir::Files);
+    ui->plotListView->setModel(plotListModel);
+    ui->plotListView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->plotListView->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    ui->plotListView->setRootIndex(
+                plotListModel->index(DataBackup::TST_DIR_PATH));
+    plotListModel->setRootPath(DataBackup::TST_DIR_PATH);
+
+    //trying to select the first item by default, not working correctly
+    //ui->programsListView->setSelection(new QItemSelectionModel(programsListModel));
+    ui->plotListView->setCurrentIndex(plotListModel->index(0,0));
 }
 
 void MainWindow::on_newProgramButton_clicked()
@@ -109,16 +130,20 @@ void MainWindow::on_programsListView_clicked(const QModelIndex &index)
 
     ui->stepsTableView->setModel(stepModel);
 
-    if(!ui->loadProgramButton->isEnabled()){
+    if(!ui->loadProgramButton->isEnabled() && communication->pidController->
+            controlCommands->isIdle()){
         ui->loadProgramButton->setEnabled(true);
     }
-    if(!ui->renameProgramButton->isEnabled()){
+    if(!ui->renameProgramButton->isEnabled() && communication->pidController->
+            controlCommands->isIdle()){
         ui->renameProgramButton->setEnabled(true);
     }
-    if(!ui->deleteProgramButton->isEnabled()){
+    if(!ui->deleteProgramButton->isEnabled() && communication->pidController->
+            controlCommands->isIdle()){
         ui->deleteProgramButton->setEnabled(true);
     }
-    if(!ui->startButton->isEnabled()){
+    if(!ui->startButton->isEnabled() && communication->pidController->
+            controlCommands->isIdle()){
         ui->startButton->setEnabled(true);
     }
     if(!ui->addStepOnSelectedButton->isEnabled())
@@ -372,6 +397,10 @@ void MainWindow::initStyle(){
 
     ui->stepsTableView->setAlternatingRowColors(true);
     ui->stepsTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ///Aux tab
+    QStringList items;
+    items << "1" << "2" << "3" << "4" << "5" << "6" << "7" << "8" << "9" << "10";
+    ui->intervalComboBox->insertItems(0, items);
 
     //! options tab !//
     QButtonGroup *optionsButtonGroup = new QButtonGroup(this);
@@ -398,6 +427,9 @@ void MainWindow::initStyle(){
     ui->cycleLineEdit->setPlaceholderText("1");
     ui->quickStartButton->setEnabled(false);
     ui->quickStopButton->setEnabled(false);
+
+    populatePlotList();
+    populateProgramsList();
 }
 void MainWindow::programTabInit()
 {
@@ -406,7 +438,7 @@ void MainWindow::programTabInit()
     ui->renameProgramButton->setEnabled(false);
     ui->deleteProgramButton->setEnabled(false);
     ui->startButton->setEnabled(false);
-    populateProgramsList();
+
 }
 
 void MainWindow::monitorTabInit()
@@ -424,17 +456,16 @@ void MainWindow::optionsTabInit()
 void MainWindow::quickStartTabInit()
 {
     this->setWindowTitle("Climate Chamber - Quick Start");
-//    quickPgm->setProgramName("untitled");
-//    quickPgm->setCycle(1);
-//    StepsModel *stepsModel = new StepsModel();
-    //stepsModel->setProgramToShow(quickPgm);
-//    stepsModel->setProgramToShow(new Program());
-//    ui->quickStartTableView->setModel(stepsModel);
 }
 
 void MainWindow::auxTabInit()
 {
+    QSettings setting;
     this->setWindowTitle("Climate Chamber - AUX Data");
+    ui->updateIntervalButton->setEnabled(false);
+    ui->intervalComboBox->setCurrentIndex(
+                setting.value(Controller::PlotInterval, 0).toInt() - 1);
+
 }
 
 void MainWindow::on_tabWidget_currentChanged(int index)
@@ -538,12 +569,13 @@ void MainWindow::on_stopButton_clicked()
     if(reply == QMessageBox::No){
         return;
     }else if(reply == QMessageBox::Yes){
-        communication->pidController->controlCommands->setIdle(true);
+        //communication->pidController->controlCommands->setIdle(true);
         //NOTE: for some reson this next line causes the app to crash.
         //it is possible to comment it out, but if used can save some memory
     //    communication->pidController->testPgm = new Program();
+        emit testStoped(true);
         ui->stopButton->setEnabled(false);
-        communication->pidController->timer->stop();
+        //communication->pidController->stepTimer->stop();
         on_testFinished();
     }
 }
@@ -886,4 +918,36 @@ void MainWindow::on_sysParamChangesButto_clicked()
     setting.setValue("point", ui->pointLineEdit->text());
     setting.setValue("max", ui->maxHighLineEdit->text());
     setting.setValue("min", ui->maxLowLineEdit->text());
+}
+
+void MainWindow::on_intervalComboBox_activated(const QString &arg1)
+{
+    ui->updateIntervalButton->setEnabled(true);
+}
+
+void MainWindow::on_updateIntervalButton_clicked()
+{
+    QSettings setting;
+    setting.setValue(Controller::PlotInterval, ui->intervalComboBox->currentText());
+}
+
+void MainWindow::on_viewButton_clicked()
+{
+    QVector<double> temp, humid, time;
+    DataBackup db;
+    db.loadPlot(ui->plotListView->currentIndex().data().toString(),
+                &temp, &humid, &time);
+    QCustomPlot *plot = new QCustomPlot();
+
+    ui->plotWidget->addGraph();
+    ui->plotWidget->graph(0)->addData(temp, time);
+    ui->plotWidget->xAxis->setLabel("Temperature");
+    ui->plotWidget->xAxis->setRange(-40, 150);
+    ui->plotWidget->yAxis->setLabel("Time");
+    ui->plotWidget->yAxis->setRange(0, 5);
+    qDebug() << temp;
+    ui->plotWidget->replot();
+    ui->plotWidget->removeGraph(0);
+//    plot->show();
+//    ui->plotFrame->layout()->addWidget(plot);
 }

@@ -2,7 +2,7 @@
 
 Step::Step(QObject *parent) : QObject(parent)
 {
-
+    completed = false;
 }
 
 int Step::getStepNumber() const{
@@ -124,4 +124,17 @@ bool Step::operator ==(const Step &step){
             minutes == step.minutes &&
             waiting == step.waiting;
 }
+bool Step::getCompleted() const
+{
+    return completed;
+}
+
+void Step::setCompleted(bool value)
+{
+    ///NOTE: if value is changing from true to false
+    /// some special attetion should be paid. Must notify the user,
+    /// must show on plot ...
+    completed = value;
+}
+
 

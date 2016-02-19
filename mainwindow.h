@@ -18,6 +18,8 @@
 #include "addpid.h"
 #include "pidlistmodel.h"
 
+#include "qcustomplot.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +44,7 @@ public:
     void populateHumidPID();
 signals:
     void quickStepAboutToAdd();
+    void testStoped(bool);
 private slots:
 
     void initStyle();
@@ -110,8 +113,16 @@ private slots:
 
     void on_sysParamChangesButto_clicked();
 
+    void on_intervalComboBox_activated(const QString &arg1);
+
+    void on_updateIntervalButton_clicked();
+
+    void on_viewButton_clicked();
+
 public slots:
     void populateProgramsList();
+
+    void populatePlotList();
 
     void on_humidPowerChange(int value);
     void on_tempPowerChange(int value);
@@ -123,7 +134,6 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Communication *communication;
-    QSettings settings;
 
     //Program *quickPgm; // removed for resons explained in the constructor
     //check details at in the implementation file. (.cpp)

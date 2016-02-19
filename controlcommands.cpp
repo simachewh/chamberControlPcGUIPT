@@ -93,6 +93,7 @@ QByteArray ControlCommands::idleCommand(){
     commandIdeal->append(zero);
     commandIdeal->append(capO);
     commandIdeal->append(zeros);
+    commandIdeal->append(etx);
     commandIdeal->append(qMark);
     commandIdeal->append(lineBreak);
 

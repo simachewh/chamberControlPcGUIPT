@@ -4,12 +4,16 @@ const QString DataBackup::PROGRAMS_DIR_NAME = "programs";
 const QString DataBackup::PRGM_FILE_EXT = ".PGM";
 const QString DataBackup::PID_DIR_NAME = "pids";
 const QString DataBackup::TXT_FILE_EXT = ".txt";
+const QString DataBackup::TST_DIR_NAME = "tests";
 
 
 const QString DataBackup::PROGRAMS_DIR_PATH = QDir::current().path()
         + QDir::separator() + DataBackup::PROGRAMS_DIR_NAME;
 const QString DataBackup::PID_DIR_PATH = QDir::current().path()
         + QDir::separator() + DataBackup::PROGRAMS_DIR_NAME;
+
+const QString DataBackup::TST_DIR_PATH = QDir::current().path()
+        + QDir::separator() + DataBackup::TST_DIR_NAME;
 
 DataBackup::DataBackup(QObject *parent) : QObject(parent)
 {
@@ -90,7 +94,7 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
     }else{
         isAdded = false;
     }
-
+    prgmFile.close();
     return isAdded;
 }
 
@@ -162,7 +166,8 @@ QString DataBackup::fileLives(File_Type type, QString name)
                 + name + PRGM_FILE_EXT;
         break;
     case TST_DATA:
-        path = "";
+        path = TST_DIR_PATH + QDir::separator()
+                + name + TXT_FILE_EXT;
         break;
     case SYS_BOOT:
         path = "";
@@ -251,6 +256,46 @@ QList<PID> DataBackup::loadPIDList(int choice)
     return pidList;
 }
 
+bool DataBackup::appendPlot(QString prgmName, double temp, double humid,
+                            int elapsedMinutes)
+{
+    ///TODO: what to do if two same program run in one day.
+    /// maybe at the end of the test rename this file to smt that
+    /// doesn't exist already.
+    bool plotAded = false;
+    checkDir(TST_DIR_NAME);
+    QString appandableFile = prgmName +
+            QDate().currentDate().toString("dd-MM-yyyy") +
+            "-pl";
+    QString path = TST_DIR_PATH + QDir().separator()
+            + appandableFile +  TXT_FILE_EXT;
+
+    QFile plotFile(path);
+    plotAded = plotFile.open(QIODevice::Append);
+    QTextStream ts(&plotFile);
+    ts << temp << "," << humid << "," << elapsedMinutes << endl;
+//    ts.flush();
+    plotFile.close();
+}
+
+void DataBackup::loadPlot(QString name, QVector<double> *temp, QVector<double> *humid, QVector<double> *time)
+{
+    QString path = TST_DIR_PATH + QDir().separator()
+            + name;
+    QFile file(path);
+    QTextStream ts(&file);
+    if(!file.open(QIODevice::ReadOnly)){
+        return;
+    }
+    while(!ts.atEnd()){
+        QString line = ts.readLine();
+        QStringList list = line.split(",");
+        temp->append(list[0].toDouble());
+        humid->append(list[1].toDouble());
+        time->append(list[2].toDouble());
+    }
+}
+
 void DataBackup::replacePIDList(QList<PID> pidList, int choice)
 {
     QString name = "temperature";
@@ -278,6 +323,39 @@ bool DataBackup::createDir(QString dirName){
         dirCreated = appDir.mkdir(dirName);
     }
     return dirCreated;
+}
+
+void DataBackup::on_testStarted(QString prgmName)
+{
+    checkDir(TST_DIR_NAME);
+    QString appandableFile = prgmName +
+            QDate().currentDate().toString("dd-MM-yyyy") +
+            "-pl";
+    QString path = fileLives(TST_DATA, appandableFile);
+    if(path.isEmpty()){
+        path = TST_DIR_PATH + QDir().separator()
+                + appandableFile +  TXT_FILE_EXT;
+    }
+
+    QFile plotFile(path);
+    plotFile.open(QIODevice::Append);
+    plotFile.close();
+}
+
+void DataBackup::on_testFinished(QString prgmName)
+{
+    checkDir(TST_DIR_NAME);
+    QString appandableFile = prgmName +
+            QDate().currentDate().toString("dd-MM-yyyy") +
+            "-pl";
+    QString path = TST_DIR_PATH + QDir().separator() +
+            appandableFile +  TXT_FILE_EXT;
+
+    QFile plotFile(path);
+    plotFile.rename(TST_DIR_PATH + QDir().separator() +
+                    prgmName +
+                    QDateTime().currentDateTime().toString("dd-MM-yyyy-HH-mm-SS") +
+                    TXT_FILE_EXT);
 }
 
 void DataBackup::on_pidFormSubmited(double p, double i, double d, int choice)

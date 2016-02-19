@@ -64,13 +64,10 @@ bool PidListModel::insertRow(int row, const QModelIndex &parent)
 void PidListModel::chooseDefault(int index)
 {
     //CONSL:
-    qDebug() << "Index " << index << "val : " <<pidList.at(index).toString();;
     for(int i = 0; i < pidList.size(); i++){
         pidList[i].setChoosen(false);
-        qDebug() << "Setting to false" << pidList.at(i).getChoosen();
     }
     pidList[index].setChoosen(true);
-    qDebug() << "Setting to true" << pidList.at(index).getChoosen();
 }
 
 QList<PID> PidListModel::getPidList()

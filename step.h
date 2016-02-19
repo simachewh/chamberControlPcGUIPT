@@ -60,6 +60,9 @@ public:
      */
     bool operator ==(const Step &step);
 
+    bool getCompleted() const;
+    void setCompleted(bool value);
+
 private:
 
     int stepNumber;
@@ -67,13 +70,15 @@ private:
     double humidity;
     double hours;
     double minutes;
-    //this is changed from int to bool, follow possible issues.
+    //FIXME:this is changed from int to bool, follow possible issues.
     bool waiting;
 
     int hR;
     int one;
     int two;
     int three;
+
+    bool completed;
 
 signals:
     void stepNumberChanged(int);

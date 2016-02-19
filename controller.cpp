@@ -6,6 +6,7 @@ const QString Controller::Temp_D = "dtemp";
 const QString Controller::Humid_P = "phumid";
 const QString Controller::Humid_I = "ihumid";
 const QString Controller::Humid_D = "dhumid";
+const QString Controller::PlotInterval = "plotInterval";
 
 Program *Controller::getTestPgm() const
 {
@@ -38,9 +39,12 @@ void Controller::setHumidityPID(PID *value)
 }
 Controller::Controller(QObject *parent) : QObject(parent)
 { 
+    //load settings
+    QSettings settings;
     testPgm = new Program(parent);
     chamberParams = new Chamber(parent);
     controlCommands = new ControlCommands(parent);
+    db = new DataBackup(parent);
 
     chamberParams->setDryTemprature(0);
     chamberParams->setHumidity(0);
@@ -48,9 +52,10 @@ Controller::Controller(QObject *parent) : QObject(parent)
     temperaturePID = new PID(parent);
     humidityPID = new PID(parent);
 
-    timer = new QTimer(parent);
+    stepTimer = new QTimer(parent);
+    plotTimer = new QTimer(parent);
+    plotTimer->setInterval(settings.value(PlotInterval).toInt() * 2000);
 
-    ///initialize class members
     previousStep = new Step();
     currentStep = new Step();
     nextStep = new Step();
@@ -58,29 +63,29 @@ Controller::Controller(QObject *parent) : QObject(parent)
 
     temperaturePID->setDt(2);
     humidityPID->setDt(2.3);
-    //load settings
-    QSettings settings;
+
     //assign temperature PID settings to system
-    temperaturePID->setKp(settings.value("ptemp", 0).toDouble());
-    temperaturePID->setKi(settings.value("itemp", 0).toDouble());
-    temperaturePID->setKd(settings.value("dtemp", 0).toDouble());
+    temperaturePID->setKp(settings.value(Temp_P, 0).toDouble());
+    temperaturePID->setKi(settings.value(Temp_I, 0).toDouble());
+    temperaturePID->setKd(settings.value(Temp_D, 0).toDouble());
 
     //assign humidity PID settings to system
-    humidityPID->setKp(settings.value("phumid", 0).toDouble());
-    humidityPID->setKi(settings.value("ihumid", 0).toDouble());
-    humidityPID->setKd(settings.value("dhumid", 0).toDouble());
+    humidityPID->setKp(settings.value(Humid_P, 0).toDouble());
+    humidityPID->setKi(settings.value(Humid_I, 0).toDouble());
+    humidityPID->setKd(settings.value(Humid_D, 0).toDouble());
 
     /// self connection
     connect(this, SIGNAL(stepsDone(bool)),
             this, SLOT(on_stepsDone(bool)));
 
     /// timer connections
-    connect(timer, SIGNAL(timeout()),
+    connect(stepTimer, SIGNAL(timeout()),
             this, SLOT(changeStep()));
 
     /// Program connections
     connect(this->testPgm, SIGNAL(currentStepChanged(int)),
             this, SLOT(on_stepChange()));
+
     connect(testPgm, SIGNAL(stepsChanged()),
             this, SLOT(on_stepsChanged()));
 
@@ -90,21 +95,31 @@ Controller::Controller(QObject *parent) : QObject(parent)
 
     connect(chamberParams, SIGNAL(humidityChanged(double)),
             humidityPID, SLOT(setMeasuredValue(double)));
-
-    ///
-    connect(chamberParams, SIGNAL(dryTemperatureChanged(double)),
-            this, SLOT(on_TemperatureRealChanged(double)));
+    /// NOTE: this connection must come after the two connections above
+    /// meaning the connections of new chamber values to pid measured values.
+    /// This is because bothe real values on temperature and humidity must be ready
+    /// for the slot in this connection, on_realValuesCollected(); to work properly.
+    /// if this connection is called before those two, the program will behave
+    /// unexpectdly.
+    connect(chamberParams, SIGNAL(humidityChanged(double)),
+            this, SLOT(on_realValuesCollected()));
 
     //TODO: set up connection between the both pid's setvalues and the
     //the controllers change in stepps (the next set value)
     connect(this, SIGNAL(currentStepChanged()),
             this, SLOT(on_stepChange()));
 
+    connect(this, SIGNAL(targetReached()),
+            this, SLOT(changeStep()));
+
+    connect(plotTimer, SIGNAL(timeout()),
+            this, SLOT(on_plotTimerOut()));
+
 }
 
 Controller::~Controller()
 {
-    delete timer;
+    delete stepTimer;
 }
 
 void Controller::controlTestRun()
@@ -120,18 +135,31 @@ void Controller::controlTestRun()
 void Controller::setUpStart()
 {
     qDebug() << "Controller::setUpStart: entered";
-    timer->setSingleShot(true);
+    stepTimer->setSingleShot(true);
     int hrs = currentStep->getHours();
     int min = currentStep->getMinutes();
     int timeOut = hrs * 3600000;
     timeOut += (min * 60000);
-    timer->start(timeOut);
-//    timer->start(2000);
+    stepTimer->start(timeOut);
+    plotTimer->start();
+//    stepTimer->start(2000);
 }
 
 void Controller::changeStep()
 {
-    if(testPgm->goToNextStep()){
+    if(!currentStep->getCompleted() && currentStep->getWaiting()){
+        return;
+    }
+    if(currentStep->getCompleted() && stepTimer->remainingTime() > 0){
+        if(testPgm->goToNextStep()){
+            setCurrentStep(testPgm->getCurrentStep());
+            setNextStep(testPgm->getNextStep());
+            setPreviousStep(testPgm->getPreviousStep());
+        }else{
+            emit stepsDone(true);
+        }
+        stepTimer->stop();
+    }else if(testPgm->goToNextStep()){
         setCurrentStep(testPgm->getCurrentStep());
         setNextStep(testPgm->getNextStep());
         setPreviousStep(testPgm->getPreviousStep());
@@ -162,6 +190,8 @@ void Controller::runDeviceControll()
     controlCommands->setHumidityPower(humidityPID->getOutput());
 
     if (temperaturePID->getOutput() <= 0){
+        controlCommands->setV1(on);
+        controlCommands->setC1(on);
         controlCommands->switchHeaters(off);
     }else if(temperaturePID->getOutput() > 0){
         controlCommands->switchHeaters(on);
@@ -174,12 +204,18 @@ void Controller::runDeviceControll()
         controlCommands->switchHumidifiers(on);
     }
 
-    int timeLeft = timer->remainingTime();
+    int timeLeft = stepTimer->remainingTime();
 }
 
 void Controller::on_stepsDone(bool)
 {
+    DataBackup db;
+    stepTimer->stop();
+    plotTimer->stop();
+    controlCommands->setIdle(false);
     controlCommands->resetAll();
+    db.on_testFinished(testPgm->getProgramName());
+
     qDebug() << "Steps are finished and reset all devices";
 }
 
@@ -194,6 +230,22 @@ void Controller::on_stepsChanged()
     humidityPID->setSetValue(currentStep->getHumidity());
 }
 
+void Controller::on_plotTimerOut()
+{
+    ///TODO: save records here
+    double temp = temperaturePID->getMeasuredValue();
+    double humid = humidityPID->getMeasuredValue();
+    int totalMinutes =currentStep->getHours() * 60 + currentStep->getMinutes();
+    int remainingMinutes = (stepTimer->remainingTime() / 1000) / 60;
+    int elapsedMinutes = totalMinutes - remainingMinutes;
+    ///CNSL:
+    qDebug() << totalMinutes << " times in munutes "
+             << remainingMinutes << "=" << elapsedMinutes;
+    DataBackup db;
+    ///Note: how would this function know the file it is looking for
+    db.appendPlot(testPgm->getProgramName(), temp, humid, elapsedMinutes);
+}
+
 void Controller::startTest(QString programName)
 {
     DataBackup db;
@@ -205,6 +257,7 @@ void Controller::startTest(QString programName)
              << testPgm->getCurrentStep()->getTemperature();
 
     controlCommands->setIdle(false);
+    db.on_testStarted(programName);
     setUpStart();
     controlTestRun();
 }
@@ -256,6 +309,7 @@ bool Controller::isDefaultSet()
 
 void Controller::startQuickTest(Program *pgm)
 {
+
     setTestPgm(pgm);
     //TODO: prepare start up here
     currentStep = testPgm->getCurrentStep();
@@ -266,8 +320,28 @@ void Controller::startQuickTest(Program *pgm)
 
 }
 
-void Controller::on_TemperatureRealChanged(double value)
+void Controller::on_temperatureRealChanged(double value)
 {
+
+}
+
+void Controller::on_humidityRealChanged(double value)
+{
+
+}
+
+void Controller::on_realValuesCollected()
+{
+    double temp = temperaturePID->getMeasuredValue();
+    double humid = humidityPID->getMeasuredValue();
+
+    if(temp <= currentStep->getTemperature() + 0.01 &&
+            temp >= currentStep->getTemperature() -0.01 &&
+            humid <= currentStep->getHumidity() + 0.1 &&
+            humid >= currentStep->getHumidity() - 0.1){
+        currentStep->setCompleted(true);
+        emit targetReached();
+    }
 }
 
 Step *Controller::getCurrentStep() const
