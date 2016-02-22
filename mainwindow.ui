@@ -88,7 +88,7 @@ QTabBar::tab:!selected {
 }</string>
        </property>
        <property name="currentIndex">
-        <number>2</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="monitorTab">
         <attribute name="title">
@@ -1804,13 +1804,13 @@ QToolButton:checked
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>
-   <header location="global">qcustomplot.h</header>
+   <header>qcustomplot.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="options-icons.qrc"/>
   <include location="res.qrc"/>
+  <include location="options-icons.qrc"/>
  </resources>
  <connections/>
 </ui>

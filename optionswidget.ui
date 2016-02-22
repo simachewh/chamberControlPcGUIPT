@@ -14,79 +14,90 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="1">
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
-     </property>
-     <property name="currentIndex">
-      <number>2</number>
-     </property>
-     <widget class="QWidget" name="systemInfoPage"/>
-     <widget class="QWidget" name="systemParamPage"/>
-     <widget class="QWidget" name="conrolParamPage">
-      <widget class="QLabel" name="testlabel">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>80</y>
-         <width>291</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:48pt;&quot;&gt;Test class&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </widget>
-    </widget>
-   </item>
    <item row="0" column="0">
-    <widget class="QFrame" name="frame">
+    <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Sunken</enum>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox
+{
+	border: none;
+	border-radius: 4px;	
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
+}</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
       <item>
-       <widget class="QPushButton" name="sysInfoPushButton">
+       <widget class="QToolButton" name="sysInfoToolButton">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 3px;
+         <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-	border: none;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), 		stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 	rgba(229, 240, 238, 255));
+	border: none;	
+	background-color: rgb(208, 241, 247);
 	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
+	background-color: rgb(240, 119, 70);
 }</string>
         </property>
         <property name="text">
          <string>System Info</string>
         </property>
         <property name="icon">
-         <iconset resource="options-icons.qrc">
-          <normaloff>:/op-ico/images/info.png</normaloff>:/op-ico/images/info.png</iconset>
+         <iconset resource="res.qrc">
+          <normaloff>:/icons/images/info.png</normaloff>:/icons/images/info.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -94,36 +105,59 @@ QPushButton:flat
           <height>48</height>
          </size>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="sysParamPushButton">
+       <widget class="QToolButton" name="sysParamToolButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 3px;
+         <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-	border: none;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), 		stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 	rgba(229, 240, 238, 255));
+	border: none;		
+	background-color: rgb(208, 241, 247);
 	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
+	background-color: rgb(240, 119, 70);
 }</string>
         </property>
         <property name="text">
          <string>System Params</string>
         </property>
         <property name="icon">
-         <iconset resource="options-icons.qrc">
-          <normaloff>:/op-ico/images/settings.png</normaloff>:/op-ico/images/settings.png</iconset>
+         <iconset resource="res.qrc">
+          <normaloff>:/icons/images/settings.png</normaloff>:/icons/images/settings.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -131,36 +165,53 @@ QPushButton:flat
           <height>48</height>
          </size>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="controlParamPushButton">
+       <widget class="QToolButton" name="controlParamToolButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton
-{
-	text-align: bottom center;
-	padding: 5px;
+         <string notr="true">QToolButton
+ {
 	border: none;
+	border-radius: 4px;
+	background-color: rgb(145, 164, 202);
+	background-color: rgb(119, 205, 240);
 }
 
-QPushButton:hover:!pressed
+QToolButton:hover:!pressed
 {
-	border: none;
-	background-color: qlineargradient(spread:pad, x1:0.541, y1:1, x2:0.530278, y2:0.188, stop:0 rgba(255, 255, 255, 255), 		stop:0.444976 rgba(212, 230, 226, 255), stop:0.827751 	rgba(229, 240, 238, 255));
+	border: none;	
+	background-color: rgb(208, 241, 247);
 	border-style: outset;
 }
 
-QPushButton:flat
+QToolButton:checked
 {
 	border: none;
+	background-color: rgb(240, 119, 70);
 }</string>
         </property>
         <property name="text">
          <string>Control Params</string>
         </property>
         <property name="icon">
-         <iconset resource="options-icons.qrc">
-          <normaloff>:/op-ico/images/control.png</normaloff>:/op-ico/images/control.png</iconset>
+         <iconset resource="res.qrc">
+          <normaloff>:/icons/images/control.png</normaloff>:/icons/images/control.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -168,10 +219,19 @@ QPushButton:flat
           <height>48</height>
          </size>
         </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="autoExclusive">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
        </widget>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <spacer name="verticalSpacer_3">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
@@ -186,9 +246,232 @@ QPushButton:flat
      </layout>
     </widget>
    </item>
+   <item row="0" column="1">
+    <layout class="QGridLayout" name="optionsTabGridLayout">
+     <item row="1" column="1">
+      <widget class="QStackedWidget" name="optionsStackedWidget">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="currentIndex">
+        <number>2</number>
+       </property>
+       <widget class="QWidget" name="systemInfoPage">
+        <widget class="QLabel" name="label_6">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>10</y>
+           <width>311</width>
+           <height>17</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Climate Chamber controller and monitor 1.0</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="systemParamsPage">
+        <widget class="QWidget" name="layoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>10</y>
+           <width>154</width>
+           <height>164</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Max High:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="maxHighLineEdit"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Max Low:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLineEdit" name="maxLowLineEdit"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Entry Point:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLineEdit" name="pointLineEdit"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QPushButton" name="sysParamChangesButto">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>180</y>
+           <width>101</width>
+           <height>27</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Save Changes</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="controlParamsPage">
+        <layout class="QGridLayout" name="gridLayout_18">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout_12">
+           <item row="0" column="1">
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMinimumSize</enum>
+             </property>
+             <item>
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="makeDefaultButton">
+               <property name="text">
+                <string>Make Default</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="plusHPButton">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="options-icons.qrc">
+                 <normaloff>:/images/More.png</normaloff>:/images/More.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="minusHPButton">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="options-icons.qrc">
+                 <normaloff>:/images/Less.png</normaloff>:/images/Less.png</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>24</width>
+                 <height>24</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>10</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="0">
+            <widget class="QTabWidget" name="pidTabWidget">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="tempPidTab">
+              <attribute name="title">
+               <string>Temperature PID</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_19">
+               <item row="0" column="0">
+                <layout class="QGridLayout" name="gridLayout_14">
+                 <item row="1" column="0">
+                  <widget class="QListView" name="tempPIDListView">
+                   <property name="selectionBehavior">
+                    <enum>QAbstractItemView::SelectItems</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="humidPidTab">
+              <attribute name="title">
+               <string>Humidity PID</string>
+              </attribute>
+              <layout class="QGridLayout" name="gridLayout_16">
+               <item row="0" column="0">
+                <layout class="QGridLayout" name="gridLayout_15">
+                 <item row="0" column="0">
+                  <widget class="QListView" name="humidPIDListView"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
  <resources>
+  <include location="res.qrc"/>
   <include location="options-icons.qrc"/>
  </resources>
  <connections/>

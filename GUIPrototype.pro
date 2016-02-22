@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     pid.cpp \
     addpid.cpp \
     pidlistmodel.cpp \
-    qcustomplot.cpp
+    qcustomplot.cpp \
+    appsettings.cpp
 
 HEADERS  += mainwindow.h \
     addprogram.h \
@@ -49,7 +50,8 @@ HEADERS  += mainwindow.h \
     pid.h \
     addpid.h \
     pidlistmodel.h \
-    qcustomplot.h
+    qcustomplot.h \
+    appsettings.h
 
 FORMS    += mainwindow.ui \
     addprogram.ui \

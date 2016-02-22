@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "optionswidget.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -64,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this, SIGNAL(testStoped(bool)),
             communication->pidController, SLOT(on_stepsDone(bool)));
+
+//    ui->tabWidget->addTab(new OptionsWidget(this), "test");
 
 }
 
@@ -945,6 +949,8 @@ void MainWindow::on_viewButton_clicked()
     ui->plotWidget->xAxis->setRange(-40, 150);
     ui->plotWidget->yAxis->setLabel("Time");
     ui->plotWidget->yAxis->setRange(0, 5);
+    ui->plotWidget->xAxis2->setVisible(true);
+    ui->plotWidget->xAxis2->setLabel("Humidity");
     qDebug() << temp;
     ui->plotWidget->replot();
     ui->plotWidget->removeGraph(0);
