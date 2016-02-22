@@ -68,7 +68,12 @@ MainWindow::MainWindow(QWidget *parent) :
             communication->pidController, SLOT(on_stepsDone(bool)));
 
 //    ui->tabWidget->addTab(new OptionsWidget(this), "test");
-
+    if(!communication->isPortNameDefaultSet()){
+QMessageBox::information(this, "Info", "Serial Port Name default has not been set yet.\n"
+                                              "A temporary name \"ttyUSB1\" is in use.\n"
+                                              "Remember to set defaults and restart.\n",
+                                QMessageBox::Ok);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -389,6 +394,7 @@ void MainWindow::on_humidPowerChange(int value)
 }
 
 void MainWindow::initStyle(){
+    QSettings setting;
     ui->tabWidget->setCurrentIndex(MONITOR_INDEX);
     ui->loadProgramButton->setEnabled(false);
     ui->renameProgramButton->setEnabled(false);
@@ -416,6 +422,20 @@ void MainWindow::initStyle(){
     ui->maxHighLineEdit->setValidator(new QIntValidator(25, 150, this));
     ui->maxLowLineEdit->setValidator(new QIntValidator(-10, -40, this));
     ui->pointLineEdit->setValidator(new QIntValidator(20, 40));
+
+    ///populate available serial port names into the combobox
+    QString portName = setting.value("portName").toString();
+    int si = 0;
+    foreach (QSerialPortInfo portInfo,
+             communication->serialPortInfo.availablePorts()) {
+        QString name = portInfo.portName();
+        ui->serialPortComboBox->addItem(name, name);
+        if(portName.compare(name, Qt::CaseSensitive) == 0){
+            ui->serialPortComboBox->setCurrentIndex(si);
+        }
+        si++;
+    }
+    ui->serialPortNameUpdateButton->setEnabled(false);
     //! options tab - pid params !//
 
 
@@ -924,11 +944,6 @@ void MainWindow::on_sysParamChangesButto_clicked()
     setting.setValue("min", ui->maxLowLineEdit->text());
 }
 
-void MainWindow::on_intervalComboBox_activated(const QString &arg1)
-{
-    ui->updateIntervalButton->setEnabled(true);
-}
-
 void MainWindow::on_updateIntervalButton_clicked()
 {
     QSettings setting;
@@ -956,4 +971,22 @@ void MainWindow::on_viewButton_clicked()
     ui->plotWidget->removeGraph(0);
 //    plot->show();
 //    ui->plotFrame->layout()->addWidget(plot);
+}
+
+void MainWindow::on_intervalComboBox_currentIndexChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1)
+    ui->updateIntervalButton->setEnabled(true);
+}
+
+void MainWindow::on_serialPortComboBox_currentIndexChanged(int index)
+{
+    Q_UNUSED(index)
+    ui->serialPortNameUpdateButton->setEnabled(true);
+}
+
+void MainWindow::on_serialPortNameUpdateButton_clicked()
+{
+    QSettings setting;
+    setting.setValue("portName", ui->serialPortComboBox->currentData().toString());
 }

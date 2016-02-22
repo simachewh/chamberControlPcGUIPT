@@ -113,11 +113,15 @@ private slots:
 
     void on_sysParamChangesButto_clicked();
 
-    void on_intervalComboBox_activated(const QString &arg1);
-
     void on_updateIntervalButton_clicked();
 
     void on_viewButton_clicked();
+
+    void on_intervalComboBox_currentIndexChanged(const QString &arg1);
+
+    void on_serialPortComboBox_currentIndexChanged(int index);
+
+    void on_serialPortNameUpdateButton_clicked();
 
 public slots:
     void populateProgramsList();

@@ -33,12 +33,16 @@ private:
 
     int stateCounter;
 
+    QSettings settings;
+
 public:
 
    // ControlPC *controlParams;
     Controller *pidController;
 
     static QSerialPort *serial;
+
+    QSerialPortInfo serialPortInfo;
 
     /**
      * @brief Communication This constructor initializes the QSerialPort object and
@@ -90,11 +94,14 @@ public:
 
     void stateCounterIncrement();
 
-
-
-
     bool getChamberConnected() const;
 
+    /**
+     * @brief isPortNameDefaultSet Checkes if the port name default has been
+     * saved into the application settings.
+     * @return true if the port name exists in application settings, fale if not.
+     */
+    bool isPortNameDefaultSet();
 signals:
     void newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND);
     void replyReady(ControlCommands::CH_COMMAND);

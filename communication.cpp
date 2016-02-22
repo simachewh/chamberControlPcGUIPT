@@ -55,7 +55,7 @@ Communication::~Communication(){
 
 bool Communication::openPort(){
     bool open = false;
-    serial->setPortName("ttyUSB1"); //the name of the serial port should not be hard coded
+    serial->setPortName(settings.value("portName","ttyUSB1").toString());
     if(!serial->isOpen()){
         open = serial->open(QIODevice::ReadWrite);
         serial->setBaudRate(QSerialPort::Baud9600);
@@ -243,6 +243,9 @@ void Communication::on_stateCounterChanged(int value)
 {
     if(value > 2){
         emit connectionLost(true);
+        ///when connection is lost, try opening port
+        /// after informing the user.
+        openPort();
     }
 
     if(value == 0){
@@ -255,6 +258,10 @@ void Communication::startIdelCommunication(){
     qDebug() << "Communication::startIdelCommunication(): entered";
 
     sendData(pidController->controlCommands->idleCommand());
+}
+
+bool Communication::isPortNameDefaultSet(){
+    return !settings.value("portName", "").toString().isEmpty();
 }
 
 bool Communication::isChamberConnected()
