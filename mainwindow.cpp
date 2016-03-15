@@ -69,7 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //    ui->tabWidget->addTab(new OptionsWidget(this), "test");
     if(!communication->isPortNameDefaultSet()){
-QMessageBox::information(this, "Info", "Serial Port Name default has not been set yet.\n"
+        QMessageBox::information(this, "Info",
+                                 "Serial Port Name default has not been set yet.\n"
                                               "A temporary name \"ttyUSB1\" is in use.\n"
                                               "Remember to set defaults and restart.\n",
                                 QMessageBox::Ok);

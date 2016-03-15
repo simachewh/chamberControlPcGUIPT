@@ -26,12 +26,10 @@ SOURCES += main.cpp\
     renamedialog.cpp \
     controller.cpp \
     controlcommands.cpp \
-    optionswidget.cpp \
     pid.cpp \
     addpid.cpp \
     pidlistmodel.cpp \
-    qcustomplot.cpp \
-    appsettings.cpp
+    qcustomplot.cpp
 
 HEADERS  += mainwindow.h \
     addprogram.h \
@@ -46,19 +44,16 @@ HEADERS  += mainwindow.h \
     renamedialog.h \
     controller.h \
     controlcommands.h \
-    optionswidget.h \
     pid.h \
     addpid.h \
     pidlistmodel.h \
-    qcustomplot.h \
-    appsettings.h
+    qcustomplot.h
 
 FORMS    += mainwindow.ui \
     addprogram.ui \
     addstep.ui \
     loadprogram.ui \
     renamedialog.ui \
-    optionswidget.ui \
     addpid.ui
 
 DISTFILES += \
