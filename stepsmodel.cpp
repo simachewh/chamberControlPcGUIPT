@@ -165,7 +165,6 @@ bool StepsModel::insertRows(int row, int count, const QModelIndex &parent)
 bool StepsModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     Q_UNUSED(count)
-    qDebug() << "removeRows: before" << pgmToShow->getNoOfSteps();
     int removed = 0;
     beginRemoveRows(parent, row, row);
 
@@ -176,6 +175,8 @@ bool StepsModel::removeRows(int row, int count, const QModelIndex &parent)
 
     if(removed == 1){
         qDebug() << "removeRows: true" << pgmToShow->getNoOfSteps();
+        DataBackup db;
+        db.replaceProgram(pgmToShow);
         return true;
     }else{
         qDebug() << "removeRows: false" << pgmToShow->getNoOfSteps();
@@ -199,8 +200,6 @@ bool StepsModel::on_addStepFormSubmitted(QString temp, QString humid, QString hr
     openStep->setTwo(two.toInt());
     openStep->setThree(three.toInt());
     openStep->setStepNumber(pgmToShow->getSteps().size());
-    //pgmToShow->addStep(openStep);
-    qDebug() << "open step " << openStep->getTemperature();
     insertRows(pgmToShow->getSteps().size(), 1, QModelIndex());
 
     return true;

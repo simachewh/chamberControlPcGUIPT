@@ -85,6 +85,10 @@ public:
 
     void setCurrentCycle(int value);
 
+    /**
+     * @brief getSteps Returns the steps in a test program.
+     * @return QMap
+     */
     QMap<int, Step*> getSteps() const;
 
     void setSteps(const QMap<int, Step *> value);

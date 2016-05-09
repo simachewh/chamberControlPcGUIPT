@@ -84,6 +84,14 @@ public:
     bool writeStepToFile(Step *step, Program *prgm);
 
     /**
+     * @brief replaceProgram Replaces all contets of the program file with the
+     * steps in the program given as argument.
+     * @param Steps
+     * @return
+     */
+    bool replaceProgram(Program *pgm);
+
+    /**
      * @brief fileLives
      * @param type
      * @param name
@@ -119,6 +127,15 @@ public:
      */
     QList<PID> loadPIDList(int choice);
 
+    /**
+     * @brief appendPlot Appends the current temperature and humidity for use later
+     * when it is needed to build a plot.
+     * @param prgmName
+     * @param temp
+     * @param humid
+     * @param elapsedMinutes
+     * @return
+     */
     bool appendPlot(QString prgmName, double temp, double humid, int elapsedMinutes);
 
     void loadPlot(QString name, QVector<double> *temp, QVector<double> *humid,
@@ -165,6 +182,15 @@ public slots:
 
     void on_testFinished(QString prgmName);
 
+    /**
+     * @brief on_pidFormSubmited Creates a new PID object from the given
+     * arguments. A call to insertPID functin is made to add the new PID to
+     * the list of PIDs in file.
+     * @param p
+     * @param i
+     * @param d
+     * @param choice
+     */
     void on_pidFormSubmited(double p, double i, double d, int choice);
 };
 

@@ -98,15 +98,21 @@ bool DataBackup::writeStepToFile(Step *step, Program *prgm)
     return isAdded;
 }
 
+bool DataBackup::replaceProgram(Program *pgm)
+{
+    saveProgram(pgm);
+    foreach (Step* s, pgm->getSteps().values()) {
+        writeStepToFile(s, pgm);
+    }
+}
+
 void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
 {
-    qDebug() << "DataBackup::loadTestProgram: Entered";
     QString path = fileLives(PRGM, pgmFileName);
     qDebug() << path;
 
     if(path.isEmpty())
     {
-        qDebug() << "DataBackup::loadTestProgram: " << "path is empty";
         return;
     }
 
@@ -115,7 +121,6 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
 
     if(!pgmFile.open(QIODevice::ReadOnly))
     {
-        qDebug() << "DataBackup::loadTestProgram: Program cant open";
         return;
     }
     QMap<int, Step*> *loadedSteps = new QMap<int, Step*>;
@@ -131,7 +136,6 @@ void DataBackup::loadTestProgram(QString pgmFileName, Program *prgm)
             prgm->setCycle(pParams.at(1).toInt());
         }else{
             QStringList stepParams = line.split(':', QString::SkipEmptyParts);
-            qDebug() << "loadTestProgram: steps split size" << stepParams.size();
             foreach (QString s, stepParams) {
                 qDebug() << s ;
             }

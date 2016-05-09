@@ -36,12 +36,20 @@ private:
     QSettings settings;
 
 public:
-
-   // ControlPC *controlParams;
+    /**
+     * @brief pidController The Controller Object.
+     */
     Controller *pidController;
 
+    /**
+     * @brief serial A QSerialPort Object to handle serial communication for this app.
+     */
     static QSerialPort *serial;
 
+    /**
+     * @brief serialPortInfo A QSerialPortInfo object to detect serial ports on the
+     * machine running this app.
+     */
     QSerialPortInfo serialPortInfo;
 
     /**
@@ -124,9 +132,19 @@ public slots:
      */
     QByteArray readData();
     void on_idelStateChanged();
+
+    /**
+     * @brief on_newDataArived
+     * @param newDataArived
+     * @param chCommand
+     */
     void on_newDataArived(QByteArray newDataArived, ControlCommands::CH_COMMAND chCommand);
-    void on_chamberConnectionChanged(bool value);
-    void on_controlReady();
+
+    /**
+     * @brief reply A function that sends data back to the chamber, based on the
+     * command recieved from the chamber which is passed as a parameter.
+     * @param chCommand The command type recived from the chamber.
+     */
     void reply(ControlCommands::CH_COMMAND chCommand);
 
     /**

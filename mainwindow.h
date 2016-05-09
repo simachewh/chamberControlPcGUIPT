@@ -123,6 +123,8 @@ private slots:
 
     void on_serialPortNameUpdateButton_clicked();
 
+    void on_plotListView_clicked(const QModelIndex &index);
+
 public slots:
     void populateProgramsList();
 

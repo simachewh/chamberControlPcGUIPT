@@ -174,16 +174,6 @@ void Communication::on_newDataArived(QByteArray newDataArived,
     }
 }
 
-void Communication::on_chamberConnectionChanged(bool value)
-{
-
-}
-
-void Communication::on_controlReady()
-{
-    //reply()
-}
-
 void Communication::reply(ControlCommands::CH_COMMAND chCommand)
 {
     if(chCommand == ControlCommands::ACK)

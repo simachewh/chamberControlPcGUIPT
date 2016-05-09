@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QCoreApplication::setOrganizationName("technobothnia");
     QCoreApplication::setOrganizationDomain("simachew.com");
     QCoreApplication::setApplicationName("climate_chamber_controller");
+    qDebug() << "QT Version: " << QT_VERSION_STR;
     ui->setupUi(this);    
     communication = new Communication();
 
@@ -513,9 +514,6 @@ void MainWindow::on_removeStepFromSelectedButton_clicked()
     QString pgmName(ui->programsListView->currentIndex().data().toString());
     pgmName = pgmName.left(pgmName.indexOf('.'));
     int selectedRow = ui->stepsTableView->selectionModel()->currentIndex().row();
-    //CONSL:
-    qDebug() << "on_removeStepFromSelectedButton_clicked: selectedRow"
-             << selectedRow;
     StepsModel *stepsModel = (StepsModel*)ui->stepsTableView->model();
     stepsModel->removeRows(selectedRow, 1, QModelIndex());
 }
@@ -990,4 +988,25 @@ void MainWindow::on_serialPortNameUpdateButton_clicked()
 {
     QSettings setting;
     setting.setValue("portName", ui->serialPortComboBox->currentData().toString());
+}
+
+void MainWindow::on_plotListView_clicked(const QModelIndex &index)
+{
+    QVector<double> temp, humid, time;
+    DataBackup db;
+    db.loadPlot(ui->plotListView->currentIndex().data().toString(),
+                &temp, &humid, &time);
+    QCustomPlot *plot = new QCustomPlot();
+
+    ui->plotWidget->addGraph();
+    ui->plotWidget->graph(0)->addData(temp, time);
+    ui->plotWidget->xAxis->setLabel("Temperature");
+    ui->plotWidget->xAxis->setRange(-40, 150);
+    ui->plotWidget->yAxis->setLabel("Time");
+    ui->plotWidget->yAxis->setRange(0, 5);
+    ui->plotWidget->xAxis2->setVisible(true);
+    ui->plotWidget->xAxis2->setLabel("Humidity");
+    qDebug() << temp;
+    ui->plotWidget->replot();
+    ui->plotWidget->removeGraph(0);
 }
